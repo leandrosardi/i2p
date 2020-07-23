@@ -11,6 +11,7 @@ module BlackStack
     many_to_one :buffer_paypal_notification, :class=>:'BlackStack::BufferPayPalNotification', :key=>:id_buffer_paypal_notification
     many_to_one :client, :class=>:'BlackStack::Client', :key=>:id_client
     many_to_one :paypal_subscription, :class=>:'BlackStack::PayPalSubscription', :key=>:id_paypal_subscription
+		many_to_one :previous, :class=>:'BlackStack::Invoice', :key=>:id_previous_invoice
     one_to_many :items, :class=>:'BlackStack::InvoiceItem', :key=>:id_invoice
   
     # compara 2 planes, y retorna TRUE si ambos pueden coexistir en una misma facutra, con un mismo enlace de PayPal
@@ -269,19 +270,75 @@ module BlackStack
       self.save()
     end
   
-    # cambia el estado de la factura de UNPAID a PAID
-    # verifica que el estado de la factura sea NULL o UNPAID
-    # crea los registros contables por el pago de esta factura 
-    def getPaid()
+    # Verifica que el estado de la factura sea NULL o UNPAID.
+    # Cambia el estado de la factura de UNPAID a PAID.
+    # Crea los registros contables por el pago de esta factura: un registro por cada item, y por cada bono del plan en cada item.
+		# Los registros en la table de movimientos se registraran con la fecha del parametro sql_payment_datetime.
+		# Las fechas de expiracion de los movimientos se calculan seguin la fecha del pago.
+		# 
+		# sql_payment_datetime: Fecha-hora del pago. Por defecto es la fecha-hora actual.
+		# 
+    def getPaid(payment_time=nil)
+			payment_time = Time.now() if payment_time.nil?
+		
       if self.canBePaid? == false
         raise "Method BlackStack::Invoice::getPaid requires the current status is nil or unpaid."
       end
       # marco la factura como pagada
       self.status = BlackStack::Invoice::STATUS_PAID
       self.save
+			# expiracion de creditos de la factura anterior
+			i = self.previous
+			if !i.nil?
+				InvoiceItem.where(:id_invoice=>self.id).all { |item|
+					# 
+					BlackStack::Movement.where(:id_invoice_item => item.id).all { |mov|
+						# 
+						if mov.expiration_on_next_payment == true
+							exp = BlackStack::Movement.new
+							exp.id = guid()
+							exp.id_client = mov.id_client
+							exp.create_time = now()
+							exp.type = BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
+							exp.id_user_creator = mov.id_user_creator
+							exp.description = 'Expiration Because Allocation is Renewed'
+							exp.paypal1_amount = 0
+							exp.bonus_amount = 0
+							exp.amount = -mov.amount
+							exp.credits = -mov.credits
+							exp.profits_amount = mov.amount
+							exp.id_invoice_item = mov.id_invoice_item
+							exp.product_code = mov.product_code
+							exp.save
+						end
+						#
+						DB.disconnect
+						GC.start
+					}
+					#
+					DB.disconnect
+					GC.start
+				}
+			end
       # registro los asientos contables
-      InvoiceItem.where(:id_invoice=>self.id).all { |item|      
-        BlackStack::Movement.new().parse(item, BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT, "Invoice Payment").save()
+      InvoiceItem.where(:id_invoice=>self.id).all { |item|
+        BlackStack::Movement.new().parse(item, BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT, "Invoice Payment", payment_time, item.id).save()
+				# agrego los bonos de este plan
+				plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
+				prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
+				plan[:bonus_plans].each { |h|
+					plan_bonus = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(h[:item_number])
+					raise "bonus plan not found" if plan_bonus.nil?
+					bonus = BlackStack::InvoiceItem.new
+					bonus.id = guid()
+					bonus.id_invoice = self.id
+					bonus.product_code = plan_bonus[:product_code]
+					bonus.unit_price = 0
+					bonus.units = plan_bonus[:credits]
+					bonus.amount = 0
+					bonus.item_number = plan_bonus[:item_number]					
+					BlackStack::Movement.new().parse(bonus, BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS, "Invoice Payment Bonus", payment_time, item.id).save()
+				}
         #
         DB.disconnect
         GC.start
@@ -450,10 +507,10 @@ module BlackStack
     # en este caso la factura se genera antes del pago.
     # crea uno o mas registros en la tabla invoice_item.
     def next(i)     
-      b = i.buffer_paypal_notification
-      if b == nil
-        raise "Method BlackStack::Invoice::next requires the previous invoice (i) is linked to a record in the table buffer_paypal_notification."
-      end
+#      b = i.buffer_paypal_notification
+#      if b == nil
+#        raise "Method BlackStack::Invoice::next requires the previous invoice (i) is linked to a record in the table buffer_paypal_notification."
+#      end
   
       id_client = i.id_client
       c = BlackStack::Client.where(:id=>id_client).first
@@ -474,7 +531,8 @@ module BlackStack
       self.create_time = now()
       self.id_client = c.id
       self.id_buffer_paypal_notification = nil
-      self.subscr_id = b.subscr_id
+			self.id_previous_invoice = i.id
+      self.subscr_id = i.subscr_id 
       self.disabled_for_add_remove_items = true
       
       i.items.each { |t| 

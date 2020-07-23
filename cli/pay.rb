@@ -1,3 +1,10 @@
+#require "blackstack_commons"
+#s = Time.now().to_s
+#puts s
+#t = DateTime.strptime(s, '%Y-%m-%d %H:%M:%S %Z').to_time
+#puts t.to_s
+#exit(0)
+
 require "simple_command_line_parser"
 require "pampa_workers"
 require_relative "../lib/invoicing_payments_processing"
@@ -5,17 +12,18 @@ require_relative './config'
 
 # command line parameters 
 PARSER = BlackStack::SimpleCommandLineParser.new(
-  :description => 'Register a new PayPal subscription.', 
+  :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
     :name=>'id_invoice', 
     :mandatory=>true, 
     :description=>'ID of the invoice related with this subscription. The invoice must be belong the same calient.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
-    :name=>'code', 
-    :mandatory=>true, 
-    :description=>'Code of the new subscription.', 
+    :name=>'datetime', 
+    :mandatory=>false,
+    :description=>'Payment date-time with SQL format plus timezone (%Y-%m-%d %H:%M:%S %Z). Example: 2020-07-23 14:45:18 -0300.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
+		:default=>Time.now().to_s,
   }, {
     :name=>'name', 
     :mandatory=>false, 
@@ -56,31 +64,35 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       self.logger.logs 'Get the invoice... '
 			i = BlackStack::Invoice.where(:id=>PARSER.value('id_invoice')).first
       raise 'Invoice not found' if i.nil?
-      #raise 'Invoice is beling another client' if i.id_client.to_guid != c.id.to_guid
-			#raise 'Invoice already linked to another subscription' if !i.subscr_id.nil?
 			self.logger.done
-
+			
       self.logger.logs 'Get the client... '
 			c = i.client
 			self.logger.done			
-
-			# create the subscription
-      self.logger.logs 'Create subscription... '
-			s = BlackStack::PayPalSubscription.new
-			s.id = guid()
-			s.subscr_id = PARSER.value('code')
-			s.id_buffer_paypal_notification = nil
-			s.create_time = now
-			s.id_client = c.id
-			s.active = true
-			s.save
-			self.logger.done
-
-      self.logger.logs 'Update invoice... '
-			i.subscr_id = PARSER.value('code')
-			i.save
-			self.logger.done
-
+			
+			# marco la factura como pagada
+			# registro contable - bookkeeping
+			if !i.canBePaid?
+				raise 'Invoice cannot be paid'
+			else
+				t = DateTime.strptime(PARSER.value('datetime'), '%Y-%m-%d %H:%M:%S %Z').to_time
+				i.getPaid(t)
+    
+				# TODO: code this!
+				# i.recalculate
+		
+				# crea una factura para el periodo siguiente (dia, semana, mes, anio)
+				j = BlackStack::Invoice.new()
+				j.id = guid()
+				j.id_client = c.id
+				j.create_time = now()
+				j.disabled_for_trial_ssm = c.disabled_for_trial_ssm
+				j.save()
+			
+				# genero los datos de esta factura, como la siguiente factura a la que estoy pagando en este momento
+				j.next(i)
+			end
+			
     rescue => e
       self.logger.error(e)
     end

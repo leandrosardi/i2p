@@ -12,6 +12,7 @@ module BlackStack
     MOVEMENT_TYPE_REFUND_BALANCE = 3
     MOVEMENT_TYPE_CANCELATION = 4 # liability with the client is reduced due service delivery
     MOVEMENT_TYPE_EXPIRATION = 5 # liability with the client is reduced due credits expiration
+		MOVEMENT_TYPE_ADJUSTMENT = 6 
   
     def typeName()
       if (self.type==MOVEMENT_TYPE_ADD_PAYMENT)
@@ -47,16 +48,16 @@ module BlackStack
     
     # actualiza el registro con los valores del item de una factura
     # type may be either MOVEMENT_TYPE_ADD_PAYMENT or MOVEMENT_TYPE_ADD_BONUS, but not other value
-    def parse(item, type=MOVEMENT_TYPE_ADD_PAYMENT, description='n/a')
-      plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
+    def parse(item, type=MOVEMENT_TYPE_ADD_PAYMENT, description='n/a', payment_time=nil, id_item=nil)
+      payment_time = Time.now() if payment_time.nil?
+			plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
       prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
-
       if (self.id==nil)
         self.id=guid()
       end
       self.id_client = item.invoice.id_client
-      self.id_invoice_item = item.id
-      self.create_time = item.invoice.billing_period_from
+      self.id_invoice_item = id_item.nil? ? item.id : id_item
+      self.create_time = payment_time #item.invoice.billing_period_from
       self.type = type
       if (type != MOVEMENT_TYPE_ADD_BONUS)
         self.paypal1_amount = item.amount.to_f
@@ -70,7 +71,11 @@ module BlackStack
       self.product_code = item.product_code
       self.profits_amount = 0
       self.description = description
-      self.expiration_time = DB["SELECT DATEADD(#{prod[:credits_expiration_period].to_s}#{prod[:credits_expiration_period].to_s}, +#{prod[:credits_expiration_units].to_s}, GETDATE()) AS d"].first[:d].to_s    
+      self.expiration_time = DB["SELECT DATEADD(#{prod[:credits_expiration_period].to_s}#{prod[:credits_expiration_period].to_s}, +#{prod[:credits_expiration_units].to_s}, '#{payment_time.to_sql}') AS d"].first[:d].to_s
+			self.expiration_on_next_payment = plan[:expiration_on_next_payment]
+			self.expiration_lead_period = plan[:expiration_lead_period]
+			self.expiration_lead_units = plan[:expiration_lead_units]
+			self.give_away_negative_credits = plan[:give_away_negative_credits]
       self.save()
     end
 
