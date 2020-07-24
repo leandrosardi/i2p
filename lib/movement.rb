@@ -79,64 +79,84 @@ module BlackStack
       self.save()
     end
 
-    # Creates a new record in the table movement, as an expiration of the unused credits of this movement.
-    # This movement must be either a payment or a bonus.
-    # This movement must have an expiration time.
-    # The expiraton time of this movement is lower than the current date-time.
-    def expire()
-      m = self
-      p = BlackStack::InvoicingPaymentsProcessing::product_descriptor(m.product_code)
-
-      if m.type != MOVEMENT_TYPE_ADD_PAYMENT && m.type != MOVEMENT_TYPE_ADD_BONUS
-        raise "Movement type mismatch."
-      end
-
-      if m.expiration_time.nil?
-        raise "Expiration time is null."
-      end
-
-      if m.expiration_time >= Time::now()
-        raise "Expiration time is pending."
-      end
-
-      if m.expiration_time <= m.create_time
-        raise "Expiration time is lower then creation time."
-      end
-      
-      # calculo cuantos creditos tiene este cliente
-      #x = 0.to_f - BlackStack::Balance.new(m.client.id, p[:code]).credits.to_f
-      # calculo los creditos de este movimiento que voy a cancelar
-      x = 0.to_f - m.credits.to_f
-
-      # calculo el credito consumido luego de este movimiento que voy a cancelar
-      y = m.client.movements.select { |o| 
+		# Returns the number of credits assigned in the movement that have been consumed.
+		# The movment must be a payment or a bonus
+		def credits_consumed()
+			# the movment must be a payment or a bonus
+			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
+puts
+puts "product_code:#{self.product_code}:."
+			# itero los pagos y bonos hechos por este mismo producto, desde el primer dia hasta este movimiento.
+			paid = 0
+			self.client.movements.select { |o| 
+				(o.type == MOVEMENT_TYPE_ADD_PAYMENT || o.type == MOVEMENT_TYPE_ADD_BONUS) &&
+        o.credits.to_f < 0 &&
+        o.product_code.upcase == self.product_code.upcase
+      }.sort_by { |o| o.create_time }.each { |o|
+				paid += (0.to_f - o.credits.to_f)
+				break if o.id.to_guid == self.id.to_guid
+			}
+puts "paid:#{paid.to_s}:."
+      # calculo los credito para este producto, desde el primer dia; incluyendo cosumo, expiraciones, ajustes.
+      consumed = self.client.movements.select { |o| 
         o.credits.to_f > 0 &&
-        o.product_code.upcase == p[:code].upcase && 
-        o.create_time > m.create_time 
+        o.product_code.upcase == self.product_code.upcase
       }.inject(0) { |sum, o| sum.to_f + o.credits.to_f }.to_f
+puts "consumed:#{consumed.to_s}:."			
+      # calculo los creditos de este movimiento que voy a cancelar
+      credits = 0.to_f - self.credits.to_f
+puts "credits:#{credits.to_s}:."
+			# 
+			if paid - consumed <= 0 # # se consumio todo
+puts "a"
+				return credits 
+			else # paid - consumed > 0 # todavia no se consumio todo
+				if paid - consumed > credits # todavia se estan consumiendo creditos de los pagos anteriores
+puts "b"
+					return 0
+				else # paid - consumed >= credits # se consumio una parte del credito
+puts "c"
+					n = credits >= (paid - consumed) ? credits - (paid - consumed) : credits
+puts "n:#{n.to_s}:."
+					return n
+				end
+			end
+		end
 
-      # calculo el # de creditos no usados de este movimiento que ha expirado
-      z = x-y>0 ? x-y : 0 
-
-      # si el monto expirado es positivo, entonces registro
-      # una cancelacion de saldo
-      if z>0
-        amount = ( m.amount.to_f / m.credits.to_f ) * z.to_f              
-        m = BlackStack::Movement.new(
-          :id_client => m.client.id,
-          :create_time => now(),
-          :type => BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION,
-          :description => "Expiration of #{m.id.to_guid}",
-          :paypal1_amount => 0,
-          :bonus_amount => 0,
-          :amount => amount,
-          :credits => z,
-          :profits_amount => -amount,
-          :product_code => p[:code],
-        )
-        m.id = guid()
-        m.save
-      end # z>0
-    end # def expire
+		# credits expiration
+		def expire()
+			credits_consumed = self.credits_consumed
+			# 
+			self.expiration_start_time = now()
+			self.expiration_tries = self.expiration_tries.to_i + 1
+			self.save
+			# 
+			total_credits = 0.to_f - BlackStack::Balance.new(self.client.id, self.product_code).credits.to_f
+			total_amount = 0.to_f - BlackStack::Balance.new(self.client.id, self.product_code).amount.to_f
+			#
+			credits = 0.to_i - self.credits.to_i
+			#
+			credits_to_expire = credits - credits_consumed.to_i #- (0.to_f - self.credits.to_f)).to_i
+			amount_to_expire = credits_to_expire.to_f * ( total_amount.to_f / total_credits.to_f )
+			#
+			exp = BlackStack::Movement.new
+			exp.id = guid()
+			exp.id_client = self.client.id
+			exp.create_time = now()
+			exp.type = BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
+			exp.id_user_creator = self.id_user_creator
+			exp.description = 'Expiration Because Allocation is Renewed'
+			exp.paypal1_amount = 0
+			exp.bonus_amount = 0
+			exp.amount = amount_to_expire
+			exp.credits = credits_to_expire
+			exp.profits_amount = -amount_to_expire
+			exp.id_invoice_item = self.id_invoice_item
+			exp.product_code = self.product_code
+			exp.save
+			# 
+			self.expiration_end_time = now()
+			self.save
+		end # def expire
   end # class Movement
 end # module BlackStack

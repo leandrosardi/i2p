@@ -290,35 +290,19 @@ module BlackStack
 			# expiracion de creditos de la factura anterior
 			i = self.previous
 			if !i.nil?
-				InvoiceItem.where(:id_invoice=>self.id).all { |item|
+				InvoiceItem.where(:id_invoice=>i.id).all { |item|
 					# 
 					BlackStack::Movement.where(:id_invoice_item => item.id).all { |mov|
 						# 
-						if mov.expiration_on_next_payment == true
-							exp = BlackStack::Movement.new
-							exp.id = guid()
-							exp.id_client = mov.id_client
-							exp.create_time = now()
-							exp.type = BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
-							exp.id_user_creator = mov.id_user_creator
-							exp.description = 'Expiration Because Allocation is Renewed'
-							exp.paypal1_amount = 0
-							exp.bonus_amount = 0
-							exp.amount = -mov.amount
-							exp.credits = -mov.credits
-							exp.profits_amount = mov.amount
-							exp.id_invoice_item = mov.id_invoice_item
-							exp.product_code = mov.product_code
-							exp.save
-						end
+						mov.expire if mov.expiration_on_next_payment == true
 						#
 						DB.disconnect
 						GC.start
-					}
+					} # BlackStack::Movement.where(:id_invoice_item => item.id).all { |mov|
 					#
 					DB.disconnect
 					GC.start
-				}
+				} # InvoiceItem.where(:id_invoice=>i.id).all { |item|
 			end
       # registro los asientos contables
       InvoiceItem.where(:id_invoice=>self.id).all { |item|
