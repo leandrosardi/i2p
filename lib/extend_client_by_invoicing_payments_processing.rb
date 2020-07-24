@@ -15,16 +15,23 @@ module BlackStack
 				# give_away_negative_credits is ON
 				prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(product_code)
 				total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
+				total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
 #puts
 #puts "total_credits:#{total_credits.to_s}:."
 #puts "give_away_negative_credits:#{prod[:give_away_negative_credits].to_s}:."
+
+				# delay to ensure the time of the bonus movement will be later than the time of the consumption movement
+				sleep(2)
 				if total_credits < 0 && prod[:give_away_negative_credits] == true
-					self.bonus(product_code, nil, -total_credits, 'Bonus Because Quota Has Been Exceeded.')
+					self.bonus(product_code, nil, -total_credits, -total_amount, 'Bonus Because Quota Has Been Exceeded.')
 				end
+				
+				# recaculate amounts in both consumptions and expirations
+				self.recalculate(product_code)
       end
 
       # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
-      def bonus(product_code, expiration, number_of_credits=1, description=nil)
+      def bonus(product_code, expiration, number_of_credits=1, bonus_amount=0, description=nil)
 				bonus = BlackStack::Movement.new
 				bonus.id = guid()
 				bonus.id_client = self.id
@@ -32,8 +39,8 @@ module BlackStack
 				bonus.type = BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS
 				bonus.description = description.nil? ? 'Bonus' : description
 				bonus.paypal1_amount = 0
-				bonus.bonus_amount = 0
-				bonus.amount = 0
+				bonus.bonus_amount = bonus_amount
+				bonus.amount = -bonus_amount
 				bonus.credits = -number_of_credits
 				bonus.profits_amount = 0
 				bonus.product_code = product_code
@@ -42,7 +49,28 @@ module BlackStack
 				# recalculate
 				bonus.recalculate
       end
-    
+
+			# recalculate the amount for all the consumptions.
+			# The movment must be a payment or a bonus
+			def recalculate(product_code)
+				# 
+				amount_paid = 0.to_f
+				credits_paid = 0
+
+				self.movements.select { |o| 
+					o.product_code.upcase == product_code.upcase
+				}.sort_by { |o| o.create_time }.each { |o|
+					#if o.credits.to_f < 0 # payment or bonus
+					if o.credits.to_f > 0 # consumption or expiration
+						o.amount = o.credits.to_f * ( amount_paid.to_f / credits_paid.to_f )
+						o.profits_amount = -o.amount
+						o.save
+					end
+					amount_paid += 0.to_f - o.amount.to_f
+					credits_paid += 0.to_i - o.credits.to_i
+				}
+			end 
+		
       # TODO: el cliente deberia tener una FK a la tabla division. La relacion no puede ser N-N.
       # TODO: se debe preguntar a la central
       def division

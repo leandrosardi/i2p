@@ -166,34 +166,13 @@ module BlackStack
 			self.save
 		end # def expire
 
-		# recalculate the amount for all the consumptions after this movement.
+		# recalculate the amount for all the consumptions.
 		# The movment must be a payment or a bonus
 		def recalculate()
 			# the movment must be a payment or a bonus
 			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
-			# 
-			amount_paid = 0.to_f
-			credits_paid = 0
-puts
-puts "recalculate:#{self.product_code}:."
-			self.client.movements.select { |o| 
-				#(o.type == MOVEMENT_TYPE_ADD_PAYMENT || o.type == MOVEMENT_TYPE_ADD_BONUS) &&
-        #o.credits.to_f < 0 &&
-				o.create_time >= self.create_time
-        o.product_code.upcase == self.product_code.upcase
-      }.sort_by { |o| o.create_time }.each { |o|
-puts 'a'
-				if o.credits.to_f < 0 # payment or bonus
-puts 'b'
-					amount_paid += 0.to_f - o.amount.to_f
-					credits_paid += 0.to_i - o.credits.to_i
-				else # consumption or adjustment
-puts 'c'
-					o.amount = o.credits.to_f * ( amount_paid.to_f / credits_paid.to_f )
-					o.profits_amount = -o.amount
-					o.save
-				end
-			}
+			# recalculate amounts for all the consumptions and expirations
+			self.client.recalculate(self.product_code)
 		end 
 
   end # class Movement

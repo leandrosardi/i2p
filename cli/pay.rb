@@ -1,5 +1,6 @@
 #require "blackstack_commons"
 #s = Time.now().to_s
+#s = 
 #puts s
 #t = DateTime.strptime(s, '%Y-%m-%d %H:%M:%S %Z').to_time
 #puts t.to_s
@@ -75,7 +76,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			if !i.canBePaid?
 				raise 'Invoice cannot be paid'
 			else
-				t = DateTime.strptime(PARSER.value('datetime'), '%Y-%m-%d %H:%M:%S %Z').to_time
+#puts
+#puts PARSER.value('datetime')
+#s = "2020-07-24 18:15:00 -0300"
+s = PARSER.value('datetime')
+				t = DateTime.strptime(s, '%Y-%m-%d %H:%M:%S %Z').to_time
 				i.getPaid(t)
     
 				# TODO: code this!
