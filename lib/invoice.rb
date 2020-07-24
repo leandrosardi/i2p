@@ -312,7 +312,7 @@ module BlackStack
 				prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
 				plan[:bonus_plans].each { |h|
 					plan_bonus = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(h[:item_number])
-					raise "bonus plan not found" if plan_bonus.nil?
+					raise "bonus plan not found" if plan_bonus.nil?					
 					bonus = BlackStack::InvoiceItem.new
 					bonus.id = guid()
 					bonus.id_invoice = self.id
@@ -321,7 +321,7 @@ module BlackStack
 					bonus.units = plan_bonus[:credits]
 					bonus.amount = 0
 					bonus.item_number = plan_bonus[:item_number]					
-					BlackStack::Movement.new().parse(bonus, BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS, "Invoice Payment Bonus", payment_time, item.id).save()
+					BlackStack::Movement.new().parse(bonus, BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS, "", payment_time, item.id).save()
 				}
         #
         DB.disconnect

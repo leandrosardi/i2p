@@ -26,10 +26,10 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
 		:default=>Time.now().to_s,
   }, {
     :name=>'credits', 
-    :mandatory=>true,
+    :mandatory=>false,
     :description=>'Number of credits consumed.', 
     :type=>BlackStack::SimpleCommandLineParser::INT,
-		:default=>Time.now().to_s,
+		:default=>1,
   }, {
     :name=>'name', 
     :mandatory=>false, 

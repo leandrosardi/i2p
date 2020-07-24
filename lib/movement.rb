@@ -49,6 +49,9 @@ module BlackStack
     # actualiza el registro con los valores del item de una factura
     # type may be either MOVEMENT_TYPE_ADD_PAYMENT or MOVEMENT_TYPE_ADD_BONUS, but not other value
     def parse(item, type=MOVEMENT_TYPE_ADD_PAYMENT, description='n/a', payment_time=nil, id_item=nil)
+			# the movment must be a payment or a bonus
+			raise 'Movement must be either a payment or a bonus' if type != MOVEMENT_TYPE_ADD_PAYMENT && type != MOVEMENT_TYPE_ADD_BONUS
+			# 
       payment_time = Time.now() if payment_time.nil?
 			plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
       prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
@@ -77,6 +80,10 @@ module BlackStack
 			self.expiration_lead_units = plan[:expiration_lead_units]
 			self.give_away_negative_credits = plan[:give_away_negative_credits]
       self.save()
+			# recalculate
+			self.recalculate
+			#
+			self
     end
 
 		# Returns the number of credits assigned in the movement that have been consumed.
@@ -84,8 +91,8 @@ module BlackStack
 		def credits_consumed()
 			# the movment must be a payment or a bonus
 			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
-puts
-puts "product_code:#{self.product_code}:."
+#puts
+#puts "product_code:#{self.product_code}:."
 			# itero los pagos y bonos hechos por este mismo producto, desde el primer dia hasta este movimiento.
 			paid = 0
 			self.client.movements.select { |o| 
@@ -96,28 +103,28 @@ puts "product_code:#{self.product_code}:."
 				paid += (0.to_f - o.credits.to_f)
 				break if o.id.to_guid == self.id.to_guid
 			}
-puts "paid:#{paid.to_s}:."
+#puts "paid:#{paid.to_s}:."
       # calculo los credito para este producto, desde el primer dia; incluyendo cosumo, expiraciones, ajustes.
       consumed = self.client.movements.select { |o| 
         o.credits.to_f > 0 &&
         o.product_code.upcase == self.product_code.upcase
       }.inject(0) { |sum, o| sum.to_f + o.credits.to_f }.to_f
-puts "consumed:#{consumed.to_s}:."			
+#puts "consumed:#{consumed.to_s}:."			
       # calculo los creditos de este movimiento que voy a cancelar
       credits = 0.to_f - self.credits.to_f
-puts "credits:#{credits.to_s}:."
+#puts "credits:#{credits.to_s}:."
 			# 
 			if paid - consumed <= 0 # # se consumio todo
-puts "a"
+#puts "a"
 				return credits 
 			else # paid - consumed > 0 # todavia no se consumio todo
 				if paid - consumed > credits # todavia se estan consumiendo creditos de los pagos anteriores
-puts "b"
+#puts "b"
 					return 0
 				else # paid - consumed >= credits # se consumio una parte del credito
-puts "c"
+#puts "c"
 					n = credits >= (paid - consumed) ? credits - (paid - consumed) : credits
-puts "n:#{n.to_s}:."
+#puts "n:#{n.to_s}:."
 					return n
 				end
 			end
@@ -158,5 +165,36 @@ puts "n:#{n.to_s}:."
 			self.expiration_end_time = now()
 			self.save
 		end # def expire
+
+		# recalculate the amount for all the consumptions after this movement.
+		# The movment must be a payment or a bonus
+		def recalculate()
+			# the movment must be a payment or a bonus
+			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
+			# 
+			amount_paid = 0.to_f
+			credits_paid = 0
+puts
+puts "recalculate:#{self.product_code}:."
+			self.client.movements.select { |o| 
+				#(o.type == MOVEMENT_TYPE_ADD_PAYMENT || o.type == MOVEMENT_TYPE_ADD_BONUS) &&
+        #o.credits.to_f < 0 &&
+				o.create_time >= self.create_time
+        o.product_code.upcase == self.product_code.upcase
+      }.sort_by { |o| o.create_time }.each { |o|
+puts 'a'
+				if o.credits.to_f < 0 # payment or bonus
+puts 'b'
+					amount_paid += 0.to_f - o.amount.to_f
+					credits_paid += 0.to_i - o.credits.to_i
+				else # consumption or adjustment
+puts 'c'
+					o.amount = o.credits.to_f * ( amount_paid.to_f / credits_paid.to_f )
+					o.profits_amount = -o.amount
+					o.save
+				end
+			}
+		end 
+
   end # class Movement
 end # module BlackStack

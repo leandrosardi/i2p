@@ -85,7 +85,10 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :return_path=>"#{CS_HOME_WEBSITE}/main/dashboard",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me!
     :credits_expiration_units=>1, 
-    :credits_expiration_period=>"M",  
+    :credits_expiration_period=>"M", 
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_SSM, 
@@ -102,6 +105,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>3, 
     :credits_expiration_period=>"M",  
+		:consumption=>true, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => true, # default true
   },
   { 
     :code=>PRODUCT_THR, 
@@ -118,6 +124,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
 =begin
   { 
@@ -160,6 +169,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_SCL, 
@@ -176,6 +188,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_SHM, 
@@ -192,6 +207,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_DRX, 
@@ -208,6 +226,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>true, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_AUT, 
@@ -224,6 +245,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://ConnectionSphere.com/automation", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_EDB, 
@@ -240,6 +264,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_MAC, 
@@ -256,6 +283,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>3, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_PVA, 
@@ -272,6 +302,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"Y",  
+		:consumption=>true, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_IP6, 
@@ -288,6 +321,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_ACC, 
@@ -304,6 +340,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_EF, 
@@ -312,6 +351,9 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :unit_name=>"email addresses", 
     :consumption=>BlackStack::InvoicingPaymentsProcessing::BasePlan::CONSUMPTION_BY_TIME, 
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
+		:consumption=>false, # it may be either allocation or consumption. Default: false
+		# Create bonus automatically to compensate negativa balance.
+		:give_away_negative_credits => false, # default true
   },
 =begin
   { 
@@ -459,8 +501,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 0, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   # Programa SSM - Planes Mensuales
@@ -495,8 +535,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   },
   
   # Programa SSM - Planes Mensuales
@@ -532,8 +570,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   },
 # 
 # END > Published plans in the landing page of the SocialSellingMachine.com 
@@ -573,8 +609,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
@@ -609,8 +643,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   }, 
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
@@ -645,8 +677,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   }, 
 
   # Programa SSM - Abonos Fijos por Unica Vez
@@ -677,8 +707,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
@@ -707,8 +735,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
@@ -738,8 +764,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   }, 
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
@@ -769,8 +793,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   }, 
 
   # Programa SSM - Ofertas - Flash Sales - Tripwires
@@ -800,8 +822,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 3, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => true, # default true
   },
   
   # Threads
@@ -831,8 +851,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 =begin
   # Dedicated Servers
@@ -891,8 +909,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
@@ -915,8 +931,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
@@ -939,8 +953,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   # Simple Host Monitoring - Small
@@ -965,8 +977,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   # Simple Host Monitoring - Medium
@@ -991,8 +1001,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   # Simple Host Monitoring - Large
@@ -1017,8 +1025,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   # LinkedIn Prospector
@@ -1050,8 +1056,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
@@ -1081,8 +1085,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
@@ -1112,8 +1114,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1142,8 +1142,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1172,8 +1170,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1202,8 +1198,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1232,8 +1226,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
@@ -1260,8 +1252,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
@@ -1288,8 +1278,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1319,8 +1307,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 12, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1349,8 +1335,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 12, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1379,8 +1363,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 12, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1409,8 +1391,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 12, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1435,8 +1415,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 12, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
   #
@@ -1465,8 +1443,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
 =begin

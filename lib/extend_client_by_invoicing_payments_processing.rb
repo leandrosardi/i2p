@@ -11,6 +11,36 @@ module BlackStack
       # crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el cliente, para el producto indicado en product_code. 
       def consume(product_code, number_of_credits=1, description=nil)
         DB.execute("exec reduceDebt '#{product_code.to_sql}', '#{self.id}', #{number_of_credits.to_s}, '#{description.to_s.to_sql}'")
+				# if there is negative credits and
+				# give_away_negative_credits is ON
+				prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(product_code)
+				total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
+#puts
+#puts "total_credits:#{total_credits.to_s}:."
+#puts "give_away_negative_credits:#{prod[:give_away_negative_credits].to_s}:."
+				if total_credits < 0 && prod[:give_away_negative_credits] == true
+					self.bonus(product_code, nil, -total_credits, 'Bonus Because Quota Has Been Exceeded.')
+				end
+      end
+
+      # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
+      def bonus(product_code, expiration, number_of_credits=1, description=nil)
+				bonus = BlackStack::Movement.new
+				bonus.id = guid()
+				bonus.id_client = self.id
+				bonus.create_time = now()
+				bonus.type = BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS
+				bonus.description = description.nil? ? 'Bonus' : description
+				bonus.paypal1_amount = 0
+				bonus.bonus_amount = 0
+				bonus.amount = 0
+				bonus.credits = -number_of_credits
+				bonus.profits_amount = 0
+				bonus.product_code = product_code
+				bonus.expiration_time = expiration
+				bonus.save
+				# recalculate
+				bonus.recalculate
       end
     
       # TODO: el cliente deberia tener una FK a la tabla division. La relacion no puede ser N-N.

@@ -26,10 +26,10 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
 		:default=>Time.now().to_s,
   }, {
     :name=>'credits', 
-    :mandatory=>true,
+    :mandatory=>false,
     :description=>'Number of credits consumed.', 
     :type=>BlackStack::SimpleCommandLineParser::INT,
-		:default=>Time.now().to_s,
+		:default=>1,
   }, {
     :name=>'expiration', 
     :mandatory=>false,
@@ -80,21 +80,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			
 			# register bonus
       self.logger.logs 'Register bonus... '
-			bonus = BlackStack::Movement.new
-			bonus.id = guid()
-			bonus.id_client = c.id
-			bonus.create_time = now()
-			bonus.type = BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS
-			#bonus.id_user_creator = mov.id_user_creator
-			bonus.description = 'Bonus'
-			bonus.paypal1_amount = 0
-			bonus.bonus_amount = 0
-			bonus.amount = 0
-			bonus.credits = PARSER.value('credits')
-			bonus.profits_amount = 0
-			bonus.product_code = PARSER.value('service')
-			bonus.expiration_time = DateTime.strptime(PARSER.value('expirtion'), '%Y-%m-%d %H:%M:%S %Z').to_time
-			bonus.save
+			c.bonus(PARSER.value('service'), DateTime.strptime(PARSER.value('expiration'), '%Y-%m-%d %H:%M:%S %Z').to_time, PARSER.value('credits'))
 			self.logger.done
 			
     rescue => e
