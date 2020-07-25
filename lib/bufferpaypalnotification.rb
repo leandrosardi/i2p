@@ -294,6 +294,7 @@ module BlackStack
   
           # le asigno el id_buffer_paypal_notification
           i.id_buffer_paypal_notification = b.id
+					i.subscr_id = b.subscr_id
           i.save
     
           # marco la factura como pagada

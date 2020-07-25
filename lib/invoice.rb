@@ -320,8 +320,8 @@ module BlackStack
 					bonus.unit_price = 0
 					bonus.units = plan_bonus[:credits]
 					bonus.amount = 0
-					bonus.item_number = plan_bonus[:item_number]					
-					BlackStack::Movement.new().parse(bonus, BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS, "", payment_time, item.id).save()
+					bonus.item_number = plan_bonus[:item_number]
+					BlackStack::Movement.new().parse(bonus, BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS, 'Payment Bonus', payment_time, item.id).save()
 				}
         #
         DB.disconnect

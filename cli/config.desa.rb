@@ -86,7 +86,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me!
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M", 
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -105,7 +104,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>3, 
     :credits_expiration_period=>"M",  
-		:consumption=>true, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => true, # default true
   },
@@ -124,7 +122,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -169,7 +166,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -188,7 +184,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -207,7 +202,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -226,7 +220,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>true, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -245,7 +238,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://ConnectionSphere.com/automation", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -264,7 +256,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -283,7 +274,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>3, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -302,7 +292,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"Y",  
-		:consumption=>true, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -321,7 +310,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -340,7 +328,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },
@@ -351,7 +338,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :unit_name=>"email addresses", 
     :consumption=>BlackStack::InvoicingPaymentsProcessing::BasePlan::CONSUMPTION_BY_TIME, 
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
-		:consumption=>false, # it may be either allocation or consumption. Default: false
 		# Create bonus automatically to compensate negativa balance.
 		:give_away_negative_credits => false, # default true
   },

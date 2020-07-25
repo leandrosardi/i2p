@@ -61,7 +61,7 @@ module BlackStack
 					o.product_code.upcase == product_code.upcase
 				}.sort_by { |o| o.create_time }.each { |o|
 					#if o.credits.to_f < 0 # payment or bonus
-					if o.credits.to_f > 0 # consumption or expiration
+					if o.credits.to_f > 0 && ( o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION ) # consumption or expiration
 						o.amount = o.credits.to_f * ( amount_paid.to_f / credits_paid.to_f )
 						o.profits_amount = -o.amount
 						o.save

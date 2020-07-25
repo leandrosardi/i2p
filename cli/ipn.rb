@@ -46,20 +46,14 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     self.logger.log "DB:#{DB['SELECT db_name() AS s'].first[:s]}."
     
     # process IPN
-    begin
-      # Depurar divisiones gemeals - Issue #976
-      self.logger.logs 'Load division... '
-      division = BlackStack::Division.where(:name=>PARSER.value('division')).first
-      raise 'Division not found' if division.nil?
-      self.logger.logf "done (#{division.name})"
-  
+    begin  
       #
       self.logger.logs "Load IPN (#{PARSER.value('id')})... "
       p = BlackStack::BufferPayPalNotification.where(:id=>PARSER.value('id')).first
       raise 'IPN not found' if p.nil?
       self.logger.done
   
-      # inicio la sincronizacion       
+      # inicio la sincronizacion.
       self.logger.logs "Initialize IPN... "
       p.sync_result = nil
       p.sync_start_time = now()
@@ -68,61 +62,15 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       self.logger.done
 
       self.logger.logs "Process IPN... "
-      #BlackStack::BufferPayPalNotification.process(p.to_hash)
-      BlackStack::Division.where("ISNULL(available,0)=1 AND ISNULL(home,0)=1 AND ISNULL(central,0)=0").all { |d|
-        self.logger.logs "Division #{d.name}... "
-        # obtengo el hash descriptor
-        params = p.to_hash()
-        # agrego el api-key al description
-        params['api_key'] = BlackStack::Pampa::api_key 
-        # envio la notificacion a la division
-        url = "#{BlackStack::Pampa::api_protocol}://#{d.ws_url}:#{d.ws_port}/api1.3/accounting/sync/paypal/notification.json"
-        #url = "http://#{d.ws_url}:87/api1.3/accounting/sync/paypal/notification.json"
-        res = BlackStack::Netting::call_post(url, params)        
-        parsed = JSON.parse(res.body)
-        if (parsed["status"] == "success")
-          self.logger.logf "Done"
-          p.sync_end_time = now()
-          p.save()
-          # libero recursos
-          DB.disconnect
-          GC.start
-          #
-          break
-        elsif ( parsed["status"] =~ /Invoice already exists/ ) #|| parsed["status"] =~ /Unknown item_number/ )
-          self.logger.logf 'Invoice already exists'
-          p.sync_end_time = now()
-          p.save()
-          # libero recursos
-          DB.disconnect
-          GC.start
-          #
-          break
-        elsif parsed["status"] =~ /Client not found/
-          self.logger.logf 'Client not found'
-          
-        elsif parsed["status"] =~ /Invoice not found/
-          self.logger.logf 'Invoice not found'
+			BlackStack::BufferPayPalNotification.process(p.to_hash)
+      self.logger.done
 
-        elsif parsed["status"] =~ /IPN already linked to an invoice/
-          self.logger.logf 'IPN already linked to an invoice'
-
-        else
-          DB.execute("update buffer_paypal_notification set sync_result='Division: #{d.name}.<br/>#{"Error:#{parsed["status"]}. Description:#{parsed["description"]}".to_sql}<br/><br/>' where id='#{p.id}'")
-          # libero recursos
-          DB.disconnect
-          GC.start
-          # lanzo una excepcion
-          raise "Error: #{parsed["status"]}"
-          #
-          #break
-        end
-      }
-
-      # 
+      # close the job.
+			# reload the object with the updates made by the process method.
       self.logger.logs "Close IPN job... "
-      p.sync_end_time = now()
-      p.save()
+      p2 = BlackStack::BufferPayPalNotification.where(:id=>PARSER.value('id')).first
+      p2.sync_end_time = now()
+      p2.save()
       self.logger.done
     rescue => e
       self.logger.error(e)

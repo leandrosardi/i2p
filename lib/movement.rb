@@ -47,10 +47,10 @@ module BlackStack
     end
     
     # actualiza el registro con los valores del item de una factura
-    # type may be either MOVEMENT_TYPE_ADD_PAYMENT or MOVEMENT_TYPE_ADD_BONUS, but not other value
+    # type may be either MOVEMENT_TYPE_ADD_PAYMENT or MOVEMENT_TYPE_ADD_BONUS or MOVEMENT_TYPE_REFUND_BALANCE, but not other value
     def parse(item, type=MOVEMENT_TYPE_ADD_PAYMENT, description='n/a', payment_time=nil, id_item=nil)
-			# the movment must be a payment or a bonus
-			raise 'Movement must be either a payment or a bonus' if type != MOVEMENT_TYPE_ADD_PAYMENT && type != MOVEMENT_TYPE_ADD_BONUS
+			# the movment must be a payment or a bonus or a refund
+			raise 'Movement must be either a payment or bonus or refund' if type != MOVEMENT_TYPE_ADD_PAYMENT && type != MOVEMENT_TYPE_ADD_BONUS && type != MOVEMENT_TYPE_REFUND_BALANCE
 			# 
       payment_time = Time.now() if payment_time.nil?
 			plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
@@ -167,10 +167,10 @@ module BlackStack
 		end # def expire
 
 		# recalculate the amount for all the consumptions.
-		# The movment must be a payment or a bonus
+		# The movment must be a payment or a bonus or refund
 		def recalculate()
-			# the movment must be a payment or a bonus
-			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
+			# the movment must be a payment or a bonus or a refund
+			raise 'Movement must be either a payment or bonus or refund' if type != MOVEMENT_TYPE_ADD_PAYMENT && type != MOVEMENT_TYPE_ADD_BONUS && type != MOVEMENT_TYPE_REFUND_BALANCE
 			# recalculate amounts for all the consumptions and expirations
 			self.client.recalculate(self.product_code)
 		end 
