@@ -130,6 +130,25 @@ module BlackStack
 			end
 		end
 
+		# returns the real expiration based on expiration_time, expiration_lead_period and expiration_lead_units
+		def expiration_lead_time()
+			return nil if self.expiration_time.nil?
+			return self.expiration_time if self.expiration_lead_period.nil? || self.expiration_lead_units.nil?
+			if self.expiration_lead_period == 'H' # hours
+				return self.expiration_time + self.expiration_lead_units.to_i * 60*60
+			elsif self.expiration_lead_period == 'D' # days
+				return self.expiration_time + self.expiration_lead_units.to_i * 24*60*60
+			elsif self.expiration_lead_period == 'W' # weeks
+				return self.expiration_time + self.expiration_lead_units.to_i * 7*24*60*60
+			elsif self.expiration_lead_period == 'M' # months
+				return self.expiration_time + self.expiration_lead_units.to_i * 31*24*60*60
+			elsif self.expiration_lead_period == 'Y' # years
+				return self.expiration_time + self.expiration_lead_units.to_i * 366*24*60*60
+			else
+				return self.expiration_time
+			end
+		end
+
 		# credits expiration
 		def expire()
 			credits_consumed = self.credits_consumed

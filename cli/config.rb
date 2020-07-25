@@ -1,1 +1,1 @@
-require_relative './config.prod.rb'
+require_relative './config.desa.rb'
