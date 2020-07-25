@@ -597,7 +597,7 @@ module BlackStack
           item1.detail = u.detail.to_s
           item1.description = u.description.to_s
           item1.save()
-          BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE).save()        
+          BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE, 'Full Refund').save()        
           # release resources
           DB.disconnect
           GC.start
@@ -628,7 +628,8 @@ module BlackStack
   
         amount = -payment_gross.to_f
         unit_price = t.amount.to_f / t.units.to_f
-        units = (amount / unit_price.to_f).round.to_i
+        float_units = (amount / unit_price.to_f)
+				units = float_units.round.to_i
   
         h = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == t.item_number }.first
         raise "Plan not found" if h.nil?
@@ -643,8 +644,19 @@ module BlackStack
         item1.detail = t.detail.to_s
         item1.description = t.description.to_s
         item1.save()
-        BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE).save()
+        BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE, 'Partial Refund').save()
   
+				# agrego un ajuste
+				if float_units.to_f != units.to_f
+					adjustment_amount = unit_price.to_f * (units.to_f - float_units.to_f)
+					adjust = self.client.adjustment(t.product_code.to_s, adjustment_amount, 'Adjustment for Partial Refund')
+					adjust.id_invoice_item = item1.id
+					adjust.save
+				end
+	
+				# recalculo todos los consumos y expiraciones - CANCELADO - NO HACE FALTA
+				# self.client.recalculate(t.product_code.to_s)
+	
       else
         raise "Refund amount is not matching with the invoice total (#{total.to_s}) and the invoice has more than 1 item."
 

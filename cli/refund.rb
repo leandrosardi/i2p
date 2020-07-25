@@ -21,10 +21,9 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
     :name=>'amount', 
-    :mandatory=>false,
+    :mandatory=>true,
     :description=>'Payment date-time with SQL format plus timezone (%Y-%m-%d %H:%M:%S %Z). Example: 2020-07-23 14:45:18 -0300.', 
-    :type=>BlackStack::SimpleCommandLineParser::FLOAT,
-		:default=>0.to_f,
+    :type=>BlackStack::SimpleCommandLineParser::INT,
   }, {
     :name=>'name', 
     :mandatory=>false, 
@@ -77,16 +76,16 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			j.id_client = c.id
 			j.create_time = now()
 			j.disabled_for_trial_ssm = c.disabled_for_trial_ssm
-			j.id_buffer_paypal_notification = b.id
+			j.id_buffer_paypal_notification = nil
 			j.status = BlackStack::Invoice::STATUS_REFUNDED
-			j.billing_period_from = b.create_time
-			j.billing_period_to = b.create_time
+			j.billing_period_from = i.billing_period_from
+			j.billing_period_to = i.billing_period_to
 			j.paypal_url = nil
 			j.disabled_for_add_remove_items = true
 			j.save()
             
 			# parseo el reeembolso - creo el registro contable
-			j.setup_refund(amount, i.id)
+			j.setup_refund(-PARSER.value('amount'), i.id)
 			
     rescue => e
       self.logger.error(e)

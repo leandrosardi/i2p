@@ -48,6 +48,26 @@ module BlackStack
 				bonus.save
 				# recalculate
 				bonus.recalculate
+				bonus
+      end
+
+      # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
+      def adjustment(product_code, adjustment_amount=0, description=nil)
+				adjust = BlackStack::Movement.new
+				adjust.id = guid()
+				adjust.id_client = self.id
+				adjust.create_time = now()
+				adjust.type = BlackStack::Movement::MOVEMENT_TYPE_ADJUSTMENT
+				adjust.description = description.nil? ? 'Adjustment' : description
+				adjust.paypal1_amount = 0
+				adjust.bonus_amount = 0
+				adjust.amount = adjustment_amount
+				adjust.credits = 0
+				adjust.profits_amount = -adjustment_amount
+				adjust.product_code = product_code
+				adjust.expiration_time = nil
+				adjust.save
+				adjust
       end
 
 			# recalculate the amount for all the consumptions.
