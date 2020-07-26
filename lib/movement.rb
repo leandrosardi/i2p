@@ -74,14 +74,16 @@ module BlackStack
       self.product_code = item.product_code
       self.profits_amount = 0
       self.description = description
-      self.expiration_time = DB["SELECT DATEADD(#{prod[:credits_expiration_period].to_s}#{prod[:credits_expiration_period].to_s}, +#{prod[:credits_expiration_units].to_s}, '#{payment_time.to_sql}') AS d"].first[:d].to_s
+      if (type == MOVEMENT_TYPE_ADD_BONUS || type == MOVEMENT_TYPE_ADD_PAYMENT)
+				self.expiration_time = DB["SELECT DATEADD(#{prod[:credits_expiration_period].to_s}#{prod[:credits_expiration_period].to_s}, +#{prod[:credits_expiration_units].to_s}, '#{payment_time.to_sql}') AS d"].first[:d].to_s
+			end
 			self.expiration_on_next_payment = plan[:expiration_on_next_payment]
 			self.expiration_lead_period = plan[:expiration_lead_period]
 			self.expiration_lead_units = plan[:expiration_lead_units]
 			self.give_away_negative_credits = plan[:give_away_negative_credits]
       self.save()
-			# recalculate
-			self.recalculate
+			# recalculate - CANCELADO - SE DEBE HACER OFFLINE
+			#self.recalculate
 			#
 			self
     end

@@ -10,24 +10,38 @@ module BlackStack
 
       # crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el cliente, para el producto indicado en product_code. 
       def consume(product_code, number_of_credits=1, description=nil)
-        DB.execute("exec reduceDebt '#{product_code.to_sql}', '#{self.id}', #{number_of_credits.to_s}, '#{description.to_s.to_sql}'")
+				# create the consumtion
+				total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
+				total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
+				ratio = total_credits == 0 ? 0.to_f : total_amount.to_f / total_credits.to_f
+				amount = number_of_credits.to_f * ratio
+				cons = BlackStack::Movement.new
+				cons.id = guid()
+				cons.id_client = self.id
+				cons.create_time = now()
+				cons.type = BlackStack::Movement::MOVEMENT_TYPE_CANCELATION
+				cons.description = description.nil? ? 'Consumption' : description
+				cons.paypal1_amount = 0
+				cons.bonus_amount = 0
+				cons.amount = amount
+				cons.credits = number_of_credits
+				cons.profits_amount = -amount
+				cons.product_code = product_code
+				cons.expiration_time = nil
+				cons.save
 				# if there is negative credits and
 				# give_away_negative_credits is ON
 				prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(product_code)
 				total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
 				total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
-#puts
-#puts "total_credits:#{total_credits.to_s}:."
-#puts "give_away_negative_credits:#{prod[:give_away_negative_credits].to_s}:."
-
-				# delay to ensure the time of the bonus movement will be later than the time of the consumption movement
-				sleep(2)
+				sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
 				if total_credits < 0 && prod[:give_away_negative_credits] == true
-					self.bonus(product_code, nil, -total_credits, -total_amount, 'Bonus Because Quota Has Been Exceeded.')
+					self.bonus(product_code, nil, -total_credits, 'Bonus Because Quota Has Been Exceeded.')
 				end
-				
-				# recaculate amounts in both consumptions and expirations
-				self.recalculate(product_code)
+				# recaculate amounts in both consumptions and expirations - CANCELADO - Se debe hacer offline
+				#self.recalculate(product_code) 
+				# return
+				cons
       end
 
       # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
@@ -48,13 +62,14 @@ module BlackStack
 				bonus.product_code = product_code
 				bonus.expiration_time = expiration
 				bonus.save
-				# recalculate
-				bonus.recalculate
+				# recalculate - CANCELADO
+				#bonus.recalculate
+				# return
 				bonus
       end
 
       # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
-      def adjustment(product_code, adjustment_amount=0, description=nil)
+      def adjustment(product_code, adjustment_amount=0, adjustment_credits=0, description=nil)
 				adjust = BlackStack::Movement.new
 				adjust.id = guid()
 				adjust.id_client = self.id
@@ -64,7 +79,7 @@ module BlackStack
 				adjust.paypal1_amount = 0
 				adjust.bonus_amount = 0
 				adjust.amount = adjustment_amount
-				adjust.credits = 0
+				adjust.credits = adjustment_credits
 				adjust.profits_amount = -adjustment_amount
 				adjust.product_code = product_code
 				adjust.expiration_time = nil
@@ -72,12 +87,14 @@ module BlackStack
 				adjust
       end
 
-			# recalculate the amount for all the consumptions.
-			# The movment must be a either cancelation (consumption), expiration
+			# recalculate the amount for all the consumptions, expirations
 			def recalculate(product_code)
 				# 
 				amount_paid = 0.to_f
 				credits_paid = 0
+
+				#total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
+				#total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
 
 				self.movements.select { |o| 
 					o.product_code.upcase == product_code.upcase
@@ -85,9 +102,10 @@ module BlackStack
 					#if o.credits.to_f < 0 # payment or bonus
 #					if o.credits.to_f > 0 && ( o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION ) # consumption or expiration
 					# consumption or expiration or bonus
-					if o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION #|| o.type==BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS
-						o.amount = o.credits.to_f * ( amount_paid.to_f / credits_paid.to_f )
-						o.profits_amount = -o.amount
+					if o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
+						x = credits_paid.to_f == 0 ? 0 : o.credits.to_f * ( amount_paid.to_f / credits_paid.to_f )
+						o.amount = x
+						o.profits_amount = -x
 						o.save
 					end
 					amount_paid += 0.to_f - o.amount.to_f

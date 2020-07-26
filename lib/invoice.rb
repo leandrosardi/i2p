@@ -569,17 +569,14 @@ module BlackStack
       # cargo la factura
       i = BlackStack::Invoice.where(:id=>id_invoice).first    
       raise "Invoice not found (#{id_invoice})" if i.nil?
-  
       # obtengo el total de la factura
       total = i.total.to_f
-  
       # Si existe un item, y solo uno, con importe igual al reembolso, entonces se aplica todo el reembolso a ese item. Y termina la funcion.
       # Si existen mas de un item con igual importe que el reembolso, entonces se levanta una excepcion.
       matched_items = i.items.select { |o| o.amount.to_f == -payment_gross.to_f }
-      
+      # 
       if total < -payment_gross
         raise "The refund is higher than the invoice amount (invoice #{id_invoice}, #{total.to_s}, #{payment_gross.to_s})"
-
       # Si el monto del reembolso es igual al total de la factura, se hace un reembolso total de todos los items. Y termina la funcion.
       # Si el monto de la factura es distinto al moneto del reembolso, entonces se levanta una excepcion.
       elsif total == -payment_gross
@@ -598,39 +595,27 @@ module BlackStack
           item1.description = u.description.to_s
           item1.save()
           BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE, 'Full Refund').save()        
+					# si el balance quedo en negativo, entonces aplico otro ajuste
+					net_amount = 0.to_f - BlackStack::Balance.new(self.client.id, u.product_code.to_s).amount.to_f
+					net_credits = 0.to_f - BlackStack::Balance.new(self.client.id, u.product_code.to_s).credits.to_f
+					if net_amount < 0 && net_credits < 0
+						adjust = self.client.adjustment(u.product_code.to_s, net_amount, net_credits, 'Adjustment for Negative Balance')
+						adjust.id_invoice_item = item1.id
+						adjust.save			
+					end # if net_amount < 0
           # release resources
           DB.disconnect
           GC.start
-        }  
-=begin
-      # si existe al menos un item que coincida el total con el monto del reembolso, 
-      # entonces selecciono el primero 
-      elsif matched_items.size > 0
-        t = matched_items.first
-        h = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == t.item_number }.first
-        raise "Plan not found" if h.nil?
-        item1 = BlackStack::InvoiceItem.new()
-        item1.id = guid()
-        item1.id_invoice = self.id
-        item1.unit_price = t.unit_price.to_f
-        item1.units = -t.units
-        item1.amount = -t.amount.to_f
-        item1.product_code = t.product_code.to_s
-        item1.item_number = t.item_number.to_s
-        item1.detail = t.detail.to_s
-        item1.description = t.description.to_s
-        item1.save()
-        BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE).save()
-=end
+        } # i.items.each { |u|
       # reembolso parcial de una factura con un unico item
       elsif i.items.size == 1
         t = i.items.first
-  
+				# 
         amount = -payment_gross.to_f
         unit_price = t.amount.to_f / t.units.to_f
         float_units = (amount / unit_price.to_f)
 				units = float_units.round.to_i
-  
+				# 
         h = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == t.item_number }.first
         raise "Plan not found" if h.nil?
         item1 = BlackStack::InvoiceItem.new()
@@ -645,31 +630,26 @@ module BlackStack
         item1.description = t.description.to_s
         item1.save()
         BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE, 'Partial Refund').save()
-  
 				# agrego un ajuste por el redondeo a una cantidad entera de creditos
 				if float_units.to_f != units.to_f
 					adjustment_amount = unit_price.to_f * (units.to_f - float_units.to_f)
-					adjust = self.client.adjustment(t.product_code.to_s, adjustment_amount, 'Adjustment for Partial Refund')
+					adjust = self.client.adjustment(t.product_code.to_s, adjustment_amount, 0, 'Adjustment for Partial Refund')
 					adjust.id_invoice_item = item1.id
 					adjust.save
 				end
-	
-				# recalculo todos los consumos y expiraciones - CANCELADO - NO HACE FALTA
+				# si el balance quedo en negativo, entonces aplico otro ajuste
+				net_amount = 0.to_f - BlackStack::Balance.new(self.client.id, t.product_code.to_s).amount.to_f
+				net_credits = 0.to_f - BlackStack::Balance.new(self.client.id, t.product_code.to_s).credits.to_f
+				if net_amount < 0 && net_credits < 0
+					adjust = self.client.adjustment(t.product_code.to_s, net_amount, net_credits, 'Adjustment for Negative Balance')
+					adjust.id_invoice_item = item1.id
+					adjust.save			
+				end # if net_amount < 0
+				# recalculo todos los consumos y expiraciones - CANCELADO - Debe hacerse offline
 				# self.client.recalculate(t.product_code.to_s)
-	
       else
         raise "Refund amount is not matching with the invoice total (#{total.to_s}) and the invoice has more than 1 item."
-
       end
-  
-			# si el balance quedo en negativo, entonces aplico otro ajuste
-			net_amount = 0.to_f - BlackStack::Balance.new(self.client.id, t.product_code.to_s).amount.to_f
-			if net_amount < 0 
-				adjust = self.client.adjustment(t.product_code.to_s, -net_amount, 'Adjustment for Negative Balance')
-				adjust.id_invoice_item = item1.id
-				adjust.save			
-			end # if net_amount < 0
-	
       # release resources
       DB.disconnect
       GC.start
