@@ -31,7 +31,9 @@ module BlackStack
       end
 
       # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
-      def bonus(product_code, expiration, number_of_credits=1, bonus_amount=0, description=nil)
+      def bonus(product_code, expiration, number_of_credits=1, description=nil)				
+				bonus_amount = 0 # Los bonos siempre son por un importa igual a 0.
+				
 				bonus = BlackStack::Movement.new
 				bonus.id = guid()
 				bonus.id_client = self.id
@@ -71,7 +73,7 @@ module BlackStack
       end
 
 			# recalculate the amount for all the consumptions.
-			# The movment must be a payment or a bonus
+			# The movment must be a either cancelation (consumption), expiration
 			def recalculate(product_code)
 				# 
 				amount_paid = 0.to_f
@@ -81,7 +83,9 @@ module BlackStack
 					o.product_code.upcase == product_code.upcase
 				}.sort_by { |o| o.create_time }.each { |o|
 					#if o.credits.to_f < 0 # payment or bonus
-					if o.credits.to_f > 0 && ( o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION ) # consumption or expiration
+#					if o.credits.to_f > 0 && ( o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION ) # consumption or expiration
+					# consumption or expiration or bonus
+					if o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION #|| o.type==BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS
 						o.amount = o.credits.to_f * ( amount_paid.to_f / credits_paid.to_f )
 						o.profits_amount = -o.amount
 						o.save

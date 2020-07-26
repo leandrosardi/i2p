@@ -646,7 +646,7 @@ module BlackStack
         item1.save()
         BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE, 'Partial Refund').save()
   
-				# agrego un ajuste
+				# agrego un ajuste por el redondeo a una cantidad entera de creditos
 				if float_units.to_f != units.to_f
 					adjustment_amount = unit_price.to_f * (units.to_f - float_units.to_f)
 					adjust = self.client.adjustment(t.product_code.to_s, adjustment_amount, 'Adjustment for Partial Refund')
@@ -662,6 +662,14 @@ module BlackStack
 
       end
   
+			# si el balance quedo en negativo, entonces aplico otro ajuste
+			net_amount = 0.to_f - BlackStack::Balance.new(self.client.id, t.product_code.to_s).amount.to_f
+			if net_amount < 0 
+				adjust = self.client.adjustment(t.product_code.to_s, -net_amount, 'Adjustment for Negative Balance')
+				adjust.id_invoice_item = item1.id
+				adjust.save			
+			end # if net_amount < 0
+	
       # release resources
       DB.disconnect
       GC.start
