@@ -306,10 +306,13 @@ module BlackStack
 			end
       # registro los asientos contables
       InvoiceItem.where(:id_invoice=>self.id).all { |item|
+				# obtengo descriptor del plan
+				plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
+				# obtengo descriptor del producto
+				prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
+				# registro el pago
         BlackStack::Movement.new().parse(item, BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT, "Invoice Payment", payment_time, item.id).save()
 				# agrego los bonos de este plan
-				plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
-				prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
 				plan[:bonus_plans].each { |h|
 					plan_bonus = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(h[:item_number])
 					raise "bonus plan not found" if plan_bonus.nil?					
@@ -327,7 +330,7 @@ module BlackStack
         DB.disconnect
         GC.start
       }
-    end
+    end # def getPaid
   
     # Verify if I can add this item_number to this invoice.
     # Otherwise, it raise an exception.

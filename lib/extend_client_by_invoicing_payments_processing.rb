@@ -29,14 +29,13 @@ module BlackStack
 				cons.product_code = product_code
 				cons.expiration_time = nil
 				cons.save
-				# if there is negative credits and
-				# give_away_negative_credits is ON
+				# if there is negative credits
 				prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(product_code)
 				total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
 				total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
 				sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
-				if total_credits < 0 && prod[:give_away_negative_credits] == true
-					self.bonus(product_code, nil, -total_credits, 'Bonus Because Quota Has Been Exceeded.')
+				if total_credits < 0
+					self.adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded.')
 				end
 				# recaculate amounts in both consumptions and expirations - CANCELADO - Se debe hacer offline
 				#self.recalculate(product_code) 

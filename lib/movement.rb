@@ -80,7 +80,7 @@ module BlackStack
 			self.expiration_on_next_payment = plan[:expiration_on_next_payment]
 			self.expiration_lead_period = plan[:expiration_lead_period]
 			self.expiration_lead_units = plan[:expiration_lead_units]
-			self.give_away_negative_credits = plan[:give_away_negative_credits]
+			#self.give_away_negative_credits = plan[:give_away_negative_credits]
       self.save()
 			# recalculate - CANCELADO - SE DEBE HACER OFFLINE
 			#self.recalculate

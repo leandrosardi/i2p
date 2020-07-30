@@ -86,8 +86,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me!
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M", 
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_SSM, 
@@ -122,8 +120,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 =begin
   { 
@@ -166,8 +162,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_SCL, 
@@ -184,8 +178,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_SHM, 
@@ -202,8 +194,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_DRX, 
@@ -220,8 +210,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_AUT, 
@@ -238,8 +226,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://ConnectionSphere.com/automation", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_EDB, 
@@ -256,8 +242,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_MAC, 
@@ -274,8 +258,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>3, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_PVA, 
@@ -292,8 +274,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"Y",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_IP6, 
@@ -310,8 +290,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_ACC, 
@@ -328,8 +306,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
   { 
     :code=>PRODUCT_EF, 
@@ -338,8 +314,6 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :unit_name=>"email addresses", 
     :consumption=>BlackStack::InvoicingPaymentsProcessing::BasePlan::CONSUMPTION_BY_TIME, 
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 =begin
   { 
@@ -447,8 +421,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
-		# Create bonus automatically to compensate negativa balance.
-		:give_away_negative_credits => false, # default true
   },
 
 
