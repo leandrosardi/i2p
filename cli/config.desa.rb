@@ -417,7 +417,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Force credits expiration in the moment when the client 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
-		:expiration_on_next_payment => false, # default true
+		:expiration_on_next_payment => true, # default true
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'D', # default D
 		:expiration_lead_units => 7, # default 0
@@ -1369,7 +1369,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		# Force credits expiration in the moment when the client 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
-		:expiration_on_next_payment => false, # default true
+		:expiration_on_next_payment => true, # default true
 		# Additional period after the billing cycle.
 		:expiration_lead_period => 'M', # default D
 		:expiration_lead_units => 12, # default 0

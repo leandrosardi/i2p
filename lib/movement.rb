@@ -165,7 +165,7 @@ module BlackStack
 			credits = 0.to_i - self.credits.to_i
 			#
 			credits_to_expire = credits - credits_consumed.to_i #- (0.to_f - self.credits.to_f)).to_i
-			amount_to_expire = credits_to_expire.to_f * ( total_amount.to_f / total_credits.to_f )
+			amount_to_expire = total_credits.to_f == 0 ? 0 : credits_to_expire.to_f * ( total_amount.to_f / total_credits.to_f )
 			#
 			exp = BlackStack::Movement.new
 			exp.id = guid()
@@ -181,6 +181,10 @@ module BlackStack
 			exp.profits_amount = -amount_to_expire
 			exp.id_invoice_item = self.id_invoice_item
 			exp.product_code = self.product_code
+puts
+puts 'product_code:' + self.product_code.to_s + ':.'
+puts 'amount_to_expire:' + amount_to_expire.to_s + ':.'
+puts 'credits_to_expire:' + credits_to_expire.to_s + ':.'
 			exp.save
 			# 
 			self.expiration_end_time = now()
