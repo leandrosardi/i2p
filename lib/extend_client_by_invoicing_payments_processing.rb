@@ -86,7 +86,7 @@ module BlackStack
 				adjust
       end
 
-			# recalculate the amount for all the consumptions, expirations
+			# recalculate the amount for all the consumptions, expirations, and adjustments
 			def recalculate(product_code)
 				# 
 				amount_paid = 0.to_f
@@ -101,7 +101,11 @@ module BlackStack
 					#if o.credits.to_f < 0 # payment or bonus
 #					if o.credits.to_f > 0 && ( o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION ) # consumption or expiration
 					# consumption or expiration or bonus
-					if o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
+					if ( 
+						o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || 
+						o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION || 
+						o.type==BlackStack::Movement::MOVEMENT_TYPE_ADJUSTMENT
+					)
 						x = credits_paid.to_f == 0 ? 0 : o.credits.to_f * ( amount_paid.to_f / credits_paid.to_f )
 						o.amount = x
 						o.profits_amount = -x

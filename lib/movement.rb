@@ -10,9 +10,9 @@ module BlackStack
     MOVEMENT_TYPE_ADD_BONUS = 1
     MOVEMENT_TYPE_REASSIGN_BALANCE = 2
     MOVEMENT_TYPE_REFUND_BALANCE = 3
-    MOVEMENT_TYPE_CANCELATION = 4 # liability with the client is reduced due service delivery
-    MOVEMENT_TYPE_EXPIRATION = 5 # liability with the client is reduced due credits expiration
-		MOVEMENT_TYPE_ADJUSTMENT = 6 
+    MOVEMENT_TYPE_CANCELATION = 4 # liability with the client is reduced due service delivery. it can be recalculated
+    MOVEMENT_TYPE_EXPIRATION = 5 # liability with the client is reduced due credits expiration. it can be recalculated
+		MOVEMENT_TYPE_ADJUSTMENT = 6 # it can be recalculated
   
     def typeName()
       if (self.type==MOVEMENT_TYPE_ADD_PAYMENT)
@@ -181,10 +181,6 @@ module BlackStack
 			exp.profits_amount = -amount_to_expire
 			exp.id_invoice_item = self.id_invoice_item
 			exp.product_code = self.product_code
-puts
-puts 'product_code:' + self.product_code.to_s + ':.'
-puts 'amount_to_expire:' + amount_to_expire.to_s + ':.'
-puts 'credits_to_expire:' + credits_to_expire.to_s + ':.'
 			exp.save
 			# 
 			self.expiration_end_time = now()
