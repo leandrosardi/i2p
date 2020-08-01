@@ -256,7 +256,7 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
     :return_path=>"#{CS_HOME_WEBSITE}/mac/dashboard?program=mac",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
-    :credits_expiration_units=>3, 
+    :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
   },
   { 
@@ -761,7 +761,9 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :product_code=>PRODUCT_SSM,
     :item_number=>"SSM.Robin-Montly-50%-Off-First-Month", 
     :name=>"SSM Robin 50% Off", 
-    :credits=>25, :fee=>99, :units=>1, :period=>"M", 
+    :credits=>25, :fee=>99, 
+		:units=>1, 
+		:period=>"M", 
     :trial_credits=>10, :trial_fee=>1, :trial_units=>15, :trial_period=>"D",
     :trial2_credits=>25, :trial2_fee=>50, :trial2_units=>1, :trial2_period=>"M",
     #:upsells=>["SUP.Dedicated-Support"],

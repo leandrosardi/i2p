@@ -62,12 +62,16 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			
 			# register bonus
       self.logger.logs 'Run expirations... '
-			c.movements.select {
+			c.movements.select { |m|
 				m.expiration_end_time.nil? &&
 				m.expiration_tries.to_i < 3 &&
 				!m.expiration_time.nil? &&
-				m.expiration_lead_time > Time.now
-			}.each { |m| m.expire() }			
+				m.expiration_lead_time < Time.now
+			}.each { |m|
+				self.logger.logs "#{m.id.to_guid}:#{m.product_code}:#{m.expiration_lead_time.to_s}:."
+				m.expire() 
+				self.logger.done
+			}			
 			self.logger.done
 			
     rescue => e
