@@ -153,7 +153,7 @@ module BlackStack
 		end
 
 		# credits expiration
-		def expire()
+		def expire(registraton_time=nil)
 			credits_consumed = self.credits_consumed
 			# 
 			self.expiration_start_time = now()
@@ -171,7 +171,7 @@ module BlackStack
 			exp = BlackStack::Movement.new
 			exp.id = guid()
 			exp.id_client = self.client.id
-			exp.create_time = now()
+			exp.create_time = registraton_time.nil? ? now() : registraton_time
 			exp.type = BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
 			exp.id_user_creator = self.id_user_creator
 			exp.description = 'Expiration Because Allocation is Renewed'

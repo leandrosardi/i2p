@@ -294,7 +294,7 @@ module BlackStack
 					# 
 					BlackStack::Movement.where(:id_invoice_item => item.id).all { |mov|
 						# 
-						mov.expire if mov.expiration_on_next_payment == true
+						mov.expire(self.billing_period_from) if mov.expiration_on_next_payment == true
 						#
 						DB.disconnect
 						GC.start
