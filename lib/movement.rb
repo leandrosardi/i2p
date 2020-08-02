@@ -153,7 +153,7 @@ module BlackStack
 		end
 
 		# credits expiration
-		def expire(registraton_time=nil)
+		def expire(registraton_time=nil, desc='Expiration Because Allocation is Renewed')
 			credits_consumed = self.credits_consumed
 			# 
 			self.expiration_start_time = now()
@@ -174,7 +174,7 @@ module BlackStack
 			exp.create_time = registraton_time.nil? ? now() : registraton_time
 			exp.type = BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
 			exp.id_user_creator = self.id_user_creator
-			exp.description = 'Expiration Because Allocation is Renewed'
+			exp.description = desc
 			exp.paypal1_amount = 0
 			exp.bonus_amount = 0
 			exp.amount = amount_to_expire
