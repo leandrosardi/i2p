@@ -110,18 +110,17 @@ module BlackStack
 						o.amount = x
 						o.profits_amount = -x
 						o.save
-
-						# if there is negative credits
-						total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
-						total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
-						sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
-						if total_credits < 0
-							self.adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded.')
-						end
-
 					end
 					amount_paid += 0.to_f - o.amount.to_f
 					credits_paid += 0.to_i - o.credits.to_i
+
+					# if there is negative credits
+					total_credits = credits_paid
+					total_amount = amount_paid
+					if total_credits < 0
+						self.adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded.')
+					end
+
 				}
 			end 
 		
