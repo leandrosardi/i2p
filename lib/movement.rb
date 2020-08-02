@@ -61,7 +61,7 @@ module BlackStack
       end
       self.id_client = item.invoice.id_client
       self.id_invoice_item = id_item.nil? ? item.id : id_item
-      self.create_time = payment_time #item.invoice.billing_period_from
+      self.create_time = item.invoice.billing_period_from #payment_time
       self.type = type
       if (type != MOVEMENT_TYPE_ADD_BONUS)
         self.paypal1_amount = item.amount.to_f
