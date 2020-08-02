@@ -68,12 +68,12 @@ module BlackStack
       end
 
       # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
-      def adjustment(product_code, adjustment_amount=0, adjustment_credits=0, description=nil)
+      def adjustment(product_code, adjustment_amount=0, adjustment_credits=0, description=nil, type=BlackStack::Movement::MOVEMENT_TYPE_ADJUSTMENT)
 				adjust = BlackStack::Movement.new
 				adjust.id = guid()
 				adjust.id_client = self.id
 				adjust.create_time = now()
-				adjust.type = BlackStack::Movement::MOVEMENT_TYPE_ADJUSTMENT
+				adjust.type = type
 				adjust.description = description.nil? ? 'Adjustment' : description
 				adjust.paypal1_amount = 0
 				adjust.bonus_amount = 0

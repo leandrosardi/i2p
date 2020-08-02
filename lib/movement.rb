@@ -13,6 +13,7 @@ module BlackStack
     MOVEMENT_TYPE_CANCELATION = 4 # liability with the client is reduced due service delivery. it can be recalculated
     MOVEMENT_TYPE_EXPIRATION = 5 # liability with the client is reduced due credits expiration. it can be recalculated
 		MOVEMENT_TYPE_ADJUSTMENT = 6 # it can be recalculated
+		MOVEMENT_TYPE_REFUND_ADJUSTMENT = 7 # it cannot be recalculated
   
     def typeName()
       if (self.type==MOVEMENT_TYPE_ADD_PAYMENT)

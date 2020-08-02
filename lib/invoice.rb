@@ -602,7 +602,7 @@ module BlackStack
 					net_amount = 0.to_f - BlackStack::Balance.new(self.client.id, u.product_code.to_s).amount.to_f
 					net_credits = 0.to_f - BlackStack::Balance.new(self.client.id, u.product_code.to_s).credits.to_f
 					if net_amount < 0 && net_credits < 0
-						adjust = self.client.adjustment(u.product_code.to_s, net_amount, net_credits, 'Adjustment for Negative Balance')
+						adjust = self.client.adjustment(u.product_code.to_s, net_amount, net_credits, 'Adjustment for Negative Balance after Refund')
 						adjust.id_invoice_item = item1.id
 						adjust.save			
 					end # if net_amount < 0
@@ -636,7 +636,7 @@ module BlackStack
 				# agrego un ajuste por el redondeo a una cantidad entera de creditos
 				if float_units.to_f != units.to_f
 					adjustment_amount = unit_price.to_f * (units.to_f - float_units.to_f)
-					adjust = self.client.adjustment(t.product_code.to_s, adjustment_amount, 0, 'Adjustment for Partial Refund')
+					adjust = self.client.adjustment(t.product_code.to_s, adjustment_amount, 0, 'Adjustment for Partial Refund', BlackStack::Movement::MOVEMENT_TYPE_REFUND_ADJUSTMENT)
 					adjust.id_invoice_item = item1.id
 					adjust.save
 				end
