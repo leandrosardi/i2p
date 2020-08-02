@@ -119,8 +119,9 @@ module BlackStack
 					total_amount = amount_paid
 					if total_credits < 0
 						self.adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded.', BlackStack::Movement::MOVEMENT_TYPE_ADJUSTMENT, o.create_time)
+						amount_paid = 0.to_f
+						credits_paid = 0.to_i
 					end
-
 				}
 			end 
 		
