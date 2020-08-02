@@ -16,7 +16,7 @@ module BlackStack
       "where id_client='#{self.client.id}' " +
       "and product_code='#{self.product_code}' "
 
-			q += "and create_time < '#{self.up_time.to_sql}' " if !self.up_time.nil?
+			q += "and create_time < '#{self.up_time.to_time.to_sql}' " if !self.up_time.nil?
 
       row = DB[q].first
       self.amount = row[:amount].to_f
