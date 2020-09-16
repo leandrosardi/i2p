@@ -449,7 +449,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :upsells=>["PVA.Plan-10", "MAC.Plan-20", "SUP.Dedicated-Support"],
     :bonus_plans=>[
       { :item_number => "MAC.Plan-20", :period => 1 },
-      { :item_number => "THR.Unique-Plan", :period => 1 }, 
       { :item_number => "STO.Small-Plan", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
@@ -480,7 +479,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :upsells=>["ACC.Plan-20", "SUP.Dedicated-Support", "THR.Unique-Plan"],
     :bonus_plans=>[
       { :item_number => "MAC.Plan-20", :period => 1 },
-      { :item_number => "THR.Unique-Plan", :period => 1 }, 
       { :item_number => "STO.Small-Plan", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 1 },
@@ -514,7 +512,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :upsells=>["ACC.Plan-20", "THR.Unique-Plan", "MAC.Plan-20"],
     :bonus_plans=>[
       { :item_number => "MAC.Plan-20", :period => 1 },
-      { :item_number => "THR.Unique-Plan", :period => 1 }, 
       { :item_number => "STO.Small-Plan", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 1 },
@@ -553,7 +550,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :trial_period=>"D", 
     #:upsells=>["SSM.Batman-Monthly", "SUP.Dedicated-Support"],
     :bonus_plans=>[
-      { :item_number => "THR.Unique-Plan", :period => 1 }, 
       { :item_number => "STO.Small-Plan", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
@@ -586,7 +582,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :trial_period=>"D", 
     #:upsells=>["SSM.Hulk-Monthly", "SUP.Dedicated-Support"],
     :bonus_plans=>[
-      { :item_number => "THR.Unique-Plan", :period => 2 }, 
       { :item_number => "STO.Medium-Plan", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 3 },
       { :item_number => "DRX.Plan-8000", :period => 1 },
@@ -620,7 +615,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :trial_period=>"D", 
     #:upsells=>["SUP.Dedicated-Support"],
     :bonus_plans=>[
-      { :item_number => "THR.Unique-Plan", :period => 3 }, 
       { :item_number => "STO.Large-Plan", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 6 },
       { :item_number => "DRX.Plan-16000", :period => 1 },
@@ -651,7 +645,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :period=>"M", 
     #:upsells=>["SUP.Dedicated-Support"],
     :bonus_plans=>[
-      { :item_number => "THR.Unique-Plan", :period => 1 }, 
       { :item_number => "STO.Small-Plan", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
@@ -679,7 +672,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :period=>"M", 
     #:upsells=>["SUP.Dedicated-Support"],
     :bonus_plans=>[
-      { :item_number => "THR.Unique-Plan", :period => 1 }, 
       { :item_number => "STO.Small-Plan", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
@@ -707,7 +699,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :period=>"M", 
     #:upsells=>["SUP.Dedicated-Support"],
     :bonus_plans=>[
-      { :item_number => "THR.Unique-Plan", :period => 2 }, 
       { :item_number => "STO.Medium-Plan", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 3 },
       { :item_number => "DRX.Plan-8000", :period => 1 },
@@ -736,7 +727,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :period=>"M", 
     #:upsells=>["SUP.Dedicated-Support"],
     :bonus_plans=>[
-      { :item_number => "THR.Unique-Plan", :period => 3 }, 
       { :item_number => "STO.Large-Plan", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 6 },
       { :item_number => "DRX.Plan-16000", :period => 1 },
@@ -768,7 +758,6 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :trial2_credits=>25, :trial2_fee=>50, :trial2_units=>1, :trial2_period=>"M",
     #:upsells=>["SUP.Dedicated-Support"],
     :bonus_plans=>[
-      { :item_number => "THR.Unique-Plan", :period => 1 }, 
       { :item_number => "STO.Small-Plan", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
