@@ -331,6 +331,12 @@ module BlackStack
             s.id_client = c.id
             s.active = true
             s.save
+            
+            # obtengo la factura que se creo con esta suscripcion
+            i = BlackStack::Invoice.where(:id=>b.item_number).first
+            
+            # vinculo esta suscripcion a la factura que la genero, y a todas las facturas siguientes
+            i.set_subscription(s)
           end
           
         elsif (

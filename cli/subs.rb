@@ -60,26 +60,25 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			#raise 'Invoice already linked to another subscription' if !i.subscr_id.nil?
 			self.logger.done
 
-      self.logger.logs 'Get the client... '
-			c = i.client
-			self.logger.done			
+  #      self.logger.logs 'Get the client... '
+      c = i.client
+#      self.logger.done      
 
-			# create the subscription
-      self.logger.logs 'Create subscription... '
-			s = BlackStack::PayPalSubscription.new
-			s.id = guid()
-			s.subscr_id = PARSER.value('code')
-			s.id_buffer_paypal_notification = nil
-			s.create_time = now
-			s.id_client = c.id
-			s.active = true
-			s.save
-			self.logger.done
+      # create the subscription
+#      self.logger.logs 'Create subscription... '
+      s = BlackStack::PayPalSubscription.new
+      s.id = guid()
+      s.subscr_id = PARSER.value('code')
+      s.id_buffer_paypal_notification = nil
+      s.create_time = now
+      s.id_client = c.id
+      s.active = true
+      s.save
+#      self.logger.done
 
-      self.logger.logs 'Update invoice... '
-			i.subscr_id = PARSER.value('code')
-			i.save
-			self.logger.done
+#      self.logger.logs 'Create subscription... '
+      i.set_subscription(s)
+#      self.logger.done
 
     rescue => e
       self.logger.error(e)

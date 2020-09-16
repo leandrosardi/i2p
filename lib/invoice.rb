@@ -56,7 +56,22 @@ module BlackStack
         raise "Unknown Invoice Status (#{status.to_s})"
       end
     end
-  
+
+    #
+    def set_subscription(s)
+      i = self
+      i.subscr_id = s.subscr_id
+      i.save
+      # aplico la mismam modificacion a todas las factuas que le siguieron a esta
+      j = BlackStack::Invoice.where(:id_previous_invoice=>i.id).first
+      while !j.nil?
+        j.subscr_id = PARSER.value('code')
+        j.save
+        k = BlackStack::Invoice.where(:id_previous_invoice=>j.id).first
+        j = k
+      end
+    end
+
     # 
     def deserve_trial?
       return self.disabled_for_trial_ssm == false || self.disabled_for_trial_ssm == nil
@@ -371,62 +386,51 @@ module BlackStack
         end
       end
     end
-  
+
     # configura la factura, segun el importe que pagara el cliente, la configuracion del plan en el descriptor h, y si el clietne merece un trial o no 
-    def create_item(item_number, n=1, validate_items_compatibility=true)    
-      #
-      deserve_trial = self.deserve_trial?
-  
-      # busco el primer item de esta factura, si es que existe
-      item0 = self.items.sort_by {|obj| obj.create_time}.first
-  
-      # numero de facturas previas a esta factura
-      subs = BlackStack::PayPalSubscription.where(:subscr_id=>self.subscr_id).first
-      nSubscriptionInvoices = 0 if subs.nil?
-      nSubscriptionInvoices = subs.invoices.count if !subs.nil?
-  
+    def create_item(item_number, n=1, validate_items_compatibility=true)      
+      prev1 = self.previous
+      prev2 = prev1.nil? ? nil : prev1.previous
+
       # encuentro el descriptor del plan
       # el descriptor del plan tambien es necesario para la llamada a paypal_link 
       h = self.client.plans.select { |j| j[:item_number].to_s == item_number.to_s }.first
   
       # mapeo variables
-      c = self.client
       amount = 0.to_f
       unit_price = 0.to_f
       units = 0.to_i
-  
-      # decido si se trata de una suscripcion    
-      isSubscription = false
-      isSubscription = true if h[:type] == "S"
-  
+    
       # le seteo la fecha de hoy
       self.billing_period_from = now()
   
-      # si es una suscripcion, y
       # si el plan tiene un primer trial, y
-      # es primer pago de esta suscripcion, entonces:
-      # => se trata del primer pago por trial de esta suscripcion
-      if (isSubscription && h[:trial_fee] != nil && deserve_trial)
+      # es la primer factura, entonces:
+      # => se trata del primer pago por trial
+      if h[:trial_fee] != nil && prev1.nil?
+#puts 'a'
         units = h[:trial_credits].to_i
         unit_price = h[:trial_fee].to_f / h[:trial_credits].to_f
         billing_period_to = DB["SELECT DATEADD(#{h[:trial_period].to_s}, +#{h[:trial_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
   
-      # si es una suscripcion, y
       # si el plan tiene un segundo trial, y
-      # es segundo pago de esta suscripcion, entonces:
-      # => se trata del segundo pago por trial de esta suscripcion
-      elsif (isSubscription && h[:trial2_fee] != nil && nSubscriptionInvoices == 1)
+      # es la segunda factura, entonces:
+      # => se trata del segundo pago por segundo trial
+      elsif h[:trial2_fee] != nil && !prev1.nil? && prev2.nil?
+#puts 'b'
         units = h[:trial2_credits].to_i
         unit_price = h[:trial2_fee].to_f / h[:trial2_credits].to_f
         billing_period_to = DB["SELECT DATEADD(#{h[:trial2_period].to_s}, +#{h[:trial2_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
   
       # si el plan tiene un fee, y
-      elsif (isSubscription && h[:fee].to_f != nil)
+      elsif h[:fee].to_f != nil && !prev1.nil? && !prev2.nil?
+#puts 'c'
         units = n.to_i * h[:credits].to_i
         unit_price = h[:fee].to_f / h[:credits].to_f
         billing_period_to = DB["SELECT DATEADD(#{h[:period].to_s}, +#{h[:units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
   
       elsif (!isSubscription && h[:fee].to_f != nil)
+#puts 'd'
         units = n.to_i * h[:credits].to_i
         unit_price = h[:fee].to_f / h[:credits].to_f
         billing_period_to = billing_period_from
@@ -435,7 +439,8 @@ module BlackStack
         raise "Plan is specified wrong"
                 
       end
-  
+
+
       #
       amount = units.to_f * unit_price.to_f
   

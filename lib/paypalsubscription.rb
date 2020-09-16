@@ -116,7 +116,7 @@ module BlackStack
         DB[
         "SELECT DISTINCT i.id " +
         "FROM invoice i WITH (NOLOCK) " + 
-        "JOIN buffer_paypal_notification b WITH (NOLOCK) ON (b.id=i.id_buffer_paypal_notification AND b.subscr_id='#{self.subscr_id.to_s}') "
+        "WHERE i.subscr_id='#{self.subscr_id.to_s}' "
         ].all { |row|
           a << BlackStack::Invoice.where(:id=>row[:id]).first
           # release resources 
