@@ -401,6 +401,8 @@ module BlackStack
             i.billing_period_to = b.create_time
             i.paypal_url = nil
             i.disabled_for_add_remove_items = true
+            i.subscr_id = k.subscr_id
+            i.id_previous_invoice = k.id
             i.save()
             
             # parseo el reeembolso - creo el registro contable

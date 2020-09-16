@@ -82,6 +82,8 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			j.billing_period_to = i.billing_period_to
 			j.paypal_url = nil
 			j.disabled_for_add_remove_items = true
+			j.subscr_id = i.subscr_id
+      j.id_previous_invoice = i.id
 			j.save()
             
 			# parseo el reeembolso - creo el registro contable
