@@ -321,7 +321,7 @@ module BlackStack
 					bonus.id_invoice = self.id
 					bonus.product_code = plan_bonus[:product_code]
 					bonus.unit_price = 0
-					bonus.units = plan_bonus[:credits]
+					bonus.units = plan_bonus[:credits] * item.number_of_packages # agrego los creditos del bono, multiplicado por la cantiad de paquetes 
 					bonus.amount = 0
 					bonus.item_number = plan_bonus[:item_number]
 					BlackStack::Movement.new().parse(bonus, BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS, 'Payment Bonus', payment_time, item.id).save()
@@ -523,7 +523,7 @@ module BlackStack
       self.disabled_for_add_remove_items = true
       
       i.items.each { |t| 
-        self.add_item(t.item_number)
+        self.add_item(t.item_number, t.number_of_packages)
         #
         DB.disconnect
         GC.start 
