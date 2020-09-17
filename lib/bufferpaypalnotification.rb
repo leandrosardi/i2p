@@ -390,24 +390,7 @@ module BlackStack
             k = BlackStack::Invoice.where(:id=>row[:id]).first
             
             # creo la factura por el reembolso
-            i = BlackStack::Invoice.new()
-            i.id = guid()
-            i.id_client = c.id
-            i.create_time = now()
-            i.disabled_for_trial_ssm = c.disabled_for_trial_ssm
-            i.id_buffer_paypal_notification = b.id
-            i.status = BlackStack::Invoice::STATUS_REFUNDED
-            i.billing_period_from = b.create_time
-            i.billing_period_to = b.create_time
-            i.paypal_url = nil
-            i.disabled_for_add_remove_items = true
-            i.subscr_id = k.subscr_id
-            i.id_previous_invoice = k.id
-            i.save()
-            
-            # parseo el reeembolso - creo el registro contable
-            i.setup_refund(payment_gross, k.id)
-  
+            k.refund(payment_gross)  
           end
         else
           # unknown

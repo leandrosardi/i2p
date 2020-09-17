@@ -162,9 +162,9 @@ module BlackStack
         if from_time > to_time
           raise "From time must be earlier than To time"
         end
-        if to_time.prev_year > from_time
-          raise "There time frame cannot be longer than 1 year."
-        end
+        #if to_time.prev_year > from_time
+        #  raise "The time frame cannot be longer than 1 year."
+        #end
         to_time += 1
         ds = BlackStack::Movement.where(:id_client => self.id, :product_code=>product_code) if !product_code.nil?
         ds = BlackStack::Movement.where(:id_client => self.id) if product_code.nil?

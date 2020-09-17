@@ -59,17 +59,14 @@ module BlackStack
 
     #
     def set_subscription(s)
-      i = self
-      i.subscr_id = s.subscr_id
-      i.save
+      self.subscr_id = s.subscr_id
+      self.save
       # aplico la mismam modificacion a todas las factuas que le siguieron a esta
-      j = BlackStack::Invoice.where(:id_previous_invoice=>i.id).first
-      while !j.nil?
-        j.subscr_id = PARSER.value('code')
-        j.save
-        k = BlackStack::Invoice.where(:id_previous_invoice=>j.id).first
-        j = k
-      end
+      BlackStack::Invoice.where(:id_previous_invoice=>self.id).all { |j|
+        j.set_subscription(s)
+        DB.disconnect
+        GC.start
+      }
     end
 
     # 
@@ -662,6 +659,28 @@ module BlackStack
       DB.disconnect
       GC.start
     end # def setup_refund
-    
+
+    def refund(amount)
+      c = self.client
+      # creo la factura por el reembolso
+      j = BlackStack::Invoice.new()
+      j.id = guid()
+      j.id_client = c.id
+      j.create_time = now()
+      j.disabled_for_trial_ssm = c.disabled_for_trial_ssm
+      j.id_buffer_paypal_notification = nil
+      j.status = BlackStack::Invoice::STATUS_REFUNDED
+      j.billing_period_from = self.billing_period_from
+      j.billing_period_to = self.billing_period_to
+      j.paypal_url = nil
+      j.disabled_for_add_remove_items = true
+      j.subscr_id = self.subscr_id
+      j.id_previous_invoice = self.id
+      j.save()
+            
+      # parseo el reeembolso - creo el registro contable
+      j.setup_refund(amount, self.id)
+    end # refund
+
   end # class Invoice
 end # module BlackStack 

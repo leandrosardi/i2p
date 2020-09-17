@@ -66,29 +66,10 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       raise 'Invoice not found' if i.nil?
 			self.logger.done
 			
-      self.logger.logs 'Get the client... '
-			c = i.client
-			self.logger.done			
-			            
-      # creo la factura por el reembolso
-			j = BlackStack::Invoice.new()
-			j.id = guid()
-			j.id_client = c.id
-			j.create_time = now()
-			j.disabled_for_trial_ssm = c.disabled_for_trial_ssm
-			j.id_buffer_paypal_notification = nil
-			j.status = BlackStack::Invoice::STATUS_REFUNDED
-			j.billing_period_from = i.billing_period_from
-			j.billing_period_to = i.billing_period_to
-			j.paypal_url = nil
-			j.disabled_for_add_remove_items = true
-			j.subscr_id = i.subscr_id
-      j.id_previous_invoice = i.id
-			j.save()
-            
-			# parseo el reeembolso - creo el registro contable
-			j.setup_refund(-PARSER.value('amount'), i.id)
-			
+      self.logger.logs 'Refund invoice... '
+      i.refund(-PARSER.value('amount'))			
+      self.logger.done
+						
     rescue => e
       self.logger.error(e)
     end
