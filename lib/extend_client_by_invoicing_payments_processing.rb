@@ -166,9 +166,46 @@ module BlackStack
         #  raise "The time frame cannot be longer than 1 year."
         #end
         to_time += 1
-        ds = BlackStack::Movement.where(:id_client => self.id, :product_code=>product_code) if !product_code.nil?
-        ds = BlackStack::Movement.where(:id_client => self.id) if product_code.nil?
-        ds.where("create_time >= ? and create_time <= ?", from_time, to_time)
+      
+        
+      
+        q =
+        "SELECT " +
+        " YEAR(m.create_time) AS creation_year, " + 
+        " MONTH(m.create_time) AS creation_month, " + 
+        " DAY(m.create_time) AS creation_day, " +
+        " YEAR(m.expiration_time) AS expiration_year, " + 
+        " MONTH(m.expiration_time) AS expiration_month, " + 
+        " DAY(m.expiration_time) AS expiration_day, " +
+        " m.type, " +
+        " m.product_code, " +
+        " CAST(m.description AS VARCHAR(500)) AS description, " +
+        " SUM(ISNULL(m.paypal1_amount,0)) AS paypal1_amount, " + 
+        " SUM(ISNULL(m.bonus_amount,0)) AS paypal1_amount, " + 
+        " SUM(ISNULL(m.amount,0)) AS paypal1_amount, " + 
+        " SUM(ISNULL(m.credits,0)) AS paypal1_amount, " + 
+        " SUM(ISNULL(m.profits_amount,0)) AS paypal1_amount, " + 
+        " SUM(ISNULL(m.credits,0)) AS paypal1_amount " + 
+        "FROM movement m WITH (NOLOCK) " +
+        "WHERE m.id_client = '#{self.id}' "
+        
+        q += "AND m.product_code = '#{product_code}' " if !product_code.nil?
+        
+        q +=
+        "AND create_time >= '#{from_time.to_sql}' " +
+        "AND create_time <= '#{to_time.to_sql}' " +
+        "GROUP BY " +
+        " YEAR(m.create_time), " + 
+        " MONTH(m.create_time), " + 
+        " DAY(m.create_time), " +
+        " YEAR(m.expiration_time), " + 
+        " MONTH(m.expiration_time), " + 
+        " DAY(m.expiration_time), " +
+        " m.type, " +
+        " m.product_code, " +
+        " CAST(m.description AS VARCHAR(500)) "
+
+        DB[q].all
       end
 
       # 

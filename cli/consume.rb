@@ -74,7 +74,12 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			
 			# consume
       self.logger.logs 'Consume the credits... '
-			c.consume(PARSER.value('service'), PARSER.value('credits').to_i, 'Consumption')
+			i = 0
+			while i<PARSER.value('credits').to_i
+			 c.consume(PARSER.value('service'), 1, 'Consumption')
+			 i+=1
+			 print '.'
+			end
 			self.logger.done
 			
     rescue => e
