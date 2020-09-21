@@ -166,11 +166,24 @@ module BlackStack
         #  raise "The time frame cannot be longer than 1 year."
         #end
         to_time += 1
-      
-        
-      
+=begin
+      :id => movement.id,
+      :id_client => movement.id_client,
+      :product_code => movement.product_code,
+      :create_time => movement.create_time,
+      :type => movement.type.to_i,
+      :description => movement.description,
+      :paypal1_amount => movement.paypal1_amount.to_f,
+      :bonus_amount => movement.bonus_amount.to_f,
+      :amount => movement.amount.to_f,
+      :credits => movement.credits.to_f,
+      :profits_amount => movement.profits_amount.to_f,
+      :expiration_time => movement.expiration_time,
+      :expiration_description => movement.expiration_time.nil? ? '-' : ((movement.expiration_time - Time.now()).to_f / 60.to_f).to_i.to_time_spent 
+=end  
         q =
         "SELECT " +
+        " m.id_client, " +
         " YEAR(m.create_time) AS creation_year, " + 
         " MONTH(m.create_time) AS creation_month, " + 
         " DAY(m.create_time) AS creation_day, " +
@@ -180,12 +193,12 @@ module BlackStack
         " m.type, " +
         " m.product_code, " +
         " CAST(m.description AS VARCHAR(500)) AS description, " +
+        " CAST(m.expiration_description AS VARCHAR(500)) AS expiration_description, " +
         " SUM(ISNULL(m.paypal1_amount,0)) AS paypal1_amount, " + 
-        " SUM(ISNULL(m.bonus_amount,0)) AS paypal1_amount, " + 
-        " SUM(ISNULL(m.amount,0)) AS paypal1_amount, " + 
-        " SUM(ISNULL(m.credits,0)) AS paypal1_amount, " + 
-        " SUM(ISNULL(m.profits_amount,0)) AS paypal1_amount, " + 
-        " SUM(ISNULL(m.credits,0)) AS paypal1_amount " + 
+        " SUM(ISNULL(m.bonus_amount,0)) AS bonus_amount, " + 
+        " SUM(ISNULL(m.amount,0)) AS amount, " + 
+        " SUM(ISNULL(m.credits,0)) AS credits, " + 
+        " SUM(ISNULL(m.profits_amount,0)) AS profits_amount " + 
         "FROM movement m WITH (NOLOCK) " +
         "WHERE m.id_client = '#{self.id}' "
         
@@ -195,6 +208,7 @@ module BlackStack
         "AND create_time >= '#{from_time.to_sql}' " +
         "AND create_time <= '#{to_time.to_sql}' " +
         "GROUP BY " +
+        " m.id_client, " + 
         " YEAR(m.create_time), " + 
         " MONTH(m.create_time), " + 
         " DAY(m.create_time), " +
@@ -203,7 +217,8 @@ module BlackStack
         " DAY(m.expiration_time), " +
         " m.type, " +
         " m.product_code, " +
-        " CAST(m.description AS VARCHAR(500)) "
+        " CAST(m.description AS VARCHAR(500)), " +
+        " CAST(m.expiration_description AS VARCHAR(500)) "
 
         DB[q].all
       end
