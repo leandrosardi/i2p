@@ -400,11 +400,12 @@ module BlackStack
     
       # le seteo la fecha de hoy
       self.billing_period_from = now()
-  
+#puts
+#puts
       # si el plan tiene un primer trial, y
       # es la primer factura, entonces:
       # => se trata del primer pago por trial
-      if h[:trial_fee] != nil && prev1.nil?
+      if h[:trial_fee] != nil && prev1.nil? && !self.disabled_for_trial_ssm
 #puts 'a'
         units = h[:trial_credits].to_i
         unit_price = h[:trial_fee].to_f / h[:trial_credits].to_f
@@ -420,13 +421,13 @@ module BlackStack
         billing_period_to = DB["SELECT DATEADD(#{h[:trial2_period].to_s}, +#{h[:trial2_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
   
       # si el plan tiene un fee, y
-      elsif h[:fee].to_f != nil && !prev1.nil? && !prev2.nil?
+      elsif h[:fee].to_f != nil && h[:type] == BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION
 #puts 'c'
         units = n.to_i * h[:credits].to_i
         unit_price = h[:fee].to_f / h[:credits].to_f
         billing_period_to = DB["SELECT DATEADD(#{h[:period].to_s}, +#{h[:units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
   
-      elsif (!isSubscription && h[:fee].to_f != nil)
+      elsif h[:fee].to_f != nil && h[:type] == BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_PAY_AS_YOU_GO
 #puts 'd'
         units = n.to_i * h[:credits].to_i
         unit_price = h[:fee].to_f / h[:credits].to_f
