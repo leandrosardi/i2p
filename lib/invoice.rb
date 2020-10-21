@@ -10,9 +10,15 @@ module BlackStack
   
     many_to_one :buffer_paypal_notification, :class=>:'BlackStack::BufferPayPalNotification', :key=>:id_buffer_paypal_notification
     many_to_one :client, :class=>:'BlackStack::Client', :key=>:id_client
-    many_to_one :paypal_subscription, :class=>:'BlackStack::PayPalSubscription', :key=>:id_paypal_subscription
+    #many_to_one :paypal_subscription, :class=>:'BlackStack::PayPalSubscription', :key=>:id_paypal_subscription
 		many_to_one :previous, :class=>:'BlackStack::Invoice', :key=>:id_previous_invoice
     one_to_many :items, :class=>:'BlackStack::InvoiceItem', :key=>:id_invoice
+  
+    def paypal_subscription
+      return nil if self.subscr_id.nil?
+      return nil if self.subscr_id.to_s.size == 0
+      return BlackStack::PayPalSubscription.where(:subscr_id=>self.subscr_id.to_s).first
+    end
   
     # compara 2 planes, y retorna TRUE si ambos pueden coexistir en una misma facutra, con un mismo enlace de PayPal
     def self.compatibility?(h, i)
@@ -60,6 +66,7 @@ module BlackStack
     #
     def set_subscription(s)
       self.subscr_id = s.subscr_id
+      self.delete_time = nil
       self.save
       # aplico la mismam modificacion a todas las factuas que le siguieron a esta
       BlackStack::Invoice.where(:id_previous_invoice=>self.id).all { |j|
@@ -246,6 +253,15 @@ module BlackStack
     def canBePaid?
       self.status == nil || self.status == BlackStack::Invoice::STATUS_UNPAID
     end
+
+    # retorna true si el estado de la factura sea NULL o UNPAID
+    def canBeDeleted?
+      if self.paypal_subscription.nil?
+        return self.status == nil || self.status == BlackStack::Invoice::STATUS_UNPAID
+      else # !self.paypal_subscription.nil?
+        return (self.status == nil || self.status == BlackStack::Invoice::STATUS_UNPAID) && !self.paypal_subscription.active
+      end # if self.paypal_subscription.nil?
+    end
   
     # actualiza el registro en la tabla invoice segun los parametros. 
     # en este caso la factura se genera antes del pago.
@@ -298,6 +314,7 @@ module BlackStack
       end
       # marco la factura como pagada
       self.status = BlackStack::Invoice::STATUS_PAID
+      self.delete_time = nil
       self.save
 			# expiracion de creditos de la factura anterior
 			i = self.previous
@@ -325,19 +342,21 @@ module BlackStack
 				# registro el pago
         BlackStack::Movement.new().parse(item, BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT, "Invoice Payment", payment_time, item.id).save()
 				# agrego los bonos de este plan
-				plan[:bonus_plans].each { |h|
-					plan_bonus = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(h[:item_number])
-					raise "bonus plan not found" if plan_bonus.nil?					
-					bonus = BlackStack::InvoiceItem.new
-					bonus.id = guid()
-					bonus.id_invoice = self.id
-					bonus.product_code = plan_bonus[:product_code]
-					bonus.unit_price = 0
-					bonus.units = plan_bonus[:credits] * item.number_of_packages # agrego los creditos del bono, multiplicado por la cantiad de paquetes 
-					bonus.amount = 0
-					bonus.item_number = plan_bonus[:item_number]
-					BlackStack::Movement.new().parse(bonus, BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS, 'Payment Bonus', payment_time, item.id).save()
-				}
+				if !plan[:bonus_plans].nil?
+  				plan[:bonus_plans].each { |h|
+  					plan_bonus = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(h[:item_number])
+  					raise "bonus plan not found" if plan_bonus.nil?					
+  					bonus = BlackStack::InvoiceItem.new
+  					bonus.id = guid()
+  					bonus.id_invoice = self.id
+  					bonus.product_code = plan_bonus[:product_code]
+  					bonus.unit_price = 0
+  					bonus.units = plan_bonus[:credits] * item.number_of_packages # agrego los creditos del bono, multiplicado por la cantiad de paquetes 
+  					bonus.amount = 0
+  					bonus.item_number = plan_bonus[:item_number]
+  					BlackStack::Movement.new().parse(bonus, BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS, 'Payment Bonus', payment_time, item.id).save()
+  				}
+        end # if !plan[:bonus_plans].nil?
         #
         DB.disconnect
         GC.start
@@ -524,7 +543,7 @@ module BlackStack
 			self.id_previous_invoice = i.id
       self.subscr_id = i.subscr_id 
       self.disabled_for_add_remove_items = true
-      
+
       i.items.each { |t| 
         self.add_item(t.item_number, t.number_of_packages)
         #
