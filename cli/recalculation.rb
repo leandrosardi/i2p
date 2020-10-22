@@ -62,7 +62,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			
 			# register bonus
       self.logger.logs 'Recalculate... '
-			c.recalculate(PARSER.value('service'))
+      BlackStack::InvoicingPaymentsProcessing::products_descriptor.each { |h|
+        self.logger.logs "Product:#{h[:code]}... "
+        c.recalculate(h[:code])
+        self.logger.done
+      }
 			self.logger.done
 			
     rescue => e
