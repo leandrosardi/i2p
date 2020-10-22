@@ -211,7 +211,7 @@ module BlackStack
         trial2 = allow_trials && plan_descriptor[:trial2_fee]!=nil && plan_descriptor[:trial2_period]!=nil && plan_descriptor[:trial2_units]!=nil
         
         values[:a3] = 0
-        self.items.each { |i|         
+        self.items.each { |i|
           if trial1 && i.units!=i.plan_descriptor[:trial_credits]
             raise 'Cannot order more than 1 package and trial in the same invoice'
           elsif trial1
@@ -315,6 +315,11 @@ module BlackStack
       # marco la factura como pagada
       self.status = BlackStack::Invoice::STATUS_PAID
       self.delete_time = nil
+      if self.previous.nil? # si es la primer factura de una suscripcion, o no es una suscripcion
+        diff = payment_time.to_time - self.billing_period_from.to_time
+        self.billing_period_from = payment_time
+        self.billing_period_to = self.billing_period_to.to_time + diff
+      end
       self.save
 			# expiracion de creditos de la factura anterior
 			i = self.previous
@@ -420,7 +425,7 @@ module BlackStack
       # le seteo la fecha de hoy
       self.billing_period_from = now()
 #puts
-#puts
+#puts  
       # si el plan tiene un primer trial, y
       # es la primer factura, entonces:
       # => se trata del primer pago por trial
@@ -429,7 +434,7 @@ module BlackStack
         units = h[:trial_credits].to_i
         unit_price = h[:trial_fee].to_f / h[:trial_credits].to_f
         billing_period_to = DB["SELECT DATEADD(#{h[:trial_period].to_s}, +#{h[:trial_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
-  
+
       # si el plan tiene un segundo trial, y
       # es la segunda factura, entonces:
       # => se trata del segundo pago por segundo trial
@@ -438,7 +443,7 @@ module BlackStack
         units = h[:trial2_credits].to_i
         unit_price = h[:trial2_fee].to_f / h[:trial2_credits].to_f
         billing_period_to = DB["SELECT DATEADD(#{h[:trial2_period].to_s}, +#{h[:trial2_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
-  
+
       # si el plan tiene un fee, y
       elsif h[:fee].to_f != nil && h[:type] == BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION
 #puts 'c'

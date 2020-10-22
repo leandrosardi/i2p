@@ -236,6 +236,9 @@ module BlackStack
     def self.process(params)
       DB.transaction do
         # verifico que no existe ya una notificacion
+#puts
+#puts 
+#puts "params2:#{params.to_s}:."
         b = BlackStack::BufferPayPalNotification.where(:id=>params['id']).first
         if b.nil?
           # proceso la notificacion
@@ -299,7 +302,7 @@ module BlackStack
     
           # marco la factura como pagada
           # registro contable - bookkeeping
-          i.getPaid() if i.canBePaid?
+          i.getPaid(b.create_time) if i.canBePaid?
     
           # crea una factura para el periodo siguiente (dia, semana, mes, anio)
           j = BlackStack::Invoice.new()

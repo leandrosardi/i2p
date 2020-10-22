@@ -15,38 +15,55 @@ module BlackStack
 		MOVEMENT_TYPE_ADJUSTMENT = 6 # it can be recalculated
 		MOVEMENT_TYPE_REFUND_ADJUSTMENT = 7 # it cannot be recalculated
   
-    def typeName()
-      if (self.type==MOVEMENT_TYPE_ADD_PAYMENT)
+    def self.typeName(t)
+      if (t==MOVEMENT_TYPE_ADD_PAYMENT)
         return "Payment"
-      elsif (self.type==MOVEMENT_TYPE_ADD_BONUS)
+      elsif (t==MOVEMENT_TYPE_ADD_BONUS)
         return "Bonus"
-      elsif (self.type==MOVEMENT_TYPE_REASSIGN_BALANCE)
+      elsif (t==MOVEMENT_TYPE_REASSIGN_BALANCE)
         return "Reassignation"
-      elsif (self.type==MOVEMENT_TYPE_REFUND_BALANCE)
+      elsif (t==MOVEMENT_TYPE_REFUND_BALANCE)
         return "Refund"
-      elsif (self.type==MOVEMENT_TYPE_CANCELATION)
-        return "Service"
-      elsif (self.type==MOVEMENT_TYPE_EXPIRATION)
+      elsif (t==MOVEMENT_TYPE_CANCELATION)
+        return "Consumption"
+      elsif (t==MOVEMENT_TYPE_EXPIRATION)
         return "Expiration"
+      elsif (t==MOVEMENT_TYPE_ADJUSTMENT)
+        return "Adjustement"
+      elsif (t==MOVEMENT_TYPE_REFUND_ADJUSTMENT)
+        return "Adjustement"
       end
+      '(unknown)'
+    end
+
+    def typeName()
+      BlackStack::Movement::typeName(self.type)
     end
   
-    def typeColorName()
-      if (self.type==MOVEMENT_TYPE_ADD_PAYMENT)
+    def self.typeColorName(t)
+      if (t==MOVEMENT_TYPE_ADD_PAYMENT)
         return "green"
-      elsif (self.type==MOVEMENT_TYPE_ADD_BONUS)
+      elsif (t==MOVEMENT_TYPE_ADD_BONUS)
         return "orange"
-      elsif (self.type==MOVEMENT_TYPE_REASSIGN_BALANCE)
+      elsif (t==MOVEMENT_TYPE_REASSIGN_BALANCE)
         return "black"
-      elsif (self.type==MOVEMENT_TYPE_REFUND_BALANCE)
+      elsif (t==MOVEMENT_TYPE_REFUND_BALANCE)
         return "red"
-      elsif (self.type==MOVEMENT_TYPE_CANCELATION)
+      elsif (t==MOVEMENT_TYPE_CANCELATION)
         return "blue"
-      elsif (self.type==MOVEMENT_TYPE_EXPIRATION)
+      elsif (t==MOVEMENT_TYPE_EXPIRATION)
         return "blue"
+      elsif (t==MOVEMENT_TYPE_ADJUSTMENT)
+        return "green"
+      elsif (t==MOVEMENT_TYPE_REFUND_ADJUSTMENT)
+        return "green"
       end
     end
-    
+
+    def typeName()
+      BlackStack::Movement::typeColorName(self.type)
+    end
+
     # actualiza el registro con los valores del item de una factura
     # type may be either MOVEMENT_TYPE_ADD_PAYMENT or MOVEMENT_TYPE_ADD_BONUS or MOVEMENT_TYPE_REFUND_BALANCE, but not other value
     def parse(item, type=MOVEMENT_TYPE_ADD_PAYMENT, description='n/a', payment_time=nil, id_item=nil)

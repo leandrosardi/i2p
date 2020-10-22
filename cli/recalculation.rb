@@ -19,12 +19,6 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :description=>'ID of the client who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
-    :name=>'service', 
-    :mandatory=>true,
-    :description=>'Code of the product that is being consumed.', 
-    :type=>BlackStack::SimpleCommandLineParser::STRING,
-		:default=>Time.now().to_s,
-  }, {
     :name=>'name', 
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
