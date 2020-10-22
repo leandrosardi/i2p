@@ -15,6 +15,19 @@ module BlackStack
 		MOVEMENT_TYPE_ADJUSTMENT = 6 # it can be recalculated
 		MOVEMENT_TYPE_REFUND_ADJUSTMENT = 7 # it cannot be recalculated
   
+    def self.types()
+      [
+        MOVEMENT_TYPE_ADD_PAYMENT,
+        MOVEMENT_TYPE_ADD_BONUS,
+        MOVEMENT_TYPE_REASSIGN_BALANCE,
+        MOVEMENT_TYPE_REFUND_BALANCE,
+        MOVEMENT_TYPE_CANCELATION,
+        MOVEMENT_TYPE_EXPIRATION,
+        MOVEMENT_TYPE_ADJUSTMENT,
+        MOVEMENT_TYPE_REFUND_ADJUSTMENT
+      ]
+    end
+  
     def self.typeName(t)
       if (t==MOVEMENT_TYPE_ADD_PAYMENT)
         return "Payment"

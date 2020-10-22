@@ -232,7 +232,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       }
       self.logger.done
 			
-			# TODO: run expirations in the division
+			# CANCELED: run expirations in the division -> It's done in p/_jobs.rb 
 			
     rescue => e
       self.logger.error(e)

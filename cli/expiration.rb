@@ -70,7 +70,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 				m.expiration_lead_time < Time.now
 			}.each { |m|
 				self.logger.logs "#{m.id.to_guid}:#{m.product_code}:#{m.expiration_lead_time.to_s}:."
-				m.expire(m.expiration_lead_time, 'Expiraton Lead Time Reached') 
+				m.expire(m.expiration_lead_time, 'Expiration Lead Time Reached') 
 				self.logger.done
 			}			
 			self.logger.done
