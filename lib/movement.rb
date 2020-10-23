@@ -42,9 +42,9 @@ module BlackStack
       elsif (t==MOVEMENT_TYPE_EXPIRATION)
         return "Expiration"
       elsif (t==MOVEMENT_TYPE_ADJUSTMENT)
-        return "Adjustement"
+        return "Credit Adjustement"
       elsif (t==MOVEMENT_TYPE_REFUND_ADJUSTMENT)
-        return "Adjustement"
+        return "Refund Adjustement"
       end
       '(unknown)'
     end
@@ -57,7 +57,7 @@ module BlackStack
       if (t==MOVEMENT_TYPE_ADD_PAYMENT)
         return "green"
       elsif (t==MOVEMENT_TYPE_ADD_BONUS)
-        return "orange"
+        return "green"
       elsif (t==MOVEMENT_TYPE_REASSIGN_BALANCE)
         return "black"
       elsif (t==MOVEMENT_TYPE_REFUND_BALANCE)
@@ -67,9 +67,9 @@ module BlackStack
       elsif (t==MOVEMENT_TYPE_EXPIRATION)
         return "blue"
       elsif (t==MOVEMENT_TYPE_ADJUSTMENT)
-        return "green"
+        return "orange"
       elsif (t==MOVEMENT_TYPE_REFUND_ADJUSTMENT)
-        return "green"
+        return "orange"
       end
     end
 

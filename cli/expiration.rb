@@ -69,8 +69,8 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 				!m.expiration_time.nil? &&
 				m.expiration_lead_time < Time.now
 			}.each { |m|
-				self.logger.logs "#{m.id.to_guid}:#{m.product_code}:#{m.expiration_lead_time.to_s}:."
-				m.expire(m.expiration_lead_time, 'Expiration Lead Time Reached') 
+				self.logger.logs "#{m.id.to_guid}:#{m.product_code}:#{m.expiration_lead_time.to_s}:."				
+				m.expire(m.expiration_lead_time, "Expiration of <a href='/member/record?rid=#{m.id.to_guid}'>record:#{m.id.to_guid}</a> because the lead-time has been reached.") 
 				self.logger.done
 			}			
 			self.logger.done
