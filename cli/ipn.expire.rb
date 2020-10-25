@@ -56,7 +56,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     begin		
 			# get the client
       self.logger.logs 'Get the client... '
-			c = BlackStack::Client.where(:id=>PARSER.value('id_client')).first
+			c = BlackStack::Client.where(:id=>PARSER.value('id')).first
       raise 'Client not found' if c.nil?
 			self.logger.done
 			
