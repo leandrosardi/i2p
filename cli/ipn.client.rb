@@ -14,7 +14,7 @@ require_relative './config'
 PARSER = BlackStack::SimpleCommandLineParser.new(
   :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
-    :name=>'id_client', 
+    :name=>'id', 
     :mandatory=>true, 
     :description=>'ID of the client who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
@@ -49,41 +49,14 @@ class MyCLIProcess < BlackStack::MyLocalProcess
   
   def process(argv)
     self.logger.log "Say hello to CLI for IPN manual processing!"
+    self.logger.log "ipn.client is ready."
     
-    self.logger.log "DB:#{DB['SELECT db_name() AS s'].first[:s]}."
-    
-    # process 
-    begin		
-			# get the client
-      self.logger.logs 'Get the client... '
-			c = BlackStack::Client.where(:id=>PARSER.value('id_client')).first
-      raise 'Client not found' if c.nil?
-			self.logger.done
-			
-			# register bonus
-      self.logger.logs 'Run expirations... '
-			c.movements.select { |m|
-				(m.type == BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT || m.type == BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS) &&
-				m.expiration_end_time.nil? &&
-				m.expiration_tries.to_i < 3 &&
-				!m.expiration_time.nil? &&
-				m.expiration_lead_time < Time.now
-			}.each { |m|
-				self.logger.logs "#{m.id.to_guid}:#{m.product_code}:#{m.expiration_lead_time.to_s}:."				
-				m.expire(m.expiration_lead_time, "Expiration of <a href='/member/record?rid=#{m.id.to_guid}'>record:#{m.id.to_guid}</a> because the lead-time has been reached.") 
-				self.logger.done
-			}			
-			self.logger.done
-			
-    rescue => e
-      self.logger.error(e)
-    end
-
-    # libero recursos
-    self.logger.logs "Release resources... "
-    DB.disconnect
-    GC.start   
-    self.logger.done
+    s = system("ipn.reproc.rb id=#{PARSER.value('id')} 1>nul 2>&1")
+#    s = system("dir")
+    puts
+    puts
+    puts
+    puts "result:#{s}"
 
     self.logger.logs "Sleep for long time. Click CTRL+C to exit... "
     sleep(500000)

@@ -23,13 +23,13 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>DEFAULT_WORKER_NAME,
+    :default=>'dispatcher_euler',
   }, {
     :name=>'division', 
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too. The invoice cannot be already linked to another subscription.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>DEFAULT_DIVISION_NAME,
+    :default=>'euler',
   }]
 )
 

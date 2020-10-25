@@ -1,3 +1,10 @@
+#require "blackstack_commons"
+#s = Time.now().to_s
+#puts s
+#t = DateTime.strptime(s, '%Y-%m-%d %H:%M:%S %Z').to_time
+#puts t.to_s
+#exit(0)
+
 require "simple_command_line_parser"
 require "pampa_workers"
 require_relative "../lib/invoicing_payments_processing"
@@ -5,24 +12,24 @@ require_relative './config'
 
 # command line parameters 
 PARSER = BlackStack::SimpleCommandLineParser.new(
-  :description => 'This command will connect a division, and process an IPN already stored in the buffer_paypal_notification table.', 
+  :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
-    :name=>'id', 
+    :name=>'id_client', 
     :mandatory=>true, 
-    :description=>'ID of the record in the table buffer_paypal_notification.', 
+    :description=>'ID of the client who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
     :name=>'name', 
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>DEFAULT_WORKER_NAME,
+    :default=>'dispatcher_euler',
   }, {
     :name=>'division', 
     :mandatory=>false, 
-    :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
+    :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too. The invoice cannot be already linked to another subscription.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>DEFAULT_DIVISION_NAME,
+    :default=>'euler',
   }]
 )
 
@@ -45,33 +52,29 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     
     self.logger.log "DB:#{DB['SELECT db_name() AS s'].first[:s]}."
     
-    # process IPN
-    begin  
-      #
-      self.logger.logs "Load IPN (#{PARSER.value('id')})... "
-      p = BlackStack::BufferPayPalNotification.where(:id=>PARSER.value('id')).first
-      raise 'IPN not found' if p.nil?
-      self.logger.done
-  
-      # inicio la sincronizacion.
-      self.logger.logs "Initialize IPN... "
-      p.sync_result = nil
-      p.sync_start_time = now()
-      p.sync_end_time = nil
-      p.save()
-      self.logger.done
-
-      self.logger.logs "Process IPN... "
-			BlackStack::BufferPayPalNotification.process(p.to_hash)
-      self.logger.done
-
-      # close the job.
-			# reload the object with the updates made by the process method.
-      self.logger.logs "Close IPN job... "
-      p2 = BlackStack::BufferPayPalNotification.where(:id=>PARSER.value('id')).first
-      p2.sync_end_time = now()
-      p2.save()
-      self.logger.done
+    # process 
+    begin		
+			# get the client
+      self.logger.logs 'Get the client... '
+			c = BlackStack::Client.where(:id=>PARSER.value('id_client')).first
+      raise 'Client not found' if c.nil?
+			self.logger.done
+			
+			# register bonus
+      self.logger.logs 'Run expirations... '
+			c.movements.select { |m|
+				(m.type == BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT || m.type == BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS) &&
+				m.expiration_end_time.nil? &&
+				m.expiration_tries.to_i < 3 &&
+				!m.expiration_time.nil? &&
+				m.expiration_lead_time < Time.now
+			}.each { |m|
+				self.logger.logs "#{m.id.to_guid}:#{m.product_code}:#{m.expiration_lead_time.to_s}:."				
+				m.expire(m.expiration_lead_time, "Expiration of <a href='/member/record?rid=#{m.id.to_guid}'>record:#{m.id.to_guid}</a> because the lead-time has been reached.") 
+				self.logger.done
+			}			
+			self.logger.done
+			
     rescue => e
       self.logger.error(e)
     end

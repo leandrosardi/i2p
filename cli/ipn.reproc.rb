@@ -14,7 +14,7 @@ require_relative './config'
 PARSER = BlackStack::SimpleCommandLineParser.new(
   :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
-    :name=>'id_client', 
+    :name=>'id', 
     :mandatory=>true, 
     :description=>'ID of the client who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
@@ -43,7 +43,7 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>DEFAULT_WORKER_NAME,
+    :default=>'dispatcher_kepler',
   }, {
     :name=>'division', 
     :mandatory=>false, 
@@ -76,7 +76,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     begin					
 			# get the client
       self.logger.logs 'Get the client... '
-			c = BlackStack::Client.where(:id=>PARSER.value('id_client')).first
+			c = BlackStack::Client.where(:id=>PARSER.value('id')).first
       raise 'Client not found' if c.nil?
 			self.logger.done
 
@@ -164,11 +164,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         # delete the IPNs in the division (NEVER in the central)
         self.logger.logs 'Delete IPNs in the division... '
         DB.execute(
-          "delete #{dname}..buffer_paypal_notification where payer_email in ( " +
+          "delete #{dname}..buffer_paypal_notification where payer_email COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
           "  select distinct payer_email " +
           "  from kepler..buffer_paypal_notification " + 
-          "  where item_number in ( " +
-          "    select cast(id as varchar(500)) " +
+          "  where item_number COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
+          "    select cast(id as varchar(500)) COLLATE SQL_Latin1_General_CP1_CI_AS " +
           "    from #{dname}..invoice " +
           "    where id_client='#{c.id}' " +
           "  ) " +
