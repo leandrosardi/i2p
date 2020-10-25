@@ -35,7 +35,7 @@ module BlackStack
 				total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
 				sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
 				if total_credits < 0
-					self.adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded.')
+					self.adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded (1).')
 				end
 				# recaculate amounts in both consumptions and expirations - CANCELADO - Se debe hacer offline
 				#self.recalculate(product_code) 
@@ -97,7 +97,7 @@ module BlackStack
 
 				self.movements.select { |o| 
 					o.product_code.upcase == product_code.upcase
-				}.sort_by { |o| o.create_time }.each { |o|
+				}.sort_by { |o| o.create_time, o.type }.each { |o| # se ordena por o.create_time, pero tmabien por o.type para procesar primero los pagos y bonos
 					#if o.credits.to_f < 0 # payment or bonus
 #					if o.credits.to_f > 0 && ( o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION ) # consumption or expiration
 					# consumption or expiration or bonus
@@ -118,7 +118,7 @@ module BlackStack
 					total_credits = credits_paid
 					total_amount = amount_paid
 					if total_credits < 0
-						self. adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded.', BlackStack::Movement::MOVEMENT_TYPE_ADJUSTMENT, o.create_time)
+						self. adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded (2).', BlackStack::Movement::MOVEMENT_TYPE_ADJUSTMENT, o.create_time)
 						amount_paid = 0.to_f
 						credits_paid = 0.to_i
 					end
