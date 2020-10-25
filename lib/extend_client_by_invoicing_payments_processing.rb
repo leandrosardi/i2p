@@ -97,7 +97,7 @@ module BlackStack
 
 				self.movements.select { |o| 
 					o.product_code.upcase == product_code.upcase
-				}.sort_by { |o| o.create_time, o.type }.each { |o| # se ordena por o.create_time, pero tmabien por o.type para procesar primero los pagos y bonos
+				}.sort_by { |o| [o.create_time, o.type] }.each { |o| # se ordena por o.create_time, pero tmabien por o.type para procesar primero los pagos y bonos
 					#if o.credits.to_f < 0 # payment or bonus
 #					if o.credits.to_f > 0 && ( o.type==BlackStack::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION ) # consumption or expiration
 					# consumption or expiration or bonus
