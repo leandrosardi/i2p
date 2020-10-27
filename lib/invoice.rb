@@ -624,8 +624,9 @@ module BlackStack
           item1.detail = u.detail.to_s
           item1.description = u.description.to_s
           item1.save()
+          # hago el reembolso de este item
+          # si el balance quedo en negativo, entonces aplico otro ajuste
           BlackStack::Movement.new().parse(item1, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE, "Full Refund of <a href='/member/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.").save()        
-					# si el balance quedo en negativo, entonces aplico otro ajuste
 					net_amount = 0.to_f - BlackStack::Balance.new(self.client.id, u.product_code.to_s).amount.to_f
 					net_credits = 0.to_f - BlackStack::Balance.new(self.client.id, u.product_code.to_s).credits.to_f
 					if net_amount < 0 && net_credits < 0
@@ -633,12 +634,37 @@ module BlackStack
 						adjust.id_invoice_item = item1.id
 						adjust.save			
 					end # if net_amount < 0
+          # hago el reembolso de cada bono de este item
+          # si el balance quedo en negativo, entonces aplico otro ajuste
+          h[:bonus_plans].each { |bonus|
+            i = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == bonus[:item_number] }.first
+            j = BlackStack::InvoicingPaymentsProcessing::products_descriptor.select { |obj| obj[:code] == i[:product_code] }.first
+            item2 = BlackStack::InvoiceItem.new()
+            item2.id = guid()
+            item2.id_invoice = self.id
+            item2.unit_price = 0
+            item2.units = -i[:credits]
+            item2.amount = 0
+            item2.product_code = i[:product_code].to_s
+            item2.item_number = i[:item_number].to_s
+            item2.detail = 'Bonus Refund'
+            item2.description = j[:description].to_s
+            item2.save()
+            BlackStack::Movement.new().parse(item2, BlackStack::Movement::MOVEMENT_TYPE_REFUND_BALANCE, "Bonus Refund of <a href='/member/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.").save()        
+            net_amount = 0.to_f - BlackStack::Balance.new(self.client.id, i[:product_code].to_s).amount.to_f
+            net_credits = 0.to_f - BlackStack::Balance.new(self.client.id, i[:product_code].to_s).credits.to_f
+            if net_amount <= 0 && net_credits < 0
+              adjust = self.client.adjustment(i[:product_code].to_s, net_amount, net_credits, "Adjustment for Negative Balance After Bonus Refund of <a href='/member/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
+              adjust.id_invoice_item = item1.id
+              adjust.save     
+            end # if net_amount < 0            
+          }
           # release resources
           DB.disconnect
           GC.start
         } # i.items.each { |u|
       # reembolso parcial de una factura con un unico item
-      elsif i.items.size == 1
+      elsif i.items.size == 1 # and we know that: total < -payment_gross
         t = i.items.first
 				# 
         amount = -payment_gross.to_f
