@@ -316,10 +316,12 @@ module BlackStack
           j.next(i)
           
           # creo el milestone con todo el credito pendiente que tiene esta subscripcion
+=begin
+# deprecated  
           buff_payment = i.buffer_paypal_notification
           buff_signup = BlackStack::BufferPayPalNotification.where(:txn_type=>"subscr_signup", :subscr_id=>buff_payment.subscr_id).first
           subs = buff_signup == nil ? nil : BlackStack::PayPalSubscription.where(:id_buffer_paypal_notification => buff_signup.id).first
-              
+=end
         elsif (b.txn_type == BlackStack::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_SIGNUP)
           # crear un registro en la tabla paypal_subscriptions
           if BlackStack::PayPalSubscription.load(b.to_hash) != nil
