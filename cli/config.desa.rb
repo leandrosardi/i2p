@@ -478,7 +478,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :trial_period=>"D", 
     :upsells=>["ACC.Plan-20", "SUP.Dedicated-Support", "THR.Unique-Plan"],
     :bonus_plans=>[
-      { :item_number => "MAC.Plan-20", :period => 1 },
+#      { :item_number => "MAC.Plan-20", :period => 1 },
       { :item_number => "STO.Small-Plan", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 1 },
@@ -511,7 +511,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :trial_period=>"D", 
     :upsells=>["ACC.Plan-20", "THR.Unique-Plan", "MAC.Plan-20"],
     :bonus_plans=>[
-      { :item_number => "MAC.Plan-20", :period => 1 },
+#      { :item_number => "MAC.Plan-20", :period => 1 },
       { :item_number => "STO.Small-Plan", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
       { :item_number => "ACC.Plan-20", :period => 1 },
@@ -554,7 +554,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
       { :item_number => "EDB.Plan-5", :period => 1 },
-      { :item_number => "MAC.Plan-20", :period => 1 },
+#      { :item_number => "MAC.Plan-20", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
 		# renew with a new payment from the same subscription.
@@ -586,7 +586,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
       { :item_number => "ACC.Plan-20", :period => 3 },
       { :item_number => "DRX.Plan-8000", :period => 1 },
       { :item_number => "EDB.Plan-15", :period => 1 },
-      { :item_number => "MAC.Plan-20", :period => 1 },
+#      { :item_number => "MAC.Plan-20", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
@@ -619,7 +619,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
       { :item_number => "ACC.Plan-20", :period => 6 },
       { :item_number => "DRX.Plan-16000", :period => 1 },
       { :item_number => "EDB.Plan-50", :period => 1 },
-      { :item_number => "MAC.Plan-45", :period => 1 },
+#      { :item_number => "MAC.Plan-45", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
@@ -649,7 +649,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
       { :item_number => "EDB.Plan-5", :period => 1 },
-      { :item_number => "MAC.Plan-20", :period => 1 },
+#      { :item_number => "MAC.Plan-20", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
 		# renew with a new payment from the same subscription.
@@ -676,7 +676,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
       { :item_number => "EDB.Plan-5", :period => 1 },
-      { :item_number => "MAC.Plan-20", :period => 1 },
+#      { :item_number => "MAC.Plan-20", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
 		# renew with a new payment from the same subscription.
@@ -703,7 +703,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
       { :item_number => "ACC.Plan-20", :period => 3 },
       { :item_number => "DRX.Plan-8000", :period => 1 },
       { :item_number => "EDB.Plan-15", :period => 1 },
-      { :item_number => "MAC.Plan-20", :period => 1 },
+#      { :item_number => "MAC.Plan-20", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
@@ -731,7 +731,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
       { :item_number => "ACC.Plan-20", :period => 6 },
       { :item_number => "DRX.Plan-16000", :period => 1 },
       { :item_number => "EDB.Plan-50", :period => 1 },
-      { :item_number => "MAC.Plan-45", :period => 1 },
+#      { :item_number => "MAC.Plan-45", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
@@ -762,7 +762,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "DRX.Plan-4000", :period => 1 },
       { :item_number => "EDB.Plan-5", :period => 1 },
-      { :item_number => "MAC.Plan-20", :period => 1 },
+#      { :item_number => "MAC.Plan-20", :period => 1 },
     ],
 		# Force credits expiration in the moment when the client 
 		# renew with a new payment from the same subscription.

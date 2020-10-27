@@ -19,7 +19,7 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :description=>'ID of the client who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
-    :name=>'service', 
+    :name=>'product', 
     :mandatory=>true,
     :description=>'Code of the product that is being consumed.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
@@ -80,7 +80,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			
 			# register bonus
       self.logger.logs 'Register bonus... '
-			c.bonus(PARSER.value('service'), DateTime.strptime(PARSER.value('expiration'), '%Y-%m-%d %H:%M:%S %Z').to_time, PARSER.value('credits'))
+			c.bonus(PARSER.value('product'), DateTime.strptime(PARSER.value('expiration'), '%Y-%m-%d %H:%M:%S %Z').to_time, PARSER.value('credits'))
 			self.logger.done
 			
     rescue => e

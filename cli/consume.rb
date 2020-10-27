@@ -19,7 +19,7 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :description=>'ID of the client who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
-    :name=>'service', 
+    :name=>'product', 
     :mandatory=>true,
     :description=>'Code of the product that is being consumed.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
@@ -76,7 +76,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       self.logger.logs 'Consume the credits... '
 			i = 0
 			while i<PARSER.value('credits').to_i
-			 c.consume(PARSER.value('service'), 1, 'Consumption')
+			 c.consume(PARSER.value('product'), 1, 'Consumption')
 			 i+=1
 			 print '.'
 			end
