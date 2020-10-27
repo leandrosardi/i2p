@@ -14,7 +14,7 @@ require_relative './config'
 PARSER = BlackStack::SimpleCommandLineParser.new(
   :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
-    :name=>'id', 
+    :name=>'id_client', 
     :mandatory=>true, 
     :description=>'ID of the client who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
@@ -76,7 +76,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     begin					
 			# get the client
       self.logger.logs 'Get the client... '
-			c = BlackStack::Client.where(:id=>PARSER.value('id')).first
+			c = BlackStack::Client.where(:id=>PARSER.value('id_client')).first
       raise 'Client not found' if c.nil?
 			self.logger.done
 
