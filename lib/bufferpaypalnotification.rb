@@ -48,19 +48,21 @@ puts "self.invoice:#{self.invoice.to_s}:."
       # obtengo el cliente que machea con este perfil
       c = nil
       if c.nil?
-puts 'a'
         if self.invoice.guid?
-puts 'b'
           i = BlackStack::Invoice.where(:id=>self.invoice).first
           c = i.client if !i.nil? 
         end
       end
       if c.nil?
-puts 'c'
+        iid = self.invoice.split(".").last.to_s
+        if iid.guid?
+          i = BlackStack::Invoice.where(:id=>iid).first
+          c = i.client if !i.nil? 
+        end
+      end
+      if c.nil?
         cid = self.invoice.split(".").first.to_s
-puts "c:#{cid}:."
         if cid.guid?
-puts 'd'
           c = BlackStack::Client.where(:id=>cid).first
         end
       end
@@ -353,7 +355,7 @@ puts 'd'
             s.save
             
             # obtengo la factura que se creo con esta suscripcion
-            i = BlackStack::Invoice.where(:id=>b.invoice).first
+            i = BlackStack::Invoice.where(:id=>b.invoice.split(".").last.to_s).first
             
             # vinculo esta suscripcion a la factura que la genero, y a todas las facturas siguientes
             i.set_subscription(s)
@@ -401,7 +403,7 @@ puts 'd'
               "SELECT TOP 1 i.id " +
               "FROM buffer_paypal_notification b " +
               "JOIN invoice i ON ( b.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::Invoice::STATUS_PAID.to_s} ) " +
-              "WHERE b.invoice='#{b.invoice}' " +
+              "WHERE b.invoice='#{b.invoice.invoice.split(".").last.to_s}' " +
               "ORDER BY i.create_time DESC "
             ].first
             if row.nil?
