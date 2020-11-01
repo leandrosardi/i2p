@@ -339,7 +339,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
             # envio la notificacion a la division
             self.logger.logs "Submit... "
             api_url = "#{BlackStack::Pampa::api_protocol}://#{d.ws_url}:#{d.ws_port}"
-api_url = "http://74.208.28.38:81"
+#api_url = "http://74.208.28.38:81"
             url = "#{api_url}/api1.3/accounting/sync/paypal/notification.json"
 #puts
 #puts "url:#{url}:."
