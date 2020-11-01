@@ -151,17 +151,20 @@ class MyCLIProcess < BlackStack::MyLocalProcess
   
         # actualizo los amounts a 0
         self.logger.logs 'Update consumption movements with 0 amount, and 0 profits... '
-        DB[
-          "select id " +
-          "from #{dname}..movement with (nolock index(IX_movment__id_client__type)) " +
-          "where id_client='#{c.id}' "
-        ].all { |row|
-          DB.execute("update #{dname}..movement set amount=0, profits_amount=0 where id='#{row[:id]}'")
-          DB.disconnect
-          GC.start
-          print '.'
+        a = []
+        q = "select id from #{dname}..movement with (nolock index(IX_movment__id_client__type)) where id_client='#{c.id}'"
+        DB[q].all { |row|
+          a << row[:id].to_guid
+          if a.size % 100 == 0          
+            DB.execute("update #{dname}..movement set amount=0, profits_amount=0 where id in ('#{a.join("','")}')")
+            a.clear
+            DB.disconnect
+            GC.start
+            print '.' 
+          end
         }
-        self.logger.done
+        DB.execute("update #{dname}..movement set amount=0, profits_amount=0 where id in ('#{a.join("','")}')") # actualizo el resto que pudo quedar en el array
+        self.logger.done #logf("done (#{DB[q].all.size.to_s} remaining)")
   
   			# delete invoice items of auto-generated invoices (invoices with a previous invoice)
         self.logger.logs 'Delete items of auto-generated invoices... '
@@ -278,7 +281,8 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           "    select cast(id as varchar(500)) " +
           "    from #{dname}..invoice " +
           "    where id_client='#{c.id}' " +
-          "  ) " 
+          "  ) " +
+          ") "
         ].all { |row|
           DB.execute(
             "update kepler..buffer_paypal_notification set " + 
@@ -288,8 +292,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
             "  sync_start_time=null, " +
             "  sync_end_time=null, " +
             "  sync_result=null where " +
-            "id = '#{row[:id]}' " +
-            ") "
+            "id = '#{row[:id]}' "
           )
           DB.disconnect
           GC.start
