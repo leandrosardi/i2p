@@ -403,7 +403,7 @@ puts "self.invoice:#{self.invoice.to_s}:."
               "SELECT TOP 1 i.id " +
               "FROM buffer_paypal_notification b " +
               "JOIN invoice i ON ( b.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::Invoice::STATUS_PAID.to_s} ) " +
-              "WHERE b.invoice='#{b.invoice.invoice.split(".").last.to_s}' " +
+              "WHERE b.invoice='#{b.invoice.split(".").last.to_s}' " +
               "ORDER BY i.create_time DESC "
             ].first
             if row.nil?
