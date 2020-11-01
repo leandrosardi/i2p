@@ -41,20 +41,34 @@ module BlackStack
     # 3) haciendo coincidir el campo payer_email de alguna suscripcion existente con el BlackStack::BufferPayPalNotification.payer_email
     # 3) haciendo coincidir el primer guid en el codigo de invoice, con el id del cliente
     def get_client()
+puts
+puts "BlackStack::BufferPayPalNotification::get_client"
+puts 'debug info:'
+puts "self.invoice:#{self.invoice.to_s}:."
       # obtengo el cliente que machea con este perfil
       c = nil
       if c.nil?
+puts 'a'
         if self.invoice.guid?
+puts 'b'
           i = BlackStack::Invoice.where(:id=>self.invoice).first
           c = i.client if !i.nil? 
         end
       end
       if c.nil?
+puts 'c'
         cid = self.invoice.split(".").first.to_s
+puts "c:#{cid}:."
         if cid.guid?
+puts 'd'
           c = BlackStack::Client.where(:id=>cid).first
         end
       end
+=begin
+# deprecated: debe obtenerse la factura (invoice), y de ahi el cliente,
+# => porque un mismo cuente puede usar su cuenta paypal en varias cuantas 
+# => de usuario.
+#  
       if c.nil?
         c = BlackStack::Client.where(:paypal_email=>self.payer_email).first
         if (c == nil)
@@ -83,6 +97,7 @@ module BlackStack
           c = BlackStack::Client.where(:id=>row[:cid]).first
         end
       end
+=end
       c
     end
   
@@ -338,7 +353,7 @@ module BlackStack
             s.save
             
             # obtengo la factura que se creo con esta suscripcion
-            i = BlackStack::Invoice.where(:id=>b.item_number).first
+            i = BlackStack::Invoice.where(:id=>b.invoice).first
             
             # vinculo esta suscripcion a la factura que la genero, y a todas las facturas siguientes
             i.set_subscription(s)
