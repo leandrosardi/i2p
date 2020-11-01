@@ -96,7 +96,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         "where z.payer_email COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
         "  select distinct payer_email " +
         "  from kepler..buffer_paypal_notification " + 
-        "  where item_number COLLATE SQL_Latin1_General_CP1_CI_AS in ( " + 
+        "  where invoice COLLATE SQL_Latin1_General_CP1_CI_AS in ( " + 
         "    select cast(id as varchar(500)) COLLATE SQL_Latin1_General_CP1_CI_AS " + 
         "    from #{dname}..invoice " +
         "    where id_client='#{c.id}' " + 
@@ -167,17 +167,19 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         self.logger.done #logf("done (#{DB[q].all.size.to_s} remaining)")
   
   			# delete invoice items of auto-generated invoices (invoices with a previous invoice)
-        self.logger.logs 'Delete items of auto-generated invoices... '
+        self.logger.logs 'Delete items of auto-generated invoices, set id_previous_invoice to null... '
         DB[
-          "  select id " +
-          "  from #{dname}..invoice " +
-          "  where id_client='#{c.id}' " +
-          "  and cast([id] as varchar(500)) not in ( " +
-          "    select distinct item_number " +
-          "    from kepler..buffer_paypal_notification " +
+          "  select i.id " +
+          "  from #{dname}..invoice i " +
+          "  where i.id_client='#{c.id}' " +
+          "  and not exists ( " +
+          "    select distinct b.invoice " +
+          "    from kepler..buffer_paypal_notification b " +
+          "    where lower(b.invoice) like '%'+lower(cast(i.[id] as varchar(500)))+'%' " +
           "  ) "
         ].all { |row|
           DB.execute("delete #{dname}..invoice_item where id_invoice = '#{row[:id]}' ")
+          DB.execute("update #{dname}..invoice set id_previous_invoice=null where id_previous_invoice = '#{row[:id]}' ")
           DB.disconnect
           GC.start
           print '.'
@@ -187,12 +189,13 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         # delete auto-generated invoices (invoices with a previous invoice)
         self.logger.logs 'Delete auto-generated invoices... '
         DB[
-          "select id " +
-          "from #{dname}..invoice " + 
-          "where id_client='#{c.id}' " +
-          "and cast([id] as varchar(500)) not in ( " +
-          "  select distinct item_number " +
-          "  from kepler..buffer_paypal_notification " +
+          "select i.id " +
+          "from #{dname}..invoice i " + 
+          "where i.id_client='#{c.id}' " +
+          "and not exists ( " +
+          "  select distinct b.invoice " +
+          "  from kepler..buffer_paypal_notification b " +
+          "  where lower(b.invoice) like '%'+lower(cast(i.[id] as varchar(500)))+'%' " +
           ") "          
         ].all { |row|
           DB.execute("delete #{dname}..invoice where [id]='#{row[:id]}'")          
@@ -212,21 +215,21 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           "  subscr_id=null, " +
           "  status=#{BlackStack::Invoice::STATUS_UNPAID.to_s}, " +
           "  id_buffer_paypal_notification=null " +
-          "where id_client='#{c.id}' " +
-          "and cast([id] as varchar(500)) in ( " +
-          "  select distinct item_number " +
-          "  from kepler..buffer_paypal_notification " +
-          ") "
+          "where id_client='#{c.id}' " #+
+          #"and cast([id] as varchar(500)) in ( " +
+          #"  select distinct invoice " +
+          #"  from kepler..buffer_paypal_notification " +
+          #") "
         )
 
         DB[
           "select id " +
           "from #{dname}..invoice " + 
-          "where id_client='#{c.id}' " +
-          "and cast([id] as varchar(500)) in ( " +
-          "  select distinct item_number " +
-          "  from kepler..buffer_paypal_notification " +
-          ") "          
+          "where id_client='#{c.id}' " #+
+          #"and cast([id] as varchar(500)) in ( " +
+          #"  select distinct invoice " +
+          #"  from kepler..buffer_paypal_notification " +
+          #") "          
         ].all { |row|
           DB.execute(
             "update #{dname}..invoice " + 
@@ -260,7 +263,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           "delete #{dname}..buffer_paypal_notification where payer_email COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
           "  select distinct payer_email " +
           "  from kepler..buffer_paypal_notification " + 
-          "  where item_number COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
+          "  where invoice COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
           "    select cast(id as varchar(500)) COLLATE SQL_Latin1_General_CP1_CI_AS " +
           "    from #{dname}..invoice " +
           "    where id_client='#{c.id}' " +
@@ -273,14 +276,15 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         self.logger.logs 'Reset IPNs in the central... '
         DB[
           "select id " +
-          "from kepler..buffer_paypal_notification " +
-          "where payer_email in ( " +
-          "  select distinct payer_email " + 
-          "  from kepler..buffer_paypal_notification " + 
-          "  where item_number in ( " +
-          "    select cast(id as varchar(500)) " +
-          "    from #{dname}..invoice " +
+          "from kepler..buffer_paypal_notification b " +
+          "where b.payer_email in ( " +
+          "  select distinct c.payer_email " + 
+          "  from kepler..buffer_paypal_notification c " + 
+          "  where exists ( " +
+          "    select cast(i.id as varchar(500)) " +
+          "    from #{dname}..invoice i " +
           "    where id_client='#{c.id}' " +
+          "    and lower(c.invoice) like '%'+lower(cast(i.id as varchar(500)))+'%' " +
           "  ) " +
           ") "
         ].all { |row|
@@ -310,7 +314,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
   			# reprocess all the IPNs in the central			
         DB["SELECT id FROM #{dname}..invoice where id_client='#{c.id}'"].all { |rowi|
           self.logger.logs "Process invoice #{rowi[:id]}... "
-          BlackStack::BufferPayPalNotification.where(:invoice=>rowi[:id], :sync_end_time=>nil).order(:create_time).all { |p|
+          BlackStack::BufferPayPalNotification.where("invoice like '%#{rowi[:id]}' and sync_end_time is null").order(:create_time).all { |p|
             self.logger.logs "IPN #{p.id.to_guid}... "
             
             # inicio la sincronizacion.
@@ -335,7 +339,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
             # envio la notificacion a la division
             self.logger.logs "Submit... "
             api_url = "#{BlackStack::Pampa::api_protocol}://#{d.ws_url}:#{d.ws_port}"
+api_url = "http://74.208.28.38:81"
             url = "#{api_url}/api1.3/accounting/sync/paypal/notification.json"
+#puts
+#puts "url:#{url}:."
+#puts "params:#{params}:."
             res = BlackStack::Netting::call_post(url, params)          
             parsed = JSON.parse(res.body)
             if (parsed["status"] == "success")
