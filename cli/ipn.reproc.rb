@@ -85,7 +85,40 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       d = c.division
       dname = d.name
       self.logger.logf("done (#{dname})")
-
+=begin
+      # verify if this client paid with the same PayPal account than other client
+      self.logger.logs 'Check if the payer_email is not used by other client... '
+      rows = DB[
+        "select distinct x.id, x.name " +
+        "from #{dname}..buffer_paypal_notification z " +
+        "join #{dname}..invoice y on ( z.id=y.id_buffer_paypal_notification and y.id_client<>'#{c.id}' ) " +
+        "join #{dname}..client x on x.id=y.id_client " +
+        "where z.payer_email COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
+        "  select distinct payer_email " +
+        "  from kepler..buffer_paypal_notification " + 
+        "  where item_number COLLATE SQL_Latin1_General_CP1_CI_AS in ( " + 
+        "    select cast(id as varchar(500)) COLLATE SQL_Latin1_General_CP1_CI_AS " + 
+        "    from #{dname}..invoice " +
+        "    where id_client='#{c.id}' " + 
+        "  ) " +
+        ") "
+      ].all
+      if rows.size == 0
+        self.logger.done
+      else
+        s = "ERROR: payer_email is used by other clients: "
+        rows.each { |row| s += "#{row[:name]} (#{row[:id].to_guid}), " }
+        s += '...'
+        s += "Please reprocess these other clients before this one:\r\n"
+        rows.each { |row| 
+          s += 
+          "ipn.reproc id_client=#{row[:id].to_guid}\r\n" + 
+          "ipn.recalc id_client=#{row[:id].to_guid}\r\n" + 
+          "ipn.expire id_client=#{row[:id].to_guid}\r\n"
+        }        
+        raise s
+      end
+=end
       # validar que no se tratade la division central
       self.logger.logs "Validate client's division is not the central... "
       raise 'Client assigned to central division' if d.central
@@ -103,39 +136,67 @@ class MyCLIProcess < BlackStack::MyLocalProcess
   
         # delete movements that are not consumptions
         self.logger.logs 'Delete non-consumption movements... '
-        DB.execute("delete #{dname}..movement where id_client='#{c.id}' and isnull([type],0)<>#{BlackStack::Movement::MOVEMENT_TYPE_CANCELATION.to_s}")
+        DB[
+          "select id " +
+          "from #{dname}..movement with (nolock index(IX_movment__id_client__type)) " +
+          "where id_client='#{c.id}' " +
+          "and isnull([type],0)<>#{BlackStack::Movement::MOVEMENT_TYPE_CANCELATION.to_s}"
+        ].all { |row|
+          DB.execute("delete #{dname}..movement where id='#{row[:id]}'")
+          DB.disconnect
+          GC.start
+          print '.'
+        }
         self.logger.done
   
         # actualizo los amounts a 0
         self.logger.logs 'Update consumption movements with 0 amount, and 0 profits... '
-        DB.execute("update #{dname}..movement set amount=0, profits_amount=0 where id_client='#{c.id}'")
+        DB[
+          "select id " +
+          "from #{dname}..movement with (nolock index(IX_movment__id_client__type)) " +
+          "where id_client='#{c.id}' "
+        ].all { |row|
+          DB.execute("update #{dname}..movement set amount=0, profits_amount=0 where id='#{row[:id]}'")
+          DB.disconnect
+          GC.start
+          print '.'
+        }
         self.logger.done
   
   			# delete invoice items of auto-generated invoices (invoices with a previous invoice)
         self.logger.logs 'Delete items of auto-generated invoices... '
-        DB.execute(
-          "delete #{dname}..invoice_item where id_invoice in (" +
+        DB[
           "  select id " +
           "  from #{dname}..invoice " +
           "  where id_client='#{c.id}' " +
           "  and cast([id] as varchar(500)) not in ( " +
           "    select distinct item_number " +
           "    from kepler..buffer_paypal_notification " +
-          "  ) " +
-          ") "
-        )
+          "  ) "
+        ].all { |row|
+          DB.execute("delete #{dname}..invoice_item where id_invoice = '#{row[:id]}' ")
+          DB.disconnect
+          GC.start
+          print '.'
+        }
         self.logger.done
   			
         # delete auto-generated invoices (invoices with a previous invoice)
         self.logger.logs 'Delete auto-generated invoices... '
-        DB.execute(
-          "delete #{dname}..invoice " + 
+        DB[
+          "select id " +
+          "from #{dname}..invoice " + 
           "where id_client='#{c.id}' " +
           "and cast([id] as varchar(500)) not in ( " +
           "  select distinct item_number " +
           "  from kepler..buffer_paypal_notification " +
-          ") "
-        )
+          ") "          
+        ].all { |row|
+          DB.execute("delete #{dname}..invoice where [id]='#{row[:id]}'")          
+          DB.disconnect
+          GC.start
+          print '.'
+        }
         self.logger.done
   			
         # actualizar estado de factoras a UNPAID, 
@@ -154,13 +215,42 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           "  from kepler..buffer_paypal_notification " +
           ") "
         )
+
+        DB[
+          "select id " +
+          "from #{dname}..invoice " + 
+          "where id_client='#{c.id}' " +
+          "and cast([id] as varchar(500)) in ( " +
+          "  select distinct item_number " +
+          "  from kepler..buffer_paypal_notification " +
+          ") "          
+        ].all { |row|
+          DB.execute(
+            "update #{dname}..invoice " + 
+            "set " +
+            "  subscr_id=null, " +
+            "  status=#{BlackStack::Invoice::STATUS_UNPAID.to_s}, " +
+            "  id_buffer_paypal_notification=null " +
+            "where id='#{row[:id]}' "
+          )
+          DB.disconnect
+          GC.start
+          print '.'
+        }
         self.logger.done
   
   			# delete subscriptions
         self.logger.logs 'Delete subscriptions... '
-        DB.execute("delete #{dname}..paypal_subscription where id_client='#{c.id}'")
+        DB["select id from #{dname}..paypal_subscription where id_client='#{c.id}'"].all { |row|
+          DB.execute("delete #{dname}..paypal_subscription where id='#{row[:id]}'")          
+          DB.disconnect
+          GC.start
+          print '.'
+        }
         self.logger.done
-  
+=begin
+# deprecated: the access point will check if the IPN already exists or not
+#   
         # delete the IPNs in the division (NEVER in the central)
         self.logger.logs 'Delete IPNs in the division... '
         DB.execute(
@@ -175,27 +265,36 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           ") "
         )      
         self.logger.done
-  
+=end
         # update the IPNs in the central
         self.logger.logs 'Reset IPNs in the central... '
-        DB.execute(
-          "update kepler..buffer_paypal_notification set " + 
-          "  sync_reservation_id=null, " +
-          "  sync_reservation_time=null, " +
-          "  sync_reservation_times=null, " +
-          "  sync_start_time=null, " +
-          "  sync_end_time=null, " +
-          "  sync_result=null where " +
-          "payer_email in ( " +
+        DB[
+          "select id " +
+          "from kepler..buffer_paypal_notification " +
+          "where payer_email in ( " +
           "  select distinct payer_email " + 
           "  from kepler..buffer_paypal_notification " + 
           "  where item_number in ( " +
           "    select cast(id as varchar(500)) " +
           "    from #{dname}..invoice " +
           "    where id_client='#{c.id}' " +
-          "  ) " +
-          ") "
-        )
+          "  ) " 
+        ].all { |row|
+          DB.execute(
+            "update kepler..buffer_paypal_notification set " + 
+            "  sync_reservation_id=null, " +
+            "  sync_reservation_time=null, " +
+            "  sync_reservation_times=null, " +
+            "  sync_start_time=null, " +
+            "  sync_end_time=null, " +
+            "  sync_result=null where " +
+            "id = '#{row[:id]}' " +
+            ") "
+          )
+          DB.disconnect
+          GC.start
+          print '.'
+        }
         self.logger.done
   
         self.logger.done
@@ -208,7 +307,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
   			# reprocess all the IPNs in the central			
         DB["SELECT id FROM #{dname}..invoice where id_client='#{c.id}'"].all { |rowi|
           self.logger.logs "Process invoice #{rowi[:id]}... "
-          BlackStack::BufferPayPalNotification.where(:invoice=>rowi[:id]).order(:create_time).all { |p|
+          BlackStack::BufferPayPalNotification.where(:invoice=>rowi[:id], :sync_end_time=>nil).order(:create_time).all { |p|
             self.logger.logs "IPN #{p.id.to_guid}... "
             
             # inicio la sincronizacion.
