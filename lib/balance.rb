@@ -22,7 +22,7 @@ module BlackStack
         "select cast(sum(cast(amount as numeric(18,12))) as numeric(18,6)) as amount, sum(credits) as credits " +
         "from stat_balance x with (nolock) " +
         "where x.id_client='#{self.client.id}' " +
-        "and x.product_code='#{self.product_code}' " +
+        "and x.product_code='#{self.product_code}' "
       end
       
       row = DB[q].first
