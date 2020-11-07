@@ -75,6 +75,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 			}			
 			self.logger.done
 			
+      # update the table stat_balance
+      self.logger.logs 'Update stat_balance... '
+      c.update_stat_balance
+      self.logger.done
+
     rescue => e
       self.logger.error(e)
     end

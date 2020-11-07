@@ -8,6 +8,47 @@ module BlackStack
       one_to_many :customplans, :class=>:'BlackStack::CustomPlan', :key=>:id_client
       one_to_many :movements, :class=>:'BlackStack::Movement', :key=>:id_client
 
+      # how many minutes ago should have updated the table stat_balance with the amount and credits of this client, for each product.
+      def stat_balance_delay_minutes
+        row = DB[
+          "SELECT TOP 1 m.id " +
+          "FROM client c WITH (NOLOCK) " +
+          "JOIN movement m WITH (NOLOCK INDEX(IX_movement__id_client__create_time_desc)) ON ( c.id=m.id_client AND m.create_time > ISNULL(c.last_stat_balance_update_time, '1900-01-01') ) " +
+          "WHERE c.id = '#{self.id}' " +
+          "ORDER BY m.create_time DESC "
+        ].first
+        
+        if row.nil?
+          return 0
+        else
+          return DB["SELECT DATEDIFF(MI, m.create_time, GETDATE()) AS n FROM movement m WITH (NOLOCK) WHERE m.id='#{row[:id]}'"].first[:n]
+        end
+      end
+  
+      # update the table stat_balance with the amount and credits of this client, for each product.
+      def update_stat_balance(product_code=nil)
+          product_descriptors = BlackStack::InvoicingPaymentsProcessing::products_descriptor        
+          product_descriptors.select! { |hprod| hprod[:code] == product_code } if !product_code.nil?
+          product_descriptors.each { |hprod|
+            row = DB[
+              "select isnull(sum(isnull(m.credits,0)),0) as credits, isnull(sum(isnull(m.amount,0)),0) as amount " +
+  #            "from movement m with (nolock index(IX_movement__id_client__product_code)) " + 
+              "from movement m with (nolock) " + 
+              "where m.id_client='#{c.id}' " +
+              "and m.product_code='#{hprod[:code]}' "
+            ].first
+            credits = row[:credits]
+            amount = row[:amount]
+            row = DB["SELECT * FROM stat_balance WHERE id_client='#{c.id}' AND product_code='#{hprod[:code]}'"].first
+            if row.nil?
+              DB.execute("INSERT INTO stat_balance (id_client, product_code, amount, credits) VALUES ('#{c.id}', '#{hprod[:code]}', #{amount.to_s}, #{credits.to_s})")
+            else
+              DB.execute("UPDATE stat_balance SET amount=#{amount.to_s}, credits=#{credits.to_s} WHERE id_client='#{c.id}' AND product_code='#{hprod[:code]}'")
+            end
+            DB.execute("UPDATE client SET last_stat_balance_update_time=GETDATE() WHERE [id]='#{c.id}'")
+          }
+      end
+
       # crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el cliente, para el producto indicado en product_code. 
       def consume(product_code, number_of_credits=1, description=nil)
 				# create the consumtion
