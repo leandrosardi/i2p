@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'invoicing_payments_processing'
-  s.version     = '1.1.56'
+  s.version     = '1.1.58'
   s.date        = '2020-11-06'
   s.summary     = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Invoicing and Payments Processing gem (a.k.a. I+2P) is a Ruby gem to setup amazing offers in your website, track them, and also process payments automatically using PayPal."
   s.description = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Find documentation here: https://github.com/leandrosardi/invoicing_payments_processing."
