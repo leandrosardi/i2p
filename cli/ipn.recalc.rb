@@ -51,6 +51,10 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     self.logger.log "Say hello to CLI for IPN manual processing!"
     
     self.logger.log "DB:#{DB['SELECT db_name() AS s'].first[:s]}."
+
+    self.logger.logs 'Loading db classes...'
+    BlackStack::InvoicingPaymentsProcessing::require_db_classes()
+    self.logger.done
     
     # process 
     begin		

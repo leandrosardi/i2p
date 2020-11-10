@@ -85,18 +85,7 @@ module BlackStack
     def allowedToAddRemoveItems?
       return (self.status == STATUS_UNPAID || self.status == nil) && (self.disabled_for_add_remove_items == false || self.disabled_for_add_remove_items == nil)
     end
-  
-    # envia un email transaccional con informacion de facturacion, y pasos a seguir despues del pago
-    def notificationSubject()
-      "We Received Your Payment"
-    end
-  
-    # 
-    def notificationBody()
-      "<p>We received your payment for a total of $#{("%.2f" % self.total()).to_s}.</p>" +
-      "<p>You can find your invoice <a href='#{CS_HOME_PAGE}/member/invoice?iid=#{self.id.to_guid}'><b>here</b></a></p>"
-    end
-  
+    
     # 
     def number()
       self.id.to_guid
@@ -246,7 +235,7 @@ module BlackStack
       end
         
       # return url
-      "#{BlackStack::InvoicingPaymentsProcessing::PAYPAL_ORDERS_URL}/cgi-bin/webscr?" + URI.encode_www_form(values)
+      "#{BlackStack::InvoicingPaymentsProcessing::paypal_orders_url}/cgi-bin/webscr?" + URI.encode_www_form(values)
     end
   
     # retorna true si el estado de la factura sea NULL o UNPAID

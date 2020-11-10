@@ -27,6 +27,7 @@ module BlackStack
   
       # update the table stat_balance with the amount and credits of this client, for each product.
       def update_stat_balance(product_code=nil)
+          c = self
           product_descriptors = BlackStack::InvoicingPaymentsProcessing::products_descriptor        
           product_descriptors.select! { |hprod| hprod[:code] == product_code } if !product_code.nil?
           product_descriptors.each { |hprod|

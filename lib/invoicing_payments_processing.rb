@@ -13,10 +13,19 @@ module BlackStack
     
     # static attributes
     @@paypal_business_email = "sardi.leandro.daniel@gmail.com"
+    @@paypal_orders_url = BlackStack::InvoicingPaymentsProcessing::PAYPAL_ORDERS_URL
+    @@paypal_ipn_listener = "#{BlackStack::Pampa::api_url.to_s}/api1.3/accounting/paypal/notify_new_invoice.json"
+
     @@products_descriptor = []
     @@plans_descriptor = []
-
+    
     # getters & setters
+    def self.set_config(h)
+      @@paypal_business_email = h[:paypal_business_email]
+      @@paypal_orders_url = h[:paypal_orders_url]
+      @@paypal_ipn_listener = h[:paypal_ipn_listener]
+    end
+      
     def self.set_paypal_business_email(email)
       @@paypal_business_email = email
     end # def self.set_paypal_business_email
@@ -25,10 +34,14 @@ module BlackStack
       @@paypal_business_email
     end # def self.set_paypal_business_email
 
-    def self.paypal_ipn_listener()
-      "#{BlackStack::Pampa::api_url.to_s}/api1.3/accounting/paypal/notify_new_invoice.json"
+    def self.paypal_orders_url()
+      @@paypal_orders_url
     end
     
+    def self.paypal_ipn_listener()
+      @@paypal_ipn_listener
+    end
+
 
     def self.set_products(h)
       @@products_descriptor = h
