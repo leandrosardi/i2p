@@ -9,8 +9,8 @@ module BlackStack
   		self.calculate()
   	end
   	
-    def calculate()
-      if !self.up_time.nil?
+    def calculate(use_stat_balance=true)
+      if !self.up_time.nil? || !use_stat_balance
         q = 
         "select cast(sum(cast(amount as numeric(18,12))) as numeric(18,6)) as amount, sum(credits) as credits " +
         "from movement with (nolock) " +

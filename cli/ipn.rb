@@ -23,13 +23,13 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>'dispatcher_kepler',
+    :default=>'dispatcher_euler',
   }, {
     :name=>'division', 
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too. The invoice cannot be already linked to another subscription.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>'kepler', # central
+    :default=>'euler', # central
   }]
 )
 
@@ -391,13 +391,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         self.logger.logs 'Expire unused credits in the movement table... '
         self.expire(c)
         self.logger.done
-=begin
-# discontinued, because I am in the central database, and this update must be done in the division.
+
         # update the table stat_balance
         self.logger.logs 'Update stat_balance... '
         c.update_stat_balance
         self.logger.done
-=end 
       } # PARSER.value('id_clients').split(/,/).each	
     rescue => e
       self.logger.error(e)

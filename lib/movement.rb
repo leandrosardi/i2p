@@ -190,8 +190,10 @@ module BlackStack
 			self.expiration_tries = self.expiration_tries.to_i + 1
 			self.save
 			# 
-			total_credits = 0.to_f - BlackStack::Balance.new(self.client.id, self.product_code, registraton_time).credits.to_f
-			total_amount = 0.to_f - BlackStack::Balance.new(self.client.id, self.product_code, registraton_time).amount.to_f
+			balance = BlackStack::Balance.new(self.client.id, self.product_code, registraton_time)
+			balance.calculate(false)
+			total_credits = 0.to_f - balance.credits.to_f
+			total_amount = 0.to_f - balance.amount.to_f
 			#
 			credits = 0.to_i - self.credits.to_i
 			#
