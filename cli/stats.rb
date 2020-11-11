@@ -14,11 +14,16 @@ require_relative './config'
 PARSER = BlackStack::SimpleCommandLineParser.new(
   :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
+    :name=>'id_clients', 
+    :mandatory=>true, 
+    :description=>'ID of the client who is consuming credits.', 
+    :type=>BlackStack::SimpleCommandLineParser::STRING,
+  }, {
     :name=>'name', 
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>DEFAULT_WORKER_NAME,
+    :default=>'dispatcher_euler',
   }, {
     :name=>'division', 
     :mandatory=>false, 
@@ -50,15 +55,19 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     # process 
     begin					
       n = 0
-      self.division.home.clients.select { |c|
-        # clients that need update
-        c.stat_balance_delay_minutes > 0
-      }.each { |c|
+      PARSER.value('id_clients').split(/,/).each { |cid|
+        # get the client
+        self.logger.logs "Get the client #{cid.to_guid}... "
+        c = BlackStack::Client.where(:id=>cid).first
+        raise 'Client not found' if c.nil?
+        self.logger.logf("done (#{c.name})");
+
         n += 1
+
         # starting client
         self.logger.logs "Client #{c.name} (#{c.id})... "
         # iterate the list of products
-        BlackStack::InvoicingPaymentsProcessing::products_descriptor.each { |hprod|
+        BlackStack::InvoicingPaymentsProcessing::products_descriptor.clone.each { |hprod|
           # starting product
           self.logger.logs "Product #{hprod[:code]}... "
           #
