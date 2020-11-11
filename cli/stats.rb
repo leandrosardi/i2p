@@ -14,11 +14,6 @@ require_relative './config'
 PARSER = BlackStack::SimpleCommandLineParser.new(
   :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
-    :name=>'id', 
-    :mandatory=>true, 
-    :description=>'ID of the client who is consuming credits.', 
-    :type=>BlackStack::SimpleCommandLineParser::STRING,
-  }, {
     :name=>'name', 
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
@@ -48,15 +43,42 @@ BlackStack::InvoicingPaymentsProcessing::require_db_classes
 class MyCLIProcess < BlackStack::MyLocalProcess
   
   def process(argv)
-    self.logger.log "Say hello to CLI for IPN manual processing!"
-    self.logger.log "ipn.client is ready."
+    self.logger.log "Say hello to CLI for STATS processing!"
     
-    s = system("ipn.reproc.rb id=#{PARSER.value('id')} 1>nul 2>&1")
-#    s = system("dir")
-    puts
-    puts
-    puts
-    puts "result:#{s}"
+    self.logger.log "DB:#{DB['SELECT db_name() AS s'].first[:s]}."
+    
+    # process 
+    begin					
+      n = 0
+      self.division.home.clients.select { |c|
+        # clients that need update
+        c.stat_balance_delay_minutes > 0
+      }.each { |c|
+        n += 1
+        # starting client
+        self.logger.logs "Client #{c.name} (#{c.id})... "
+        # iterate the list of products
+        BlackStack::InvoicingPaymentsProcessing::products_descriptor.each { |hprod|
+          # starting product
+          self.logger.logs "Product #{hprod[:code]}... "
+          #
+          c.update_stat_balance(hprod[:code])
+          #
+          self.logger.done
+        }
+        # client done
+        self.logger.done
+      }
+      self.logger.log "#{n.to_s} clients processed!"
+    rescue => e
+      self.logger.error(e)
+    end
+
+    # libero recursos
+    self.logger.logs "Release resources... "
+    DB.disconnect
+    GC.start   
+    self.logger.done
 
     self.logger.logs "Sleep for long time. Click CTRL+C to exit... "
     sleep(500000)
