@@ -23,13 +23,13 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>'dispatcher_euler',
+    :default=>'dispatcher_kepler',
   }, {
     :name=>'division', 
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too. The invoice cannot be already linked to another subscription.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>'euler', # central
+    :default=>'kepler', # central
   }]
 )
 
@@ -214,24 +214,28 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       print '.'
     }
     self.logger.done
-=begin
-# deprecated: the access point will check if the IPN already exists or not
-#   
-        # delete the IPNs in the division (NEVER in the central)
-        self.logger.logs 'Delete IPNs in the division... '
-        DB.execute(
-          "delete #{dname}..buffer_paypal_notification where payer_email COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
-          "  select distinct payer_email " +
-          "  from kepler..buffer_paypal_notification " + 
-          "  where invoice COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
-          "    select cast(id as varchar(500)) COLLATE SQL_Latin1_General_CP1_CI_AS " +
-          "    from #{dname}..invoice " +
-          "    where id_client='#{c.id}' " +
-          "  ) " +
-          ") "
-        )      
-        self.logger.done
-=end
+
+    # delete the IPNs in the division (NEVER in the central)
+    self.logger.logs 'Delete IPNs in the division... '
+    DB[
+      "SELECT id FROM #{dname}..buffer_paypal_notification where payer_email COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
+      "  select distinct payer_email " +
+      "  from kepler..buffer_paypal_notification " + 
+      "  where invoice COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
+      "    select cast(id as varchar(500)) COLLATE SQL_Latin1_General_CP1_CI_AS " +
+      "    from #{dname}..invoice " +
+      "    where id_client='#{c.id}' " +
+      "  ) " +
+      ") "
+    ].all { |row|
+      DB.execute("UPDATE #{dname}..invoice SET id_buffer_paypal_notification=NULL WHERE id_buffer_paypal_notification='#{row[:id]}'");
+      DB.execute("UPDATE #{dname}..paypal_subscription SET id_buffer_paypal_notification=NULL WHERE id_buffer_paypal_notification='#{row[:id]}'");
+      DB.execute("DELETE #{dname}..buffer_paypal_notification WHERE [id]='#{row[:id]}'");
+      DB.disconnect
+      GC.start
+    }
+    self.logger.done
+
     # update the IPNs in the central
     self.logger.logs 'Reset IPNs in the central... '
     DB[
@@ -300,7 +304,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         # envio la notificacion a la division
         self.logger.logs "Submit... "
         api_url = "#{BlackStack::Pampa::api_protocol}://#{d.ws_url}:#{d.ws_port}"
-#api_url = "http://74.208.28.38:81"
+api_url = "http://74.208.28.38:81"
         url = "#{api_url}/api1.3/accounting/sync/paypal/notification.json"
 #puts
 #puts "url:#{url}:."
@@ -308,11 +312,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         res = BlackStack::Netting::call_post(url, params)          
         parsed = JSON.parse(res.body)
         if (parsed["status"] == "success")
-          self.logger.done
+          self.logger.logf("done (#{parsed.to_s})")
           p.sync_end_time = now()
           p.save()
         else
-          raise "IPN submission error:#{parsed['status']}."
+          raise "IPN submission error:#{parsed.to_s}."
         end  
         self.logger.done
 

@@ -16,7 +16,7 @@ module BlackStack
         "from movement with (nolock) " +
         "where id_client='#{self.client.id}' " +
         "and product_code='#{self.product_code}' " +
-  			"and create_time < '#{self.up_time.to_time.to_sql}' "
+  			"and create_time <= '#{self.up_time.to_time.to_sql}' "
       else
         q = 
         "select cast(sum(cast(amount as numeric(18,12))) as numeric(18,6)) as amount, sum(credits) as credits " +
