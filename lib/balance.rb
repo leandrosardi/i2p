@@ -24,7 +24,7 @@ module BlackStack
         "where x.id_client='#{self.client.id}' " +
         "and x.product_code='#{self.product_code}' "
       end
-      
+#puts "Balance.calculate:q:#{q}:."
       row = DB[q].first
       self.amount = row[:amount].to_f
       self.credits = row[:credits].to_f

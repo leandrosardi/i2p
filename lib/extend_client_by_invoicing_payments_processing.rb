@@ -51,7 +51,9 @@ module BlackStack
       end
 
       # crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el cliente, para el producto indicado en product_code. 
-      def consume(product_code, number_of_credits=1, description=nil)
+      def consume(product_code, number_of_credits=1, description=nil, datetime=nil)
+				dt = datetime.nil? ? now() : datetime.to_time.to_sql
+				
 				# create the consumtion
 				total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
 				total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
@@ -60,7 +62,7 @@ module BlackStack
 				cons = BlackStack::Movement.new
 				cons.id = guid()
 				cons.id_client = self.id
-				cons.create_time = now()
+				cons.create_time = dt
 				cons.type = BlackStack::Movement::MOVEMENT_TYPE_CANCELATION
 				cons.description = description.nil? ? 'Consumption' : description
 				cons.paypal1_amount = 0

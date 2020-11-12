@@ -121,7 +121,12 @@ module BlackStack
 
 		# Returns the number of credits assigned in the movement that have been consumed.
 		# The movment must be a payment or a bonus
-		def credits_consumed()
+		#
+		# registraton_time: consider only movements before this time. If it is nil, this method will consider all the movements.
+		# 
+		def credits_consumed(registraton_time=nil)
+      # le agrego 365 dias a la fecha actual, para abarcar todas las fechas ocurridas hasta hoy seguro
+      registraton_time = (Time.now() + 365*24*60*60).to_time if registraton_time.nil? 
 			# the movment must be a payment or a bonus
 			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
 #puts
@@ -131,7 +136,8 @@ module BlackStack
 			self.client.movements.select { |o| 
 				(o.type == MOVEMENT_TYPE_ADD_PAYMENT || o.type == MOVEMENT_TYPE_ADD_BONUS) &&
         o.credits.to_f < 0 &&
-        o.product_code.upcase == self.product_code.upcase
+        o.product_code.upcase == self.product_code.upcase &&
+        o.create_time.to_time <= registraton_time.to_time
       }.sort_by { |o| o.create_time }.each { |o|
 				paid += (0.to_f - o.credits.to_f)
 				break if o.id.to_guid == self.id.to_guid
@@ -140,7 +146,8 @@ module BlackStack
       # calculo los credito para este producto, desde el primer dia; incluyendo cosumo, expiraciones, ajustes.
       consumed = self.client.movements.select { |o| 
         o.credits.to_f > 0 &&
-        o.product_code.upcase == self.product_code.upcase
+        o.product_code.upcase == self.product_code.upcase &&
+        o.create_time.to_time <= registraton_time.to_time
       }.inject(0) { |sum, o| sum.to_f + o.credits.to_f }.to_f
 #puts "consumed:#{consumed.to_s}:."			
       # calculo los creditos de este movimiento que voy a cancelar
@@ -184,7 +191,10 @@ module BlackStack
 
 		# credits expiration
 		def expire(registraton_time=nil, desc='Expiration Because Allocation is Renewed')
-			credits_consumed = self.credits_consumed
+#puts
+#puts "registraton_time:#{registraton_time.to_s}:."
+			credits_consumed = self.credits_consumed(registraton_time)
+#puts "credits_consumed:#{credits_consumed.to_s}:."
 			# 
 			self.expiration_start_time = now()
 			self.expiration_tries = self.expiration_tries.to_i + 1
@@ -192,6 +202,8 @@ module BlackStack
 			# 
 			balance = BlackStack::Balance.new(self.client.id, self.product_code, registraton_time)
 			balance.calculate(false)
+#puts "balance.credits.to_s:#{balance.credits.to_s}:."
+#puts "balance.amount.to_s:#{balance.amount.to_s}:."
 			total_credits = 0.to_f - balance.credits.to_f
 			total_amount = 0.to_f - balance.amount.to_f
 			#
@@ -199,6 +211,8 @@ module BlackStack
 			#
 			credits_to_expire = credits - credits_consumed.to_i #- (0.to_f - self.credits.to_f)).to_i
 			amount_to_expire = total_credits.to_f == 0 ? 0 : credits_to_expire.to_f * ( total_amount.to_f / total_credits.to_f )
+#puts "credits_to_expire.to_s:#{credits_to_expire.to_s}:."
+#puts "amount_to_expire.to_s:#{amount_to_expire.to_s}:."
 			#
 			exp = BlackStack::Movement.new
 			exp.id = guid()
