@@ -31,6 +31,12 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :type=>BlackStack::SimpleCommandLineParser::INT,
 		:default=>1,
   }, {
+    :name=>'date', 
+    :mandatory=>false,
+    :description=>'Consumption date-time with SQL format plus timezone (%Y-%m-%d). Example: 2020-07-23.', 
+    :type=>BlackStack::SimpleCommandLineParser::STRING,
+    :default=>Time.now().to_s,
+  }, {
     :name=>'name', 
     :mandatory=>false, 
     :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
@@ -65,7 +71,16 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     self.logger.log "DB:#{DB['SELECT db_name() AS s'].first[:s]}."
     
     # process 
-    begin		
+    begin
+      # parse the date-time		
+      s = PARSER.value('date')
+#puts
+#puts s
+      t = DateTime.strptime(s, '%Y-%m-%d').to_time
+#      t = Date.strptime(s, '%Y-%m-%d').to_time
+#puts t.to_s
+#puts
+
 			# get the client
       self.logger.logs 'Get the client... '
 			c = BlackStack::Client.where(:id=>PARSER.value('id_client')).first
@@ -76,7 +91,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       self.logger.logs 'Consume the credits... '
 			i = 0
 			while i<PARSER.value('credits').to_i
-			 c.consume(PARSER.value('product'), 1, 'Consumption')
+			 c.consume(PARSER.value('product'), 1, 'Consumption', t)
 			 i+=1
 			 print '.'
 			end

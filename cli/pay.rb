@@ -20,9 +20,9 @@ PARSER = BlackStack::SimpleCommandLineParser.new(
     :description=>'ID of the invoice related with this subscription. The invoice must be belong the same calient.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
-    :name=>'datetime', 
+    :name=>'date', 
     :mandatory=>false,
-    :description=>'Payment date-time with SQL format plus timezone (%Y-%m-%d %H:%M:%S %Z). Example: 2020-07-23 14:45:18 -0300.', 
+    :description=>'Payment date-time with SQL format plus timezone (%Y-%m-%d). Example: 2020-07-23.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
 		:default=>Time.now().to_s,
   }, {
@@ -77,10 +77,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 				raise 'Invoice cannot be paid'
 			else
 #puts
-#puts PARSER.value('datetime')
+#puts "PARSER.value('date'):#{PARSER.value('date')}"
+#puts
 #s = "2020-07-24 18:15:00 -0300"
-s = PARSER.value('datetime')
-				t = DateTime.strptime(s, '%Y-%m-%d %H:%M:%S %Z').to_time
+        s = PARSER.value('date')
+				t = DateTime.strptime(s, '%Y-%m-%d').to_time
 				i.getPaid(t)
     
 				# TODO: code this!
