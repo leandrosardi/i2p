@@ -126,7 +126,14 @@ module BlackStack
 		# 
 		def credits_consumed(registraton_time=nil)
       # le agrego 365 dias a la fecha actual, para abarcar todas las fechas ocurridas hasta hoy seguro
-      registraton_time = (Time.now() + 365*24*60*60).to_time if registraton_time.nil? 
+      if registraton_time.nil?
+        registraton_time = (Time.now() + 365*24*60*60)
+      else
+        registraton_time = registraton_time.to_time if registraton_time.class != Time
+      end
+			# move time to the first second of the next day.
+			# example: '2020-11-12 15:49:43 -0300' will be converted to '2020-11-13 00:00:00 -0300'
+			registraton_time = (Date.strptime(registraton_time.strftime("%Y-%m-%d"), "%Y-%m-%d").to_time + 24*60*60)			
 			# the movment must be a payment or a bonus
 			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
 #puts
@@ -137,7 +144,7 @@ module BlackStack
 				(o.type == MOVEMENT_TYPE_ADD_PAYMENT || o.type == MOVEMENT_TYPE_ADD_BONUS) &&
         o.credits.to_f < 0 &&
         o.product_code.upcase == self.product_code.upcase &&
-        o.create_time.to_time <= registraton_time.to_time
+        o.create_time.to_time < registraton_time.to_time
       }.sort_by { |o| o.create_time }.each { |o|
 				paid += (0.to_f - o.credits.to_f)
 				break if o.id.to_guid == self.id.to_guid
@@ -147,7 +154,7 @@ module BlackStack
       consumed = self.client.movements.select { |o| 
         o.credits.to_f > 0 &&
         o.product_code.upcase == self.product_code.upcase &&
-        o.create_time.to_time <= registraton_time.to_time
+        o.create_time.to_time < registraton_time.to_time
       }.inject(0) { |sum, o| sum.to_f + o.credits.to_f }.to_f
 #puts "consumed:#{consumed.to_s}:."			
       # calculo los creditos de este movimiento que voy a cancelar
