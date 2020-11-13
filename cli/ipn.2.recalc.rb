@@ -104,6 +104,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     GC.start   
     self.logger.done
 
+    # long sleep
+    self.logger.logs "Sleep for long time. Click CTRL+C to exit... "
+    sleep(500000)
+    self.logger.done
+
   end # process  
 end # class
 
