@@ -17,12 +17,16 @@ module BlackStack
       # The call to this method may take too much time, but ti won't raise a query timeout.
       # 
       def movements
+        i = 0 
         ret = []
         BlackStack::Movement.where(:id_client=>self.id).each { |o| 
           ret << o
-          print '.'
-          GC.start
-          DB.disconnect
+          i += 1
+          if i == 1000
+            i = 0
+            GC.start
+            DB.disconnect
+          end
         }
         ret
       end

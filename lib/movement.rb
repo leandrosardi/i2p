@@ -159,7 +159,8 @@ module BlackStack
         "and m.id_client='#{self.client.id.to_guid}' " +
         "and isnull(m.credits,0) < 0 " +
         "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
-        "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' "
+        "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " +
+        "and m.id <> '#{self.id.to_guid}' "
       ].first[:n]
 #puts "paid:#{paid.to_s}:."
 
@@ -177,7 +178,8 @@ module BlackStack
         "where m.id_client='#{self.client.id.to_guid}' " +
         "and isnull(m.credits,0) > 0 " +
         "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
-        "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' "
+        "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " +
+        "and m.id <> '#{self.id.to_guid}' "
       ].first[:n]
 #puts "consumed:#{consumed.to_s}:."     
 
