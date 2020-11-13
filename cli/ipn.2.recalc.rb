@@ -47,56 +47,75 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     self.logger.log "Say hello to CLI for IPN manual processing!"
     
     self.logger.log "DB:#{DB['SELECT db_name() AS s'].first[:s]}."
-    
+
+    reports = []
+
     # process 
     begin					
       PARSER.value('id_clients').split(/,/).each { |cid|
         # get the client
         self.logger.logs "Get the client #{cid.to_guid}... "
-        c = BlackStack::Client.where(:id=>cid).first
-        raise 'Client not found' if c.nil?
-        self.logger.logf("done (#{c.name})");
-  
-        # get the dvision name
-        self.logger.logs 'Get the division name... '
-        d = c.division.home
-        dname = d.name
-        self.logger.logf("done (#{dname})")
+        report = {:cid=>cid}
+        begin
+          c = BlackStack::Client.where(:id=>cid).first
+          raise 'Client not found' if c.nil?
+          self.logger.logf("done (#{c.name})");
 
-        # validar que no se tratade la division central
-        self.logger.logs "Validate client's division is not the central... "
-        raise 'Client assigned to central division' if d.central
-        raise "Division #{dname} is known as the central division" if dname == 'kepler'
-        self.logger.done
+          #
+          report[:cname] = c.name
+
+          # get the dvision name
+          self.logger.logs 'Get the division name... '
+          d = c.division.home
+          dname = d.name
+          self.logger.logf("done (#{dname})")
+  
+          # validar que no se tratade la division central
+          self.logger.logs "Validate client's division is not the central... "
+          raise 'Client assigned to central division' if d.central
+          raise "Division #{dname} is known as the central division" if dname == 'kepler'
+          self.logger.done
 =begin      
-        # 
-        self.logger.logs 'Delete movements that are not consumption, invoices, and subscriptions...'
-        self.clear(c)
-        self.logger.done
-        
-        # 
-        self.logger.logs 'Reprocess IPNs... '
-        self.reproc(c)
-        self.logger.done
+          # 
+          self.logger.logs 'Delete movements that are not consumption, invoices, and subscriptions...'
+          self.clear(c)
+          self.logger.done
+          
+          # 
+          self.logger.logs 'Reprocess IPNs... '
+          self.reproc(c)
+          self.logger.done
 =end
-        # 
-        self.logger.logs 'Recalculate credits fees in the movement table... '
-        self.recalc(c)
-        self.logger.done
-        
-        # 
-        self.logger.logs 'Expire unused credits in the movement table... '
-        self.expire(c)
-        self.logger.done
-        
-        # update the table stat_balance
-        self.logger.logs 'Update stat_balance... '
-        c.update_stat_balance
-        self.logger.done
+          # 
+          self.logger.logs 'Recalculate credits fees in the movement table... '
+          self.recalc(c)
+          self.logger.done
+          
+          # 
+          self.logger.logs 'Expire unused credits in the movement table... '
+          self.expire(c)
+          self.logger.done
+          
+          # update the table stat_balance
+          self.logger.logs 'Update stat_balance... '
+          c.update_stat_balance
+          self.logger.done
+
+          report[:result] = 'success'
+        rescue => e
+          report[:result] = "error: #{e.to_console}"
+        end
+        reports << report
       } # PARSER.value('id_clients').split(/,/).each	
     rescue => e
       self.logger.error(e)
     end
+
+    # report
+    self.logger.log "Report:"
+    reports.each { |report|
+      self.logger.log report.to_s 
+    }
 
     # libero recursos
     self.logger.logs "Release resources... "
