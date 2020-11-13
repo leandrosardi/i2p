@@ -103,6 +103,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 
           report[:result] = 'success'
         rescue => e
+          self.logger.error(e)
           report[:result] = "error: #{e.to_console}"
         end
         reports << report
@@ -112,8 +113,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     end
 
     # report
+    self.logger.log
+    self.logger.log
     self.logger.log "Report:"
     reports.each { |report|
+      self.logger.log
       self.logger.log report.to_s 
     }
 
