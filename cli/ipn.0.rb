@@ -1,5 +1,5 @@
 module IPNReprocessing
-    def self.clear(c)
+  def clear(c)
     # get the dvision name
     self.logger.logs 'Get the division name... '
     d = c.division.home
