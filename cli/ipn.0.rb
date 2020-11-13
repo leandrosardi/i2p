@@ -1,59 +1,12 @@
-#require "blackstack_commons"
-#s = Time.now().to_s
-#puts s
-#t = DateTime.strptime(s, '%Y-%m-%d %H:%M:%S %Z').to_time
-#puts t.to_s
-#exit(0)
-
-require "simple_command_line_parser"
-require "pampa_workers"
-require_relative "../lib/invoicing_payments_processing"
-require_relative './config'
-
-# command line parameters 
-PARSER = BlackStack::SimpleCommandLineParser.new(
-  :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
-  :configuration => [{
-    :name=>'id_clients', 
-    :mandatory=>true, 
-    :description=>'ID of the client who is consuming credits.', 
-    :type=>BlackStack::SimpleCommandLineParser::STRING,
-  }, {
-    :name=>'name', 
-    :mandatory=>false, 
-    :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too.', 
-    :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>'dispatcher_kepler',
-  }, {
-    :name=>'division', 
-    :mandatory=>false, 
-    :description=>'Name of the worker. Note that the full-name of the worker will be composed with the host-name and the mac-address of this host too. The invoice cannot be already linked to another subscription.', 
-    :type=>BlackStack::SimpleCommandLineParser::STRING,
-    :default=>'kepler', # central
-  }]
-)
-
-BlackStack::Pampa::set_division_name(
-  PARSER.value('division')
-)
-
-# connect to DB and require ORM classes
-require 'sequel'
-#puts "Connector Descriptor: #{BlackStack::Pampa::connection_descriptor}"
-DB = BlackStack::Pampa::db_connection
-BlackStack::Pampa::require_db_classes
-BlackStack::InvoicingPaymentsProcessing::require_db_classes
-
-# 
-class MyCLIProcess < BlackStack::MyLocalProcess
-  
-  def clear(c)
+module IPNReprocessing
+    def self.clear(c)
     # get the dvision name
     self.logger.logs 'Get the division name... '
     d = c.division.home
     dname = d.name
     self.logger.logf("done (#{dname})")
 =begin
+# TODO: add this validation to prevent abuses  
     # verify if this client paid with the same PayPal account than other client
     self.logger.logs 'Check if the payer_email is not used by other client... '
     rows = DB[
@@ -168,20 +121,6 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     # desvincularlas de cualquier subscripcion,
     # desvincularlas de cualquie IPN 
     self.logger.logs 'Update invoices to unpaid status, unlink to any IPN, unlink to any subscription... '
-=begin
-    DB.execute(
-      "update #{dname}..invoice " + 
-      "set " +
-      "  subscr_id=null, " +
-      "  status=#{BlackStack::Invoice::STATUS_UNPAID.to_s}, " +
-      "  id_buffer_paypal_notification=null " +
-      "where id_client='#{c.id}' " #+
-      #"and cast([id] as varchar(500)) in ( " +
-      #"  select distinct invoice " +
-      #"  from kepler..buffer_paypal_notification " +
-      #") "
-    )
-=end
     DB[
       "select id " +
       "from #{dname}..invoice " + 
@@ -304,11 +243,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         # envio la notificacion a la division
         self.logger.logs "Submit... "
         api_url = "#{BlackStack::Pampa::api_protocol}://#{d.ws_url}:#{d.ws_port}"
-api_url = "http://74.208.28.38:81"
         url = "#{api_url}/api1.3/accounting/sync/paypal/notification.json"
-#puts
-#puts "url:#{url}:."
-#puts "params:#{params}:."
         res = BlackStack::Netting::call_post(url, params)          
         parsed = JSON.parse(res.body)
         if (parsed["status"] == "success")
@@ -349,75 +284,4 @@ api_url = "http://74.208.28.38:81"
       self.logger.done
     }     
   end # def recalc
-
-  def process(argv)
-    self.logger.log "Say hello to CLI for IPN manual processing!"
-    
-    self.logger.log "DB:#{DB['SELECT db_name() AS s'].first[:s]}."
-    
-    # process 
-    begin					
-      PARSER.value('id_clients').split(/,/).each { |cid|
-        # get the client
-        self.logger.logs "Get the client #{cid.to_guid}... "
-        c = BlackStack::Client.where(:id=>cid).first
-        raise 'Client not found' if c.nil?
-        self.logger.logf("done (#{c.name})");
-  
-        # get the dvision name
-        self.logger.logs 'Get the division name... '
-        d = c.division.home
-        dname = d.name
-        self.logger.logf("done (#{dname})")
-    
-        # validar que no se tratade la division central
-        self.logger.logs "Validate client's division is not the central... "
-        raise 'Client assigned to central division' if d.central
-        raise "Division #{dname} is known as the central division" if dname == 'kepler'
-        self.logger.done
-      
-        # 
-        self.logger.logs 'Delete movements that are not consumption, invoices, and subscriptions...'
-        self.clear(c)
-        self.logger.done
-        
-        # 
-        self.logger.logs 'Reprocess IPNs... '
-        self.reproc(c)
-        self.logger.done
-        
-        # 
-        self.logger.logs 'Recalculate credits fees in the movement table... '
-        self.recalc(c)
-        self.logger.done
-        
-        # 
-        self.logger.logs 'Expire unused credits in the movement table... '
-        self.expire(c)
-        self.logger.done
-
-        # update the table stat_balance
-        self.logger.logs 'Update stat_balance... '
-        c.update_stat_balance
-        self.logger.done
-      } # PARSER.value('id_clients').split(/,/).each	
-    rescue => e
-      self.logger.error(e)
-    end
-
-    # libero recursos
-    self.logger.logs "Release resources... "
-    DB.disconnect
-    GC.start   
-    self.logger.done
-
-    self.logger.logs "Sleep for long time. Click CTRL+C to exit... "
-    sleep(500000)
-    self.logger.done
-
-  end # process  
-end # class
-
-PROCESS = MyCLIProcess.new(PARSER.value('name'), PARSER.value('division'))
-PROCESS.verify_configuration = false # disable this to run any script with the name of this worker-thread, even if worker is configured to run another script
-PROCESS.run()
+end # module
