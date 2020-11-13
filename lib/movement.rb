@@ -137,22 +137,23 @@ module BlackStack
 			# the movment must be a payment or a bonus
 			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
 #puts
+#puts "id:#{self.id.to_guid}:."
 #puts "product_code:#{self.product_code}:."
-
 			# itero los pagos y bonos hechos por este mismo producto, desde el primer dia hasta este movimiento.
 =begin
-			paid = 0
+			paid1 = 0
 			self.client.movements.select { |o| 
 				(o.type == MOVEMENT_TYPE_ADD_PAYMENT || o.type == MOVEMENT_TYPE_ADD_BONUS) &&
         o.credits.to_f < 0 &&
         o.product_code.upcase == self.product_code.upcase &&
         o.create_time.to_time < registraton_time.to_time
       }.sort_by { |o| o.create_time }.each { |o|
-				paid += (0.to_f - o.credits.to_f)
+				paid1 += (0.to_f - o.credits.to_f)
 				break if o.id.to_guid == self.id.to_guid
 			}
+#puts "paid1:#{paid1.to_s}:."
 =end
-      paid = 0 - DB[
+      q = 
         "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
         "from movement m with (nolock) " +
         "where isnull(m.type, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}) in (#{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS.to_s}) " +
@@ -160,27 +161,29 @@ module BlackStack
         "and isnull(m.credits,0) < 0 " +
         "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
         "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " +
-        "and m.id <> '#{self.id.to_guid}' "
-      ].first[:n]
+        "and m.create_time <= (select m2.create_time from movement m2 with (nolock) where m2.id='#{self.id.to_guid}') "
+      paid = 0 - DB[q].first[:n]
+#puts "q:#{q.to_s}:."
 #puts "paid:#{paid.to_s}:."
-
 =begin
       # calculo los credito para este producto, desde el primer dia; incluyendo cosumo, expiraciones, ajustes.
-      consumed = self.client.movements.select { |o| 
+      consumed1 = self.client.movements.select { |o| 
         o.credits.to_f > 0 &&
         o.product_code.upcase == self.product_code.upcase &&
         o.create_time.to_time < registraton_time.to_time
       }.inject(0) { |sum, o| sum.to_f + o.credits.to_f }.to_f
+#puts "consumed1:#{consumed1.to_s}:."     
 =end
-      consumed = DB[
+      q = 
         "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
         "from movement m with (nolock) " +
         "where m.id_client='#{self.client.id.to_guid}' " +
         "and isnull(m.credits,0) > 0 " +
         "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
-        "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " +
-        "and m.id <> '#{self.id.to_guid}' "
-      ].first[:n]
+        "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " #+
+#        "and m.id <> '#{self.id.to_guid}' "
+      consumed = DB[q].first[:n]
+#puts "q:#{q.to_s}:."
 #puts "consumed:#{consumed.to_s}:."     
 
       # calculo los creditos de este movimiento que voy a cancelar
