@@ -106,3 +106,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 
   end # process  
 end # class
+
+PROCESS = MyCLIProcess.new(PARSER.value('name'), PARSER.value('division'))
+PROCESS.verify_configuration = false # disable this to run any script with the name of this worker-thread, even if worker is configured to run another script
+PROCESS.run()
