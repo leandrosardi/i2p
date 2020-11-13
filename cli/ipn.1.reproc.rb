@@ -41,7 +41,7 @@ BlackStack::InvoicingPaymentsProcessing::require_db_classes
 
 # 
 class MyCLIProcess < BlackStack::MyLocalProcess
-  inlcude IPNReprocessing
+  include IPNReprocessing
 
   def process(argv)
     self.logger.log "Say hello to CLI for IPN manual processing!"
