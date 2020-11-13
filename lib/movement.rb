@@ -138,7 +138,9 @@ module BlackStack
 			raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
 #puts
 #puts "product_code:#{self.product_code}:."
+
 			# itero los pagos y bonos hechos por este mismo producto, desde el primer dia hasta este movimiento.
+=begin
 			paid = 0
 			self.client.movements.select { |o| 
 				(o.type == MOVEMENT_TYPE_ADD_PAYMENT || o.type == MOVEMENT_TYPE_ADD_BONUS) &&
@@ -149,14 +151,36 @@ module BlackStack
 				paid += (0.to_f - o.credits.to_f)
 				break if o.id.to_guid == self.id.to_guid
 			}
+=end
+      paid = 0 - DB[
+        "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
+        "from movement m with (nolock) " +
+        "where isnull(m.type, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}) in (#{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS.to_s}) " +
+        "and m.id_client='#{self.client.id.to_guid}' " +
+        "and isnull(m.credits,0) < 0 " +
+        "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
+        "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' "
+      ].first[:n]
 #puts "paid:#{paid.to_s}:."
+
+=begin
       # calculo los credito para este producto, desde el primer dia; incluyendo cosumo, expiraciones, ajustes.
       consumed = self.client.movements.select { |o| 
         o.credits.to_f > 0 &&
         o.product_code.upcase == self.product_code.upcase &&
         o.create_time.to_time < registraton_time.to_time
       }.inject(0) { |sum, o| sum.to_f + o.credits.to_f }.to_f
-#puts "consumed:#{consumed.to_s}:."			
+=end
+      consumed = DB[
+        "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
+        "from movement m with (nolock) " +
+        "where m.id_client='#{self.client.id.to_guid}' " +
+        "and isnull(m.credits,0) > 0 " +
+        "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
+        "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' "
+      ].first[:n]
+#puts "consumed:#{consumed.to_s}:."     
+
       # calculo los creditos de este movimiento que voy a cancelar
       credits = 0.to_f - self.credits.to_f
 #puts "credits:#{credits.to_s}:."

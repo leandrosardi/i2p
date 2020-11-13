@@ -6,7 +6,26 @@ module BlackStack
     class Client < Sequel::Model(:client)
       one_to_many :paypal_subscriptions, :class=>:'BlackStack::PayPalSubscription', :key=>:id_client
       one_to_many :customplans, :class=>:'BlackStack::CustomPlan', :key=>:id_client
-      one_to_many :movements, :class=>:'BlackStack::Movement', :key=>:id_client
+
+      # This method replace the line:
+      # one_to_many :movements, :class=>:'BlackStack::Movement', :key=>:id_client
+      # 
+      # Because when you have a large number of records in the table movement, for a client, 
+      # then the call to this attribute client.movements can take too much time and generates
+      # a query timeout exception.
+      # 
+      # The call to this method may take too much time, but ti won't raise a query timeout.
+      # 
+      def movements
+        ret = []
+        BlackStack::Movement.where(:id_client=>self.id).each { |o| 
+          ret << o
+          print '.'
+          GC.start
+          DB.disconnect
+        }
+        ret
+      end
 
       # how many minutes ago should have updated the table stat_balance with the amount and credits of this client, for each product.
       def stat_balance_delay_minutes
@@ -137,7 +156,7 @@ module BlackStack
 				credits_paid = 0
 
 				#total_credits = 0.to_f - BlackStack::Balance.new(self.id, product_code).credits.to_f
-				#total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f
+				#total_amount = 0.to_f - BlackStack::Balance.new(self.id, product_code).amount.to_f        
 
 				self.movements.select { |o| 
 					o.product_code.upcase == product_code.upcase
