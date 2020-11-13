@@ -113,11 +113,11 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     end
 
     # report
-    self.logger.log
-    self.logger.log
+    self.logger.log ''
+    self.logger.log ''
     self.logger.log "Report:"
     reports.each { |report|
-      self.logger.log
+      self.logger.log ''
       self.logger.log report.to_s 
     }
 
