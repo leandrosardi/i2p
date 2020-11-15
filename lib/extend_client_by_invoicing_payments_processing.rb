@@ -32,11 +32,17 @@ module BlackStack
       end
 
       # how many minutes ago should have updated the table stat_balance with the amount and credits of this client, for each product.
+      # return a positive integer if either:
+      # 1. the client didn't update stats in the last 24 hours, or
+      # 2. the client has a new record in the table movements after its last update in the table stat_balance.
       def stat_balance_delay_minutes
         row = DB[
           "SELECT TOP 1 m.id " +
           "FROM client c WITH (NOLOCK) " +
-          "JOIN movement m WITH (NOLOCK INDEX(IX_movement__id_client__create_time_desc)) ON ( c.id=m.id_client AND m.create_time > ISNULL(c.last_stat_balance_update_time, '1900-01-01') ) " +
+          "JOIN movement m WITH (NOLOCK INDEX(IX_movement__id_client__create_time_desc)) ON ( " +
+          " c.id=m.id_client AND " +
+          " m.create_time > ISNULL(c.last_stat_balance_update_time, '1900-01-01') " +
+          ") " +
           "WHERE c.id = '#{self.id}' " +
           "ORDER BY m.create_time DESC "
         ].first

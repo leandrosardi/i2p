@@ -42,27 +42,38 @@ module BlackStack
     # 3) haciendo coincidir el primer guid en el codigo de invoice, con el id del cliente
     def get_client()
 puts
-puts "BlackStack::BufferPayPalNotification::get_client"
-puts 'debug info:'
-puts "self.invoice:#{self.invoice.to_s}:."
+puts "get_client: BlackStack::BufferPayPalNotification::get_client"
+puts "get_client: self.invoice:#{self.invoice.to_s}:."
       # obtengo el cliente que machea con este perfil
       c = nil
       if c.nil?
+puts 'get_client: a'
         if self.invoice.guid?
+puts 'get_client: a1'
+puts "get_client: #{self.invoice.to_s}"
           i = BlackStack::Invoice.where(:id=>self.invoice).first
-          c = i.client if !i.nil? 
+          if !i.nil?
+            c = i.client  
+puts 'get_client: a1a'
+          else
+puts 'get_client: a1b'
+          end
         end
       end
       if c.nil?
+puts 'get_client: b'
         iid = self.invoice.split(".").last.to_s
         if iid.guid?
+puts 'get_client: b1'
           i = BlackStack::Invoice.where(:id=>iid).first
           c = i.client if !i.nil? 
         end
       end
       if c.nil?
+puts 'get_client: c'
         cid = self.invoice.split(".").first.to_s
         if cid.guid?
+puts 'get_client: c1'
           c = BlackStack::Client.where(:id=>cid).first
         end
       end
