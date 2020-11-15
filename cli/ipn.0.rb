@@ -252,7 +252,7 @@ api_url = "http://74.208.28.38:81"
           p.sync_end_time = now()
           p.save()
         else
-          raise "IPN submission error:#{parsed.to_s}."
+          raise "IPN #{p.id.to_guid} error:#{parsed.to_s}."
         end  
         self.logger.done
 

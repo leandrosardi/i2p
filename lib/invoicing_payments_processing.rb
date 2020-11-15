@@ -63,7 +63,7 @@ module BlackStack
 
     def self.plan_descriptor(item_number)
       plan = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |h| h[:item_number].to_s == item_number.to_s }.first
-      raise "Plan not found" if plan.nil?
+      raise "Plan not found (#{item_number.to_s})" if plan.nil?
       plan
     end
   
