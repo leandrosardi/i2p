@@ -104,7 +104,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           report[:result] = 'success'
         rescue => e
           self.logger.error(e)
-          report[:result] = "error: #{e.to_console}"
+          report[:result] = 'error'
         end
         reports << report
       } # PARSER.value('id_clients').split(/,/).each	
