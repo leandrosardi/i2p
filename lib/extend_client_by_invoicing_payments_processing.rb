@@ -62,8 +62,8 @@ module BlackStack
           product_descriptors.each { |hprod|
             row = DB[
               "select isnull(sum(isnull(m.credits,0)),0) as credits, isnull(sum(isnull(m.amount,0)),0) as amount " +
-  #            "from movement m with (nolock index(IX_movement__id_client__product_code)) " + 
-              "from movement m with (nolock) " + 
+              "from movement m with (nolock index(IX_movement__id_client__product_code)) " + 
+              #"from movement m with (nolock) " + 
               "where m.id_client='#{c.id}' " +
               "and m.product_code='#{hprod[:code]}' "
             ].first
