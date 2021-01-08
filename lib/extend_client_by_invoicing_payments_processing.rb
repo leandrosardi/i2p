@@ -347,7 +347,8 @@ module BlackStack
         end
         
         q +=
-        "WHERE i.id_client='#{self.id}' "
+        "WHERE i.id_client='#{self.id}' " +
+        "AND i.delete_time IS NULL "
         
         return !DB[q].first.nil?
       end
