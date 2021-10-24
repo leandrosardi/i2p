@@ -226,4 +226,4 @@ puts BlackStack::InvoicingPaymentsProcessing::plans_descriptor
 
 [Identifying Your IPN Listener to PayPal](https://developer.paypal.com/docs/ipn/integration-guide/IPNSetup/)
 
-[IPN Operations/History on PayPal](https://developer.paypal.com/docs/classic/ipn/integration-guide/IPNOperations/#view-ipn-messages-and-details)
+[IPN Operations/History on PayPal](https://developer.paypal.com/docs/api-basics/notifications/ipn/IPNOperations/#:~:text=Resend%20IPN%20messages-,View%20IPN%20messages%20and%20details,status%2C%20and%20PayPal%20transaction%20ID.)
