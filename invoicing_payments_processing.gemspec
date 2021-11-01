@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'invoicing_payments_processing'
-  s.version     = '1.1.75'
-  s.date        = '2021-01-07'
+  s.version     = '1.1.76'
+  s.date        = '2021-11-01'
   s.summary     = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Invoicing and Payments Processing gem (a.k.a. I+2P) is a Ruby gem to setup amazing offers in your website, track them, and also process payments automatically using PayPal."
   s.description = "THIS GEM IS STILL IN DEVELOPMENT STAGE. Find documentation here: https://github.com/leandrosardi/invoicing_payments_processing."
   s.authors     = ["Leandro Daniel Sardi"]
@@ -23,5 +23,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'json', '~> 1.8.1', '>= 1.8.1'
   s.add_runtime_dependency 'tiny_tds', '~> 1.0.5', '>= 1.0.5'
   s.add_runtime_dependency 'sequel', '~> 4.28.0', '>= 4.28.0'
-  s.add_runtime_dependency 'pampa_workers', '~> 1.1.1', '>= 1.1.1'
+  s.add_runtime_dependency 'pampa_workers', '~> 1.1.24', '>= 1.1.24'
 end
