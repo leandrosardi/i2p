@@ -201,6 +201,12 @@ module BlackStack
         
         values[:a3] = 0
         self.items.each { |i|
+puts
+puts
+puts "i.units.to_i.to_s:#{i.units.to_i.to_s}:."
+puts "i.plan_descriptor[:trial_credits].to_i.to_s:#{i.plan_descriptor[:trial_credits].to_i.to_s}:."
+puts
+puts
           if trial1 && i.units.to_i!=i.plan_descriptor[:trial_credits].to_i
             raise 'Cannot order more than 1 package and trial in the same invoice'
           elsif trial1
