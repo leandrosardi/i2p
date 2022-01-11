@@ -203,6 +203,8 @@ module BlackStack
         self.items.each { |i|
 puts
 puts
+puts "i.id.to_s:#{i.id.to_s}:."
+puts "i.id_invoice.to_s:#{i.id_invoice.to_s}:."
 puts "i.units.to_i.to_s:#{i.units.to_i.to_s}:."
 puts "i.plan_descriptor[:trial_credits].to_i.to_s:#{i.plan_descriptor[:trial_credits].to_i.to_s}:."
 puts
