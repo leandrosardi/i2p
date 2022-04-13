@@ -81,8 +81,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_AGENCY,
     :description=>"Dedicated Support, Optimization & Campaigns Management.",
     :summary=>"Get One Account Manager for Your Campaigns.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/main/dashboard",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me!
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M", 
@@ -97,8 +97,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_AGENCY,
     :description=>"SocialSellingMachine Program", 
     :summary=>"Receive emails of people interested in what you offer.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/ssm3/step1?program=ssm",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/prospecting/pipeline/new/step1?program=ssm",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>3, 
     :credits_expiration_period=>"M",  
@@ -115,8 +115,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"Additional Processing Threads for your Automation.",
     :summary=>"Get many processing threads working in paralell in order to scale your campaign.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/thr/dashboard?program=thr",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/threads/dashboard?program=thr",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -130,8 +130,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"Dedicated Server for Isolated Fingerprinting.",
     :summary=>"You can assign a limited number of accounts to each dedicated server, so you can control the stealth of your whole farm.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/thr/dashbaord",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/threads/dashbaord",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
   },
   { 
@@ -142,8 +142,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"Stealth Browser Profiles with Counter-Fingerprinting Technology Included.",
     :summary=>"Each Stealth Browser Profile will spoof both: software and hardward fingerprints. It's good to launch as many accounts as you want in one single thread.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/thr/dashbaord",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/threads/dashbaord",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
   },
 =end
@@ -157,8 +157,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"512MB Storage in your Account.",
     :summary=>"Disk Space for Browser Profiles, Logs, Pictures, Reports.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/main/dashboard",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -173,8 +173,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
     :description=>"Save and analyze your logs in the cloud.",
     :summary=>"Save and analyze your logs in the cloud. Publish your logs in any website.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/main/dashboard",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -189,8 +189,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
     :description=>"Real-time monitor of CPU, RAM and disk space.",
     :summary=>"Setup threashold alerts and get email notifications before your servers break down.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/shm/dashboard?program=shm",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/hostsmonitoring/dashboard?program=shm",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -205,8 +205,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
     :description=>"Generate Sales on LinkedIn through automated prospecting.",
     :summary=>"Unlimited accounts allowed. Setup automated invitations & messages follow-ups. Manage one unique conversation with every lead. Manage the chat of thousands of accounts from one single dashboard. Proprietary browser with counter-fingerprinting technology.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/ssm3/step1?program=drx",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/prospecting/pipeline/new/step1?program=drx",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -221,8 +221,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
     :description=>"Move leads between pipelines.",
     :summary=>"Move leads between pipelines, in order to do a high customized campaign.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/ssm3/step1?program=aut",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/prospecting/pipeline/new/step1?program=aut",
     :landing_page=>"http://ConnectionSphere.com/automation", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -237,8 +237,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
     :description=>"Replacate and Scrape Sales Navigator Searches.",
     :summary=>"Scrape 90% of any LinkedIn search, even if the search is larger than 10,000 results.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/edb/searches?program=edb",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/listbuilder/searches?program=edb",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -247,14 +247,14 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :code=>PRODUCT_MAC, 
     :public=>true,
     :icon => "program.ssm.png", 
-    :name=>"Linked Creator", 
+    :name=>"Farming", 
     :unit_name=>"accounts", 
     :consumption=>BlackStack::InvoicingPaymentsProcessing::BasePlan::CONSUMPTION_BY_TIME, 
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_SOFTWARE,
     :description=>"More Slots to Upload Your Own Accounts.",
     :summary=>"Automated Signup, Email Confirmation, Profile Edition. SMS Verifictions. Captcha Resolving. One Stealth Browser Profiles for each Account with Counter-Fingerprinting Technology.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/mac/dashboard?program=mac",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/farming/dashboard?program=mac",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -269,7 +269,7 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"LinkedIn Accounts for Sale.",
     :summary=>"Every account is worth $1 or more depending upon how old is it and how many connections it already has. Don't include proxies.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
     :return_path=>"#{CS_HOME_WEBSITE}/pva/results?program=pva",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
@@ -285,7 +285,7 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"Mass Bulk Fresh IPv6 Proxies.",
     :summary=>"Mass warehouse of IPv6 proxies for social accounts.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
     :return_path=>"#{CS_HOME_WEBSITE}/prx/dashboard",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
@@ -301,8 +301,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"Social Accounts Rental. Include Proxies.",
     :summary=>"Social accounts rental. Include proxies. You can't login the accounts yourself. But you can handle them through our platform and watch their activity.",
-    :thumbnail=>"#{CS_HOME_WEBSITE}/assets/images/modules.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/mac/lnusers?program=mac",
+    :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
+    :return_path=>"#{CS_HOME_WEBSITE}/farming/accounts?program=mac",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -371,7 +371,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :period=>"M", 
     :description=>"BlackStack Seminars - B2B Selling Mastery.", 
     :thumbnail=>"https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/ssm3/step1",
+    :return_path=>"#{CS_HOME_WEBSITE}/prospecting/pipeline/new/step1",
   },
   
   {
@@ -393,7 +393,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :description=>"B2B Selling Fraternity",
     :summary=>"More than 5,000 marketers sharing experiences and testing results.",
     :thumbnail=>"https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/ssm3/step1",
+    :return_path=>"#{CS_HOME_WEBSITE}/prospecting/pipeline/new/step1",
   },
 =end
 
@@ -904,7 +904,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
 
-  # Simple Host Monitoring - Small
+  # Simple Hosts Monitoring - Small
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
     :public=>true,
@@ -928,7 +928,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
 
-  # Simple Host Monitoring - Medium
+  # Simple Hosts Monitoring - Medium
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
     :public=>true,
@@ -952,7 +952,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
 
-  # Simple Host Monitoring - Large
+  # Simple Hosts Monitoring - Large
   {
     :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
     :public=>true,
@@ -1156,7 +1156,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_MAC, 
     :item_number=>"MAC.Plan-20", 
-    :name=>"Linked Creator", 
+    :name=>"Farming", 
     :credits=>20, 
     :normal_fee=>66, 
     :fee=>39, 
@@ -1182,7 +1182,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_MAC, 
     :item_number=>"MAC.Plan-45", 
-    :name=>"Linked Creator", 
+    :name=>"Farming", 
     :credits=>45, 
     :normal_fee=>132, 
     :fee=>59, 
@@ -1208,7 +1208,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_MAC, 
     :item_number=>"MAC.Plan-100", 
-    :name=>"Linked Creator", 
+    :name=>"Farming", 
     :credits=>100, 
     :normal_fee=>264, 
     :fee=>99, 
@@ -1415,7 +1415,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :description=>"Real-time monitor of CPU, RAM and disk space.",
     :summary=>"Real-time monitor of CPU, RAM and disk space.",
     :thumbnail=>"https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/ssm3/step1",
+    :return_path=>"#{CS_HOME_WEBSITE}/prospecting/pipeline/new/step1",
     #:upsells=>[],
     :bonus_plans=>[]
   },
@@ -1440,7 +1440,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
     :description=>"Real-time monitor of CPU, RAM and disk space.",
     :summary=>"Real-time monitor of CPU, RAM and disk space.",
     :thumbnail=>"https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png",
-    :return_path=>"#{CS_HOME_WEBSITE}/ssm3/step1",
+    :return_path=>"#{CS_HOME_WEBSITE}/prospecting/pipeline/new/step1",
     #:upsells=>[],
     :bonus_plans=>[]
   },

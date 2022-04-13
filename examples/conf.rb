@@ -39,7 +39,7 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :description=>"Dedicated Processing Threads for Bots.",
     :summary=>"Get many processing threads working in paralell in order to scale your bot farm.",
     :thumbnail=>"https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png",
-    :return_path=>"/thr/dashbaord",
+    :return_path=>"/threads/dashbaord",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  
@@ -54,7 +54,7 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :description=>"512MB Storage in your Account.",
     :summary=>"Disk Space for Browser Profiles, Logs, Pictures, Reports.",
     :thumbnail=>"https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png",
-    :return_path=>"/main/dashboard",
+    :return_path=>"/",
     :landing_page=>"http://SocialSellingMachine.com", # TODO: edit me! 
     :credits_expiration_units=>1, 
     :credits_expiration_period=>"M",  

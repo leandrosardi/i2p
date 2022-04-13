@@ -281,7 +281,7 @@ api_url = "http://74.208.28.38:81"
       m.expiration_lead_time < Time.now
     }.each { |m|
       self.logger.logs "#{m.id.to_guid}:#{m.product_code}:#{m.expiration_lead_time.to_s}:."       
-      m.expire(m.expiration_lead_time, "Expiration of <a href='/member/record?rid=#{m.id.to_guid}'>record:#{m.id.to_guid}</a> because the lead-time has been reached.") 
+      m.expire(m.expiration_lead_time, "Expiration of <a href='/settings/record?rid=#{m.id.to_guid}'>record:#{m.id.to_guid}</a> because the lead-time has been reached.") 
       self.logger.done
     }     
   end # def recalc
