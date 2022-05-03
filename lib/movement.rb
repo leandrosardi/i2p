@@ -176,7 +176,7 @@ module BlackStack
 =end
       q = 
         "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
-        "from movement m with (nolock index(IX_movement__type__id_client__product_code__create_time_desc__credits_asc)) " +
+        "from movement m with (nolock index(IX_movement__id_client__product_code__create_time_desc__credits_asc)) " +
         "where m.id_client='#{self.client.id.to_guid}' " +
         "and isnull(m.credits,0) > 0 " +
         "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
