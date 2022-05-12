@@ -60,15 +60,22 @@ module BlackStack
           product_descriptors = BlackStack::InvoicingPaymentsProcessing::products_descriptor.clone     
           product_descriptors.select! { |hprod| hprod[:code] == product_code } if !product_code.nil?
           product_descriptors.each { |hprod|
-            row = DB[
-              "select isnull(sum(isnull(m.credits,0)),0) as credits, isnull(sum(isnull(m.amount,0)),0) as amount " +
-              "from movement m with (nolock index(IX_movement__id_client__product_code)) " + 
-              #"from movement m with (nolock) " + 
-              "where m.id_client='#{c.id}' " +
-              "and m.product_code='#{hprod[:code]}' "
-            ].first
-            credits = row[:credits]
-            amount = row[:amount]
+            row1 = DB["
+              select isnull(sum(isnull(m.credits,0)),0) as credits  
+              from movement m with (nolock index(IX_movement__id_client__product_code)) 
+              --from movement m with (nolock) 
+              where m.id_client='#{c.id}' 
+              and m.product_code='#{hprod[:code]}' 
+            "].first
+            row2 = DB["
+              select isnull(sum(isnull(m.amount,0)),0) as amount  
+              from movement m with (nolock index(IX_movement__id_client__product_code)) 
+              --from movement m with (nolock) 
+              where m.id_client='#{c.id}' 
+              and m.product_code='#{hprod[:code]}' 
+            "].first
+            credits = row1[:credits]
+            amount = row2[:amount]
             row = DB["SELECT * FROM stat_balance WHERE id_client='#{c.id}' AND product_code='#{hprod[:code]}'"].first
             if row.nil?
               DB.execute("INSERT INTO stat_balance (id_client, product_code, amount, credits) VALUES ('#{c.id}', '#{hprod[:code]}', #{amount.to_s}, #{credits.to_s})")
