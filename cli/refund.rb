@@ -8,7 +8,7 @@
 
 require "simple_command_line_parser"
 require "pampa_workers"
-require_relative "../lib/invoicing_payments_processing"
+require_relative "../lib/i2p"
 require_relative './config'
 
 # command line parameters 

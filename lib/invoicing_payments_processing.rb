@@ -83,7 +83,7 @@ module BlackStack
       require_relative '../lib/invoiceitem.rb'
       require_relative '../lib/movement.rb'
       require_relative '../lib/paypalsubscription.rb'
-      require_relative '../lib/extend_client_by_invoicing_payments_processing.rb'
+      require_relative '../lib/extend_client_by_i2p.rb'
     end
 
     class BasePlan

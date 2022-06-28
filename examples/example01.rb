@@ -1,4 +1,4 @@
-require_relative '../lib/invoicing_payments_processing'
+require_relative '../lib/i2p'
 require_relative './conf'
 
 puts BlackStack::InvoicingPaymentsProcessing::paypal_ipn_listener

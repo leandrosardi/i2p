@@ -11,7 +11,7 @@ The BlackStack.io will also receive the IPN notifications and process your payme
 ## Installing
 
 ```
-gem install invoicing_payments_processing
+gem install i2p
 ```
 
 ## Signing Up to BlackStack.io
@@ -32,7 +32,7 @@ Even if you publish your invoices in your own website, PayPal's IPNs will be hoo
 You can know the exact URL where PayPal will send the IPNs by running this code:
 
 ```ruby
-require 'invoicing_payments_processing'
+require 'i2p'
 
 puts BlackStack::InvoicingPaymentsProcessing::PAYPAL_HOOKS_URL
 # => http://blackstack.io:80/
@@ -44,7 +44,7 @@ puts BlackStack::InvoicingPaymentsProcessing::paypal_ipn_listener
 ## Setting You PayPal Account
 
 ```ruby
-require 'invoicing_payments_processing'
+require 'i2p'
 
 BlackStack::InvoicingPaymentsProcessing::set_paypal_business_email(
 	"sardi.leandro.daniel@gmail.com"	
@@ -57,7 +57,7 @@ puts BlackStack::InvoicingPaymentsProcessing::paypal_business_email
 ## Setting Up Products
 
 ```ruby
-require 'invoicing_payments_processing'
+require 'i2p'
 
 BlackStack::InvoicingPaymentsProcessing::set_products([
 { 
@@ -90,7 +90,7 @@ puts BlackStack::InvoicingPaymentsProcessing::products_descriptor
 ## Setting Up Plans
 
 ```ruby
-require 'invoicing_payments_processing'
+require 'i2p'
 
 BlackStack::InvoicingPaymentsProcessing::set_plans([
 # Dedicated Support
