@@ -1,0 +1,50 @@
+<!-- HERE IS HOW TO CATCH POST/GET PARAMETERS -->
+<%
+login = BlackStack::Login.where(:id=>session['login.id']).first
+user = BlackStack::User.where(:id=>login.id_user).first
+c = BlackStack::Client.where(:id=>user.id_client).first
+item_number = params["item_number"]
+n = params["n"]
+hPlan = c.plans.select { |h| h[:item_number] == item_number }.first
+return_message = {}
+
+# 
+if (hPlan==nil)
+	return_message[:status] = 'Unkown item number.'
+	return_message[:value] = ""
+	# libero recursos
+	DB.disconnect	
+	GC.start
+	#			
+	return return_message.to_json
+end
+
+# creo la factura
+i = BlackStack::Invoice.new()
+i.id = guid()
+i.id_client = c.id
+i.create_time = now()
+i.disabled_for_trial_ssm = c.disabled_for_trial_ssm
+
+# verifico que el item-number corresponda a un producto conocido
+# verifico que el item-number no sea un one-time offer
+begin
+	i.check_create_item(item_number)
+rescue => e
+	redirect_adapted_to_nginx getDivisionURL + "/settings/credit?errdesc=#{CGI.escape(e.to_s)}"
+end
+
+# save the invoice
+i.save()	
+
+# agrego items a la factura
+i.add_item(item_number, n)
+
+# deshabilito el cliente para mas trials ssm
+c.disabled_for_trial_ssm = true
+c.save
+
+# redireccionar al dashboard
+redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{i.id.to_guid}"
+%>
+<!-- ---------------------------------------- -->

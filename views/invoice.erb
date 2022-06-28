@@ -1,0 +1,412 @@
+<%
+login = BlackStack::Login.where(:id=>session['login.id']).first
+user = login.user
+client = user.client
+division = client.division
+
+iid = params[:iid]
+
+invoice = BlackStack::Invoice.where(:id=>iid).first
+
+add_item_number = params[:add_item_number]
+if add_item_number.to_s.size>0
+	invoice.add_item(add_item_number)
+	redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}"
+end 
+
+remove_item_id = params[:remove_item_id]
+if remove_item_id.to_s.size>0
+	DB.execute("DELETE invoice_item WHERE [id]='#{remove_item_id}'")
+	invoice.setup
+	redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}"
+end
+%>
+
+<!-- Main navigation bar
+
+<!-- Page content
+================================================== -->
+<section class="container">
+
+	<section class="row-fluid">
+			
+		<section class='span12'>
+			<%=nav3("Settings", "#{getDivisionURL}/settings/dashboard", "Invoices", "#{getDivisionURL}/settings/invoices", invoice.number.to_s)%>
+		</section>
+	</section>
+
+	<br/>
+
+	<div class="box invoice">
+		<div class="header clearfix row-fluid">
+			<div class='span6'>
+				<div class='span12'>
+					<h3>
+					<div class='span2' style="align:right;text-align:center;vertical-align:middle;" align="center">
+						<img src='../../apps/images/logo/32x32-01.png' with='150px' width='75px' height='75px' style="align:center;text-align:center;vertical-align:middle;" align="center" />
+					</div>
+					<div class='span10' style="align:right;text-align:left;" align="left">
+						<div>
+							<small><%=COMPANY_NAME%></small>
+							<br>
+							INVOICE #: <small><%= invoice.number.to_s%></small>
+						</div>
+					</div>
+					</h3>
+				</div>
+				<div class='span12'>
+					<br>
+					<small><strong>Date</strong></small>
+					<br>
+					<%= invoice.dateDesc%>
+					<address>
+						<%=COMPANY_NAME%>
+						<br>
+						<%=COMPANY_ADDRESS%>
+					</address>
+				</div>
+			</div>
+			<div class='span6'>
+				<div class="pull-right">
+					
+					<div class="row-fluid">							
+						<div class="span6" style="align:right;text-align:left;" align="left">					
+							<p style='color:<%=BlackStack::Invoice.statusColor(invoice.status)%>;font-size:32px;'>
+								<br>
+								<%=BlackStack::Invoice.statusDescription(invoice.status)%>
+							</p>
+						</div>
+
+						<div class="span6" style="align:right;text-align:right;" align="center">					
+							<p style='color:<%=BlackStack::Invoice.statusColor(invoice.status)%>;font-size:22px;'>
+								<br>
+								<%
+								if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::Invoice::STATUS_UNPAID || invoice.status == nil)
+								%>
+								<a style='border: none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='../../apps/images/paypal-button-001.png' width='265px' height='102px' /></a>
+								<%
+								elsif invoice.automatic_billing == true
+								%>
+								<button class='btn btn-gray btn-large' disabled><b>Auto Billing</b></button>
+								<%
+								elsif invoice.paypal_url.to_s.size == 0
+								%>
+								<button class='btn btn-gray btn-large' disabled><b>Link Not Found</b></button>
+								<%
+								end
+								%>
+							</p>
+						</div>
+					</div>
+
+					<br>
+					<div class="row-fluid" style="align:right;text-align:right;" align="right">
+						<small><strong>Due Date</strong></small>
+						<br>
+						<%= invoice.dueDateDesc%>
+						<br>
+						<small>Period: <%= invoice.billingPeriodFromDesc%> to <%= invoice.billingPeriodToDesc%></small>
+					</div>
+					<br>
+				</div>
+			</div>	
+		</div>
+
+		<div class="row-fluid">
+			<div class="span10">
+				<strong><%=client.name%></strong>
+				<br/>
+				<%
+				if client.hasBillingAddress?
+				%>
+				<%=client.billing_address.to_s%>
+				<br/>
+				<%=client.billing_city.to_s%>, <%=client.billing_state.to_s%>, <%=client.billing_zipcode.to_s%>.
+				<br/>
+				<%=client.billingCountry.name.to_s%>.
+				<%
+				end
+				%>
+				<br/>
+				<small><a href='/settings/clientinformation?redirect=<%=CGI.escape("settings/invoice?iid=#{invoice.id.to_guid}")%>'>Edit Billing Address</a></small>
+			</div>
+			<div class="span2">
+				<b>TOTAL:</b>
+				<span class="pull-right">$<%= invoice.totalDesc%></span>
+			</div>
+		</div>
+
+		<br/>
+
+		<div class="row-fluid">
+			<div class="pull-right span12">
+				<table width='100%'>
+					<thead>
+						<tr>
+							<th width='45%' align='left' colspan=3> Product description </th>
+							<th width='15%' align='right' class="span2"> Rate </th>
+							<th width='15%' align='right' class="span2"> Units </th>
+							<th width='25%' align='right' class="span2"> Line total </th>
+						</tr>
+					</thead>
+					<tbody>
+						<%
+						# TODO: no se porque los valores flotantes se imprimen como coma (,) en vez de punto (.), entonces tengo que hacer ese reemplazo espantoso .to_s.gsub(",",".")
+						bonuses = []
+						invoice.items.sort_by {|obj| obj.create_time}.each { |item|
+							plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
+							prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
+							bonus_plans = plan[:bonus_plans]
+							bonuses += bonus_plans if !bonus_plans.nil?
+						%>
+						<tr><td colspan='10' style='height:15px;'> </td></tr>
+						<tr>
+							<td align='left' colspan=3  valign='top'> 
+								<div class="description">
+									<%=item.description.encode_html%>
+									<%
+									if invoice.items.size>1 && invoice.allowedToAddRemoveItems?
+									%> 
+									<a style='color:gray;text-decoration:none;' href='./filter_remove_invoice_item?iid=<%=iid%>&remove_item_id=<%=item.id.to_guid%>'><i class='icon-remove'></i></a>
+									<%
+									end
+									%>
+									<br/>
+									<span style='color:gray;'><%=item.detail.encode_html%></span>
+									<br/>
+								</div>
+							</td>
+							<td align='right' valign='top'> $<%=("%.4f" % item.unit_price.to_s.gsub(",",".").to_f)%></td>
+							<td align='right' valign='top'> <%=(item.units.to_i.to_s)%><br/><span style='color:gray;'><%=prod[:unit_name]%></span></td>
+							<td align='right' valign='top'> $<%=("%.2f" % item.amount.to_s.gsub(",",".").to_f)%></td>
+						</tr>
+						<%
+						}
+						
+						if bonuses.size > 0 && false
+							%>
+							<tr style='height='15px;'><td><br/></td></tr>
+							<tr>
+								<td align='left' colspan=3> 
+									<div class='bonus'>
+										<b><i class='icon-gift'></i> Bonus Products</b>
+									</div>
+								</td>
+							</tr>
+							<%
+							bonuses.each { |bonus|
+								#h = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |j| j[:item_number].to_s == bonus[:item_number] }.first
+								#raise "Bonus plan '#{bonus[:plan]}' not found." if h.nil?
+								
+								#i = BlackStack::InvoicingPaymentsProcessing::products_descriptor.select { |j| j[:code] == h[:product_code] }.first
+								#raise "Bonus product '#{h[:product_code]}' not found in #{BlackStack::InvoicingPaymentsProcessing::products_descriptor.to_s}" if i.nil?
+
+								item_bonus = invoice.create_item(bonus[:item_number], 1, false)
+								%>
+								<tr><td colspan='10' style='height:2px;'> </td></tr>
+								<tr>
+									<td align='left' colspan=3> 
+										<div class="description">
+											<%=item_bonus.description.encode_html%>
+											<br/>
+											<span style='color:gray;'><b><%=item_bonus.detail.encode_html%></b></span>
+											<br/>
+										</div>
+									</td>
+									<td align='right' style='color:gray;'> </td>
+									<td align='right' style='color:gray;'> </td>
+									<td align='right'> 
+										<span style='color:red;'>free</span> <span style='color:gray;text-decoration:line-through;'>$<%=("%.2f" % item_bonus.amount.to_s.gsub(",",".").to_f)%></span>
+									</td>
+								</tr>
+								<%
+							}
+						end # if bonuses.size > 0
+						%>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div> <!-- <div class="box invoice"> -->
+
+	<section class="row-fluid pull-left">
+			<%
+			if !invoice.allowedToAddRemoveItems?
+			%>
+			<table width='100%'>
+				<tr><td colspan='10' style='height:5px;'> </td></tr>
+				</tr>
+			</table>
+	
+			<div class='pull-left span11 box'>
+				<h4>Why I Can't Edit This Invoice?</h4>
+				<p>
+					You can't add or remove items from the invoice after you clicked in the PayPal check out button.<br/>
+					After the PayPal order has been generated, is not possible to modifiy the invoice.
+				</p>
+			</div>			
+			<%
+			else
+				upsell_plans = []
+				invoice.items.sort_by { |obj| obj.create_time }.reverse.each { |item0|
+					upsells = item0.plan_descriptor[:upsells]
+					#.select { |obj| obj[:item_number] == item0.item_number }.first[:upsells]
+					if !upsells.nil?
+						upsells.each { |upsell_item_number|
+							add_plan = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == upsell_item_number }.first
+							if !add_plan.nil?
+								if upsell_plans.select { |obj| obj[:item_number] == add_plan[:item_number] }.first.nil?
+									upsell_plans << add_plan
+								end
+							end
+							
+						}
+					end
+				}
+				
+				compatible_upsell_plans = upsell_plans.select { |obj|
+					BlackStack::Invoice.compatibility?( invoice.items.first.plan_descriptor, obj ) &&
+					obj[:public] == true &&
+					!( obj[:one_time_offer] == true && client.has_item(obj[:item_number]) ) &&
+					invoice.items.select { |item0| item0.plan_descriptor[:item_number] == obj[:item_number] }.first.nil?
+				}.uniq
+				
+				if compatible_upsell_plans.size > 0 && false # #136: Remove the add-ons from the $1 invoice
+				%>
+					<table width='100%'>
+						<tr><td colspan='10' style='height:5px;'> </td></tr>
+						</tr>
+						<tr>
+							<td colspan='10' style='height:35px;'>
+								<h4>Other Resources That You May Need:</h4>
+							</td>
+						</tr>
+					</table>
+	
+					<%
+						n = 0
+						compatible_upsell_plans.each { |upsell_plan|
+							upsell_product = BlackStack::InvoicingPaymentsProcessing::products_descriptor.select { |j| j[:code] == upsell_plan[:product_code] }.first
+							raise 'Product not found.' if upsell_product.nil?
+							
+							item = invoice.create_item(upsell_plan[:item_number])
+							%>
+							
+							<%
+							if n % 3 == 0
+							%>
+							<div class="pull-left span12">
+							<%
+							end
+							%>
+							
+							<div class='span4 box pull-left'>
+								<div class='span12'>
+									<h4 align="right"><%=item.plan_descriptor[:name]%></h4>						
+								</div>
+								<div class='span12'>
+									<div class='span4'>
+										<img width='150px' src='<%=upsell_product[:thumbnail]%>'>
+									</div>
+									<div class='span8'>
+										<%
+										if !item.plan_descriptor[:normal_fee].nil?
+											fee = item.plan_descriptor[:fee].to_f
+											normal = item.plan_descriptor[:normal_fee].to_f
+											saving = (normal.to_f - fee.to_f).to_f
+											ratio = (saving.to_f / normal.to_f) * 100.to_f
+										%>
+										<div class='span12'>
+										<table align='right'>
+											<tr>
+												<td align='right'>
+													<span style='color:gray;font-size:12px;'>Price:</span><br/>
+												</td>
+												<td width='10px'></td>
+												<td align='left'>
+													<span style='color:gray;font-size:14px;text-decoration:line-through;'>$<%=('%.2f' % normal).to_s%></span><br/>													
+												</td>
+											</tr>
+
+											<tr>
+												<td align='right'>
+													<span style='color:gray;font-size:12px;'>Offer:</span><br/>
+												</td>
+												<td></td>
+												<td align='left'>
+													<span style='color:red;font-size:18px;'>$<%=('%.2f' % fee).to_s%></span><br/>
+												</td>
+											</tr>
+
+											<tr>
+												<td align='right'>
+													<span style='color:gray;font-size:12px;'>Saving:</span><br/>
+												</td>
+												<td></td>
+												<td align='left'>
+													<span style='color:rgb(153,0,48);font-size:16px;'>$<%=('%.2f' % saving).to_s%> (<%=('%.0f' % ratio).to_s%>%)</span><br/>
+												</td>
+											</tr>
+											
+											<tr><td height='15px'></td></tr>
+										</table>
+										</div>
+										<%
+										end
+										%>
+
+										<div class='span12'>
+										<%
+										if item.plan_descriptor[:type].to_s == 'S'
+										%>
+										<p align='right'>
+											<span style='color:black;'><b>Plan Details:</b></span><br/>
+											<span style='color:gray;'><%=invoice.plan_payment_description(item.plan_descriptor)%></span>
+										</p>
+										<%
+										end
+										%>
+
+										<p align='right'>
+											<span style='color:black;'><b>Description:</b></span><br/>
+											<span style='color:gray;'><%=upsell_product[:description]%></span>
+										</p>
+
+										<p align='right'>
+											<span style='color:black;'><b>Summary:</b></span><br/>
+											<span style='color:gray;font-size:11px;'><%=upsell_product[:summary]%></span>
+										</p>
+
+										</div>
+									</div>
+								</div>
+								<div class='span12'>
+									<table width='100%'>
+										<tr><td colspan='10' style='height:5px;'> </td></tr></tr>
+									</table>
+								</div>
+								<div class='span12'>
+									<p align='right'><a href='./filter_add_invoice_item?iid=<%=iid%>&add_item_number=<%=item.item_number%>'><img src='../../apps/images/addtocart.png' border=0 /></a></p>									
+								</div>
+							</div>
+
+							<%
+							n += 1
+
+							if n % 3 == 0
+							%>
+							</div>
+							<%
+							end
+						}
+					%>
+				</div>
+				<%
+				end # if a.size > 0
+				%>
+		<%
+		end # if invoice.allowedToAddRemoveItems?
+		%>
+	</section>	
+</section>

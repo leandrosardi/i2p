@@ -1,0 +1,154 @@
+<!--#include virtual = "./lgi/commons.asp"-->
+
+<%
+login = @login
+user = BlackStack::User.where(:id=>login.id_user).first
+client = BlackStack::Client.where(:id=>user.id_client).first
+%>
+
+
+	<!-- Page content
+		================================================== -->
+	<section class="container">
+
+		<section class="row-fluid">	
+			<section class='span6'>
+				<%=nav2("Settings", "#{getDivisionURL}/settings/dashboard", "Subscriptions")%>
+			</section>
+			<section class='span6'>
+			</section>
+		</section>
+
+		<section class="row-fluid">						
+			<div class="span12 box" style="margin-bottom: 20px">
+				<div class='span12'>
+					<table>
+					<%
+					n = 0
+					client.paypal_subscriptions.each { |subs|
+						%>
+						<tr>
+							<td colspan=10>
+								<label class="control-label bold-text" for="inputPipeline">
+								<span style='font:16px Arial;'>
+									<b>SUBSCRIPTION ID: </b> <%=subs.subscr_id%>
+									<%
+									if subs.active == true
+									%>
+										<span class="label label-green label-mini">active</span>
+									<%
+									else
+									%>
+										<span class="label label-red label-mini">inactive</span>
+									<%
+									end
+									%>
+								</span>
+								</label>
+							</td>
+						</tr>
+						<%
+						i = BlackStack::Invoice.where(:subscr_id=>subs.subscr_id).all.select { |o| o.canBePaid? }.sort_by { |o| o.billing_period_from }.first
+						if i.nil? 
+						%>					
+						<tr style='font:Arial;font-size:16px;'>						
+							<td colspan=10>
+								<span style='font:16px Arial;color:red;'>No invoice processed yet.</span>
+							</td>
+						</tr>
+						<%
+						else
+						%>					
+						<tr style='font:Arial;font-size:16px;'>						
+							<td width='25px'></td>
+							
+							<td>
+								<b>Amount: </b> $<%=('%.2f'%i.total.to_f).to_s%>
+							</td>
+	
+							<td width='25px'></td>
+							<!--
+							<td>
+								<b>Period:</b> <%=subs.period3.to_s%>.
+							</td>
+							
+							<td width='25px'></td>
+							-->
+							<td>
+								<b>Next Billing:</b> <%=i.billingPeriodFromDesc%>.
+							</td>
+							
+							<td width='25px'></td>
+						</tr>
+
+						<tr><td style='height:15px;'></td></tr>
+
+						<tr>						
+							<td width='25px'></td>
+							<td colspan=10>
+								<b>Products:</b>
+							</td>
+						</tr>
+						<%
+						i.items.each { |t|
+						%>
+						<tr>
+							<td width='25px'></td>
+							
+							<td colspan=10>
+								<%
+								product_type = BlackStack::InvoicingPaymentsProcessing::products_descriptor.select { |o| o[:code] == t.product_code }.first[:type]
+								%>
+								<i class='<%=BlackStack::InvoicingPaymentsProcessing::BasePlan.product_type_icon(product_type)%>' title='<%=CGI.escapeHTML(product_type)%>'></i> <%=t.description%>. <b><%=t.detail%></b>.
+							</td>						
+						</tr>
+						<%
+						} # i.items.each
+						end # if !i.nil?
+					%>
+
+
+					<tr><td style='height:35px;'></td></tr>
+
+					<br/>
+					<br/>
+					
+					<%
+					# incremento el contador
+					n += 1
+					# libero recursos
+					GC.start
+					DB.disconnect
+					} # client.paypal_subscriptions.each
+					%>
+					</table>
+					
+					<%
+					if n == 0
+						%>
+						<center>
+							<h2>No subscriptions found.</h2>
+
+							<br/>
+							
+							<p style='font-size:18px'>
+								If you just subscribed, please wait a few minutes.
+							</p>
+
+							<br/>
+							<br/>
+							
+							<p style='font-size:18px'>
+								If you didn't subscribe yet... <br/>
+								<br/>
+								<button class='btn btn-large btn-green' onclick='window.location="/settings/credit#ssm"'>subscribe here</button>
+							</p>
+						</center>
+						<%
+					end
+					%>
+				</div>
+			</div>
+			
+		</section>
+	</section>

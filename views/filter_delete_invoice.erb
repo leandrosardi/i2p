@@ -1,0 +1,27 @@
+<%
+	if (params.has_key?('iid') == false)
+		DB.disconnect
+		GC.start
+	 	# redireccionar al dashboard
+	 	redirect_adapted_to_nginx getDivisionURL + '/settings/invoices?errdesc=iid%20Parameter%20Missed.'
+	end
+
+	invoice = BlackStack::Invoice.where(:id=>params['iid']).first
+	if ( invoice == nil )
+		DB.disconnect
+		GC.start
+	 	# redireccionar al dashboard
+	 	redirect_adapted_to_nginx getDivisionURL + '/settings/invoices?errdesc=Invoice%20Not%20Found.'
+	end
+
+	# actualizo el registro
+	invoice.delete_time = now()
+	invoice.save
+
+	# 
+    DB.disconnect
+    GC.start
+
+ 	# redireccionar al dashboard
+ 	redirect_adapted_to_nginx getDivisionURL + '/settings/invoices?msgdesc=Invoice%20Deleted.'
+%>

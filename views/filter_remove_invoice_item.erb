@@ -1,0 +1,17 @@
+<!-- HERE IS HOW TO CATCH POST/GET PARAMETERS -->
+<%
+iid = params[:iid]
+remove_item_id = params[:remove_item_id]
+invoice = BlackStack::Invoice.where(:id=>iid).first
+if invoice.allowedToAddRemoveItems?
+	begin
+		invoice.remove_item(remove_item_id)
+	rescue => e
+		redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}&errdesc=#{CGI.escape(e.to_s)}"
+	end
+	redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}"
+else
+	redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}&errdesc=#{CGI.escape("Can't add or remove items from this invoice")}"
+end
+%>
+<!-- ---------------------------------------- -->

@@ -1,0 +1,129 @@
+<!--#include virtual = "./lgi/commons.asp"-->
+
+<%
+login = @login
+user = BlackStack::User.where(:id=>login.id_user).first
+c = BlackStack::Client.where(:id=>user.id_client).first
+%>
+
+	<!-- Page content
+		================================================== -->
+	<section class="container">
+
+		<section class="row-fluid">	
+			<section class='span6'>
+				<%=nav2("Settings", "#{getDivisionURL}/settings/dashboard", "Invoices")%>
+			</section>
+			<section class='span6'>
+			</section>
+		</section>
+
+		<br/>
+
+		<section class="row-fluid">
+
+			<div class="span12 box" style="margin-bottom: 20px">
+
+				<input type='hidden' name='uid' id='uid' value='<%=user.id.gsub("{", "").gsub("}", "")%>'>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>
+								number
+							</th>
+							<th>
+								subscr.
+							</th>
+							<th>
+								priod
+							</th>
+							<th>
+								due
+							</th>
+							<th align='right'>
+								total
+							</th>
+							<th>
+								status
+							</th>
+							<th>
+								<!-- paypal link -->								
+							</th>
+						</tr>
+					</thead>
+
+					<tbody>
+
+						<%
+						n = 0
+						BlackStack::Invoice.where(:id_client=>login.user.client.id, :delete_time=>nil).reverse(:billing_period_from).all { |invoice|
+							n += 1
+						%>
+						<tr>
+							<td>
+								<a href='./invoice?iid=<%=invoice.id%>' target='_window'>#<%=invoice.number.to_s%></a>
+								<%
+								if invoice.canBeDeleted?
+								%>
+								<a class='btn-link btn-mini' href='/settings/filter_delete_invoice?iid=<%=invoice.id.to_guid%>'>delete</a>
+								<%
+								end
+								%>
+							</td>
+							<td align='right'>
+								<a href='/settings/subscriptions'><%=invoice.subscr_id%></a>
+							</td>
+							<td align='right'>
+								<%=invoice.billing_period_from.strftime('%b %d, %Y')%>
+							</td>
+							<td align='right'>
+								<%=invoice.billing_period_to.strftime('%b %d, %Y')%>
+							</td>
+							<td>
+								$<%=invoice.totalDesc.encode_html%>
+							</td>
+							<td>
+								<span class='label label-<%=BlackStack::Invoice.statusColor(invoice.status)%>'><%=BlackStack::Invoice.statusDescription(invoice.status).to_s.downcase%></span>
+							</td>
+							<td>
+								<%
+								if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::Invoice::STATUS_UNPAID || invoice.status == nil)
+								%>
+								<a style='border:none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='../../apps/images/paypal-button-002.png' width='75px' /></a>
+								<%
+								elsif invoice.automatic_billing == true
+								%>
+								<small>automatic billing</small>
+								<%
+								elsif invoice.paypal_url.to_s.size == 0
+								%>
+								<small>paypal link not found!</small>
+								<%
+								end
+								%>
+							</td>
+						</tr>
+						<%
+						}
+						%>
+					</tbody>
+				</table>
+						
+				<%
+				if (n == 0)
+				%>
+					<center>
+						<br>
+						<h4>No invoices found.</h4>
+						<p>
+							Click <a href="/settings/credit"><b>here</b></a> to choose a plan.
+						</p>
+					</center>
+				<%
+				end
+				%>						
+			</div>				
+
+
+		</section>
+	</section>
