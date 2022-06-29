@@ -1,3 +1,19 @@
+/*
+Numeric Data Type: Arbitrary Precision Numbers
+
+The type numeric can store numbers with a very large number of digits. 
+It is especially recommended for storing monetary amounts and other quantities where exactness is required. 
+Calculations with numeric values yield exact results where possible, e.g., addition, subtraction, multiplication. 
+However, calculations on numeric values are very slow compared to the integer types, or to the floating-point types described in the next section.
+
+references: 
+1. https://www.postgresql.org/docs/current/datatype-numeric.html
+2. https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-numeric/
+*/
+
+/*
+ * Use this the day we want to 1) store plans configuration on database, or 2) offer custom plans to specific clients.
+ *
 CREATE TABLE IF NOT EXISTS plan (
 	id uuid NOT NULL,
 	id_client uuid NOT NULL,
@@ -5,20 +21,21 @@ CREATE TABLE IF NOT EXISTS plan (
 	type varchar(1) NOT NULL,
 	item_number varchar(500) NOT NULL,
 	name varchar(500) NOT NULL,
-	credits numeric(18, 0) NOT NULL,
-	fee numeric(18, 6) NOT NULL,
-	period numeric(18, 0) NOT NULL,
+	credits bigint NOT NULL,
+	fee numeric(22, 8) NOT NULL,
+	period bigint NOT NULL,
 	units varchar(1) NOT NULL,
-	trial_credits numeric(18, 0) NULL,
-	trial_fee numeric(18, 6) NULL,
-	trial_period numeric(18, 0) NULL,
+	trial_credits bigint NULL,
+	trial_fee numeric(22, 8) NULL,
+	trial_period bigint NULL,
 	trial_units varchar(1) NULL,
-	trial2_credits numeric(18, 0) NULL,
-	trial2_fee numeric(18, 6) NULL,
-	trial2_period numeric(18, 0) NULL,
+	trial2_credits bigint NULL,
+	trial2_fee numeric(22, 8) NULL,
+	trial2_period bigint NULL,
 	trial2_units varchar(1) NULL,
 	description varchar(8000) NOT NULL,
 );
+*/
 
 CREATE TABLE IF NOT EXISTS buffer_paypal_notification (
 	id uuid NOT NULL,
@@ -61,7 +78,7 @@ CREATE TABLE IF NOT EXISTS buffer_paypal_notification (
 	payment_fee varchar(500) NULL,
 	sync_reservation_id uuid NULL,
 	sync_reservation_time timestamp NULL,
-	sync_reservation_times numeric(18, 0) NULL,
+	sync_reservation_times int NULL,
 	sync_start_time timestamp NULL,
 	sync_end_time timestamp NULL,
 	sync_result varchar(8000) NULL,
@@ -104,13 +121,13 @@ CREATE TABLE IF NOT EXISTS movement(
 	type int NOT NULL,
 	id_user_creator uuid NULL,
 	description text NULL,
-	paypal1_amount numeric(18, 6) NOT NULL,
-	bonus_amount numeric(18, 6) NOT NULL,
-	amount numeric(18, 6) NOT NULL,
-	credits numeric(18, 0) NOT NULL,
+	paypal1_amount numeric(22, 8) NOT NULL, -- transactions must be operated with double of precision (8 digits) stored on other tables (4 digits)
+	bonus_amount numeric(22, 8) NOT NULL, -- transactions must be operated with double of precision (8 digits) stored on other tables (4 digits)
+	amount numeric(22, 8) NOT NULL, -- transactions must be operated with double of precision (8 digits) stored on other tables (4 digits)
+	credits bigint NOT NULL,
 	lgb2_id_lngroup uuid NULL,
 	edb_id_crmlist uuid NULL,
-	profits_amount numeric(18, 6) NOT NULL,
+	profits_amount numeric(22, 8) NOT NULL,
 	id_invoice_item uuid NULL,
 	product_code varchar(500) NOT NULL,
 	expiration_time timestamp NULL,
