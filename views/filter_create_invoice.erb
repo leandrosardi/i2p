@@ -24,7 +24,7 @@ i = BlackStack::Invoice.new()
 i.id = guid()
 i.id_client = c.id
 i.create_time = now()
-i.disabled_for_trial_ssm = c.disabled_for_trial_ssm
+i.disabled_for_trial = c.disabled_for_trial
 
 # verifico que el item-number corresponda a un producto conocido
 # verifico que el item-number no sea un one-time offer
@@ -41,7 +41,7 @@ i.save()
 i.add_item(item_number, n)
 
 # deshabilito el cliente para mas trials ssm
-c.disabled_for_trial_ssm = true
+c.disabled_for_trial = true
 c.save
 
 # redireccionar al dashboard

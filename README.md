@@ -222,6 +222,21 @@ puts BlackStack::InvoicingPaymentsProcessing::plans_descriptor
 
 *(pending: it will create 2 movments: first a 'deduction movement', and then a 'bonus-with-credits movment')*
 
+## Appendix 1: Avoiding Cumulative Rounding Errors 
+
+To avoid [cumulative rounding errors](https://math.stackexchange.com/questions/3032627/how-to-avoid-cumulative-rounding-errors-when-calculating-a-result-to-a-specific), we calculate numbers with double of the precision stored in database.
+
+The data type numeric can store numbers with a very large number of digits. 
+
+It is especially recommended for storing monetary amounts and other quantities where exactness is required. 
+Calculations with numeric values yield exact results where possible, e.g., addition, subtraction, multiplication. 
+However, calculations on numeric values are very slow compared to the integer types, or to the floating-point types described in the next section.
+
+references: 
+1. https://www.postgresql.org/docs/current/datatype-numeric.html
+2. https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-numeric/
+
+
 ## Further Readings
 
 [Identifying Your IPN Listener to PayPal](https://developer.paypal.com/docs/ipn/integration-guide/IPNSetup/)

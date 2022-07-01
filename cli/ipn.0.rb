@@ -43,7 +43,7 @@ module IPNReprocessing
 
     # el cliente no puede estar habilitado para trial
     self.logger.logs 'Set trial off for the client... '
-    DB.execute("update #{dname}..client set disabled_for_trial_ssm=1 where id='#{c.id}'")
+    DB.execute("update #{dname}..client set disabled_for_trial=1 where id='#{c.id}'")
     self.logger.done
   
     # delete movements that are not consumptions

@@ -30,7 +30,7 @@ i = BlackStack::Invoice.new()
 i.id = id_invoice
 i.id_client = c.id
 i.create_time = now()
-i.disabled_for_trial_ssm = c.disabled_for_trial_ssm
+i.disabled_for_trial = c.disabled_for_trial
 i.save()  
 
 # Add a plan as an invoice item
