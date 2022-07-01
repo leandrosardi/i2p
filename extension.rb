@@ -1,7 +1,7 @@
 BlackStack::Extensions::add ({
     # descriptive name and descriptor
     :name => 'I2P',
-    :description => 'Invoicing and Payments Processing (I2P) is a Ruby gem and MySaaS extension to setup offers in your website, create invoices, and process payments automatically.',
+    :description => 'Simple Invoicing & Payments Processing.',
 
     # setup the url of the repository for installation and updates
     :repo_url => 'https://github.com/leandrosardi/i2p',
@@ -14,7 +14,7 @@ BlackStack::Extensions::add ({
     :author => 'leandrosardi',
 
     # what is the section to add this extension in either the top-bar, the footer, the dashboard.
-    :apps_section => 'Software Services',
+    :services_section => 'Services for Marketers',
     # show this extension as a service in the top bar?
     :show_in_top_bar => false,
     # show this extension as a service in the footer?

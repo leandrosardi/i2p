@@ -1,9 +1,7 @@
 <!--#include virtual = "./lgi/commons.asp"-->
 
 <%
-login = @login
-user = BlackStack::User.where(:id=>login.id_user).first
-c = BlackStack::Client.where(:id=>user.id_client).first
+user = @login.user
 %>
 
 	<!-- Page content
@@ -12,7 +10,7 @@ c = BlackStack::Client.where(:id=>user.id_client).first
 
 		<section class="row-fluid">	
 			<section class='span6'>
-				<%=nav2("Settings", "#{getDivisionURL}/settings/dashboard", "Invoices")%>
+				<%=nav2("Settings", "/settings/dashboard", "Invoices")%>
 			</section>
 			<section class='span6'>
 			</section>
@@ -56,7 +54,7 @@ c = BlackStack::Client.where(:id=>user.id_client).first
 
 						<%
 						n = 0
-						BlackStack::Invoice.where(:id_client=>login.user.client.id, :delete_time=>nil).reverse(:billing_period_from).all { |invoice|
+						BlackStack::Invoice.where(:id_client=>user.client.id, :delete_time=>nil).reverse(:billing_period_from).all { |invoice|
 							n += 1
 						%>
 						<tr>
