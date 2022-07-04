@@ -49,7 +49,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     begin		
 			# get the subscription
       self.logger.logs 'Get the subscription... '
-			s = BlackStack::PayPalSubscription.where(:subscr_id => PARSER.value('code')).first
+			s = BlackStack::Subscription.where(:subscr_id => PARSER.value('code')).first
       raise 'Subscr not found' if s.nil?
 			self.logger.done
 			

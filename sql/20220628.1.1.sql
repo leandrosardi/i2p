@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS buffer_paypal_notification (
-	id uuid NOT NULL,
+	id uuid NOT NULL PRIMARY KEY,
 	create_time timestamp NOT NULL,
 	txn_type varchar(500) NULL,
 	subscr_id varchar(500) NULL,
@@ -48,23 +48,23 @@ CREATE TABLE IF NOT EXISTS buffer_paypal_notification (
 CREATE TABLE IF NOT EXISTS invoice (
 	id uuid NOT NULL PRIMARY KEY,
 	create_time timestamp NOT NULL,
-	id_account uuid NOT NULL,
+	id_account uuid NOT NULL REFERENCES account(id),
 	billing_period_from date NULL,
 	billing_period_to date NULL,
-	id_buffer_paypal_notification uuid NULL,
+	id_buffer_paypal_notification uuid NULL REFERENCES buffer_paypal_notification(id),
 	"status" int NULL,
 	paypal_url varchar(8000) NULL,
 	automatic_billing boolean NULL,
 	subscr_id varchar(500) NULL,
 	disabled_for_trial boolean NULL,
 	disabled_for_add_remove_items boolean NULL,
-	id_previous_invoice uuid NULL,
+	id_previous_invoice uuid NULL REFERENCES invoice(id),
 	delete_time timestamp NULL
 );
 
 CREATE TABLE IF NOT EXISTS invoice_item (
 	id uuid NOT NULL PRIMARY KEY,
-	id_invoice uuid NOT NULL,
+	id_invoice uuid NOT NULL REFERENCES invoice(id),
 	product_code varchar(5) NOT NULL,
 	unit_price numeric(18, 4) NOT NULL,
 	units numeric(18, 4) NOT NULL,
@@ -77,19 +77,17 @@ CREATE TABLE IF NOT EXISTS invoice_item (
 
 CREATE TABLE IF NOT EXISTS movement (
 	id uuid NOT NULL PRIMARY KEY,
-	id_account uuid NOT NULL,
+	id_account uuid NOT NULL REFERENCES account(id),
 	create_time timestamp NOT NULL,
 	type int NOT NULL,
-	id_user_creator uuid NULL,
+	id_user_creator uuid NULL REFERENCES "user"(id),
 	description text NULL,
 	paypal1_amount numeric(22, 8) NOT NULL, -- transactions must be operated with double of precision (8 digits) stored on other tables (4 digits)
 	bonus_amount numeric(22, 8) NOT NULL, -- transactions must be operated with double of precision (8 digits) stored on other tables (4 digits)
 	amount numeric(22, 8) NOT NULL, -- transactions must be operated with double of precision (8 digits) stored on other tables (4 digits)
 	credits bigint NOT NULL,
-	lgb2_id_lngroup uuid NULL,
-	edb_id_crmlist uuid NULL,
 	profits_amount numeric(22, 8) NOT NULL,
-	id_invoice_item uuid NULL,
+	id_invoice_item uuid NULL REFERENCES invoice_item(id),
 	product_code varchar(500) NOT NULL,
 	expiration_time timestamp NULL,
 	expiration_start_time timestamp NULL,
@@ -102,11 +100,11 @@ CREATE TABLE IF NOT EXISTS movement (
 	give_away_negative_credits boolean NULL
 );
 
-CREATE TABLE IF NOT EXISTS paypal_subscription(
-	id uuid NOT NULL,
-	id_buffer_paypal_notification uuid NULL,
-	create_time datetime NOT NULL,
-	id_account uuid NULL,
+CREATE TABLE IF NOT EXISTS subscription (
+	id uuid NOT NULL PRIMARY KEY,
+	id_buffer_paypal_notification uuid NULL REFERENCES buffer_paypal_notification(id),
+	create_time timestamp NOT NULL,
+	id_account uuid NULL REFERENCES account(id),
 	active boolean NOT NULL,
 	subscr_id varchar(500) NULL,
 	last_name varchar(500) NULL,
@@ -133,6 +131,6 @@ CREATE TABLE IF NOT EXISTS paypal_subscription(
 	period3 varchar(500) NULL,
 	mc_amount3 varchar(500) NULL,
 	ipn_track_id varchar(500) NULL,
-	stat_cencelation_notification_time datetime NULL,
-	stat_creation_notification_time datetime NULL
+	stat_cencelation_notification_time timestamp NULL,
+	stat_creation_notification_time timestamp NULL
 );

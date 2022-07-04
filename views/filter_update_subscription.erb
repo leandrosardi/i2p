@@ -21,7 +21,7 @@
 	end
   
 	# Actualizo la password
-	DB.execute("UPDATE [paypal_subscription] SET id_pipeline=#{value_pid} WHERE [id]='#{sid}'")
+	DB.execute("UPDATE [subscription] SET id_pipeline=#{value_pid} WHERE [id]='#{sid}'")
 
 	# TODO: crear el milestone para este pipeline, con todo el credito pendiente de la suscripcion, y deadline igual a la fecha de proximo pago de la suscripcion
 	# TODO: restar el saldo pendiente al milestone del pipeline anterior

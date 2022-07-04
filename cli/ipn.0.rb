@@ -146,8 +146,8 @@ module IPNReprocessing
   
     # delete subscriptions
     self.logger.logs 'Delete subscriptions... '
-    DB["select id from #{dname}..paypal_subscription where id_client='#{c.id}'"].all { |row|
-      DB.execute("delete #{dname}..paypal_subscription where id='#{row[:id]}'")          
+    DB["select id from #{dname}..subscription where id_client='#{c.id}'"].all { |row|
+      DB.execute("delete #{dname}..subscription where id='#{row[:id]}'")          
       DB.disconnect
       GC.start
       print '.'
@@ -168,7 +168,7 @@ module IPNReprocessing
       ") "
     ].all { |row|
       DB.execute("UPDATE #{dname}..invoice SET id_buffer_paypal_notification=NULL WHERE id_buffer_paypal_notification='#{row[:id]}'");
-      DB.execute("UPDATE #{dname}..paypal_subscription SET id_buffer_paypal_notification=NULL WHERE id_buffer_paypal_notification='#{row[:id]}'");
+      DB.execute("UPDATE #{dname}..subscription SET id_buffer_paypal_notification=NULL WHERE id_buffer_paypal_notification='#{row[:id]}'");
       DB.execute("DELETE #{dname}..buffer_paypal_notification WHERE [id]='#{row[:id]}'");
       DB.disconnect
       GC.start

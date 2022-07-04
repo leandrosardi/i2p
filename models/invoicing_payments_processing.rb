@@ -5,17 +5,14 @@ require 'pampa_workers'
 # 
 # 
 module BlackStack
-  
-  module InvoicingPaymentsProcessing
-    
+  module I2P
     # constants
     PAYPAL_ORDERS_URL = "https://www.paypal.com"
     
     # static attributes
     @@paypal_business_email = "sardi.leandro.daniel@gmail.com"
-    @@paypal_orders_url = BlackStack::InvoicingPaymentsProcessing::PAYPAL_ORDERS_URL
-    @@paypal_ipn_listener = "#{BlackStack::Pampa::api_url.to_s}/api1.3/accounting/paypal/notify_new_invoice.json"
-
+    @@paypal_orders_url = BlackStack::I2PInvoicingPaymentsProcessing::PAYPAL_ORDERS_URL
+    @@paypal_ipn_listener = "#{CS_HOME_WEBSITE}/api1.3/accounting/paypal/notify_new_invoice.json"
     @@products_descriptor = []
     @@plans_descriptor = []
     
@@ -42,7 +39,6 @@ module BlackStack
       @@paypal_ipn_listener
     end
 
-
     def self.set_products(h)
       @@products_descriptor = h
     end # def self.set_products
@@ -51,7 +47,6 @@ module BlackStack
       @@products_descriptor
     end # def self.products_descriptor
     
-
     def self.set_plans(h)
       @@plans_descriptor = h
     end # def self.set_plans
@@ -60,30 +55,16 @@ module BlackStack
       @@plans_descriptor
     end # def self.plans_descriptor
 
-
     def self.plan_descriptor(item_number)
-      plan = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |h| h[:item_number].to_s == item_number.to_s }.first
+      plan = BlackStack::I2PInvoicingPaymentsProcessing::plans_descriptor.select { |h| h[:item_number].to_s == item_number.to_s }.first
       raise "Plan not found (#{item_number.to_s})" if plan.nil?
       plan
     end
   
     def self.product_descriptor(product_code)
-      ret = BlackStack::InvoicingPaymentsProcessing::products_descriptor.select { |h| h[:code] == product_code }.first
+      ret = BlackStack::I2PInvoicingPaymentsProcessing::products_descriptor.select { |h| h[:code] == product_code }.first
       raise "Product not found" if ret.nil?
       ret 
-    end
-
-
-    def self.require_db_classes()
-      # You have to load all the Sinatra classes after connect the database.
-      require_relative '../lib/balance.rb'
-      require_relative '../lib/bufferpaypalnotification.rb'
-      require_relative '../lib/customplan.rb'
-      require_relative '../lib/invoice.rb'
-      require_relative '../lib/invoiceitem.rb'
-      require_relative '../lib/movement.rb'
-      require_relative '../lib/paypalsubscription.rb'
-      require_relative '../lib/extend_client_by_i2p.rb'
     end
 
     class BasePlan
@@ -131,10 +112,6 @@ module BlackStack
         return "icon-book" if s == PRODUCT_EDUCATION
         return "icon-help" if s == PRODUCT_OTHER
       end
-
-
     end # class BasePlan
-     
-  end # module InvoicingPaymentsProcessing
-  
+  end # module I2P
 end # module BlackStack

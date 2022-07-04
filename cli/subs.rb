@@ -66,7 +66,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 
       # create the subscription
 #      self.logger.logs 'Create subscription... '
-      s = BlackStack::PayPalSubscription.new
+      s = BlackStack::Subscription.new
       s.id = guid()
       s.subscr_id = PARSER.value('code')
       s.id_buffer_paypal_notification = nil

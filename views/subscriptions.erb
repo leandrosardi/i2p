@@ -25,7 +25,7 @@ client = BlackStack::Client.where(:id=>user.id_client).first
 					<table>
 					<%
 					n = 0
-					client.paypal_subscriptions.each { |subs|
+					client.subscriptions.each { |subs|
 						%>
 						<tr>
 							<td colspan=10>
@@ -119,7 +119,7 @@ client = BlackStack::Client.where(:id=>user.id_client).first
 					# libero recursos
 					GC.start
 					DB.disconnect
-					} # client.paypal_subscriptions.each
+					} # client.subscriptions.each
 					%>
 					</table>
 					

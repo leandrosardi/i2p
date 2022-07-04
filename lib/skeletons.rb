@@ -1,0 +1,7 @@
+require '/extensions/i2p/models/skeleton/account'
+require '/extensions/i2p/models/skeleton/bufferpaypalnotifications'
+require '/extensions/i2p/models/skeleton/customplan'
+require '/extensions/i2p/models/skeleton/invoice'
+require '/extensions/i2p/models/skeleton/invoiceitem'
+require '/extensions/i2p/models/skeleton/movement'
+require '/extensions/i2p/models/skeleton/subscription'

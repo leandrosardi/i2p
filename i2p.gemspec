@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
     'lib/invoice.rb',
     'lib/invoiceitem.rb',
     'lib/movement.rb',
-    'lib/paypalsubscription.rb',
+    'lib/subscription.rb',
     'lib/extend_client_by_i2p.rb'
   ]
   s.homepage    = 'https://rubygems.org/gems/i2p'
