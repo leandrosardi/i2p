@@ -18,7 +18,6 @@ subscr_id = 'I-U1VUKAX36LNE'
 
 # fake IPN regarding a new subscription
 h = {
-  "id" => guid, 
   "create_time" => '20191224150000', 
   "txn_type"=>"subscr_signup", 
   "subscr_id"=>subscr_id, 

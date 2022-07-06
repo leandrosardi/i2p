@@ -412,7 +412,7 @@ module BlackStack
         if h[:trial_fee] != nil && prev1.nil? && !self.disabled_trial
           units = h[:trial_credits].to_i
           unit_price = h[:trial_fee].to_f / h[:trial_credits].to_f
-          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:trial_period].to_s} #{h[:trial_units].to_s}' AS now"].map(:now)[0].to_s
+          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:trial_units].to_s} #{h[:trial_period].to_s}' AS now"].map(:now)[0].to_s
 
         # si el plan tiene un segundo trial, y
         # es la segunda factura, entonces:
@@ -420,13 +420,13 @@ module BlackStack
         elsif h[:trial2_fee] != nil && !prev1.nil? && prev2.nil?
           units = h[:trial2_credits].to_i
           unit_price = h[:trial2_fee].to_f / h[:trial2_credits].to_f
-          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:trial2_period].to_s} #{h[:trial2_units].to_s}' AS now"].map(:now)[0].to_s
+          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:trial2_units].to_s} #{h[:trial2_period].to_s}' AS now"].map(:now)[0].to_s
 
         # si el plan tiene un fee, y
         elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::PAYMENT_SUBSCRIPTION
           units = n.to_i * h[:credits].to_i
           unit_price = h[:fee].to_f / h[:credits].to_f
-          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:period].to_s} #{h[:units].to_s}' AS now"].map(:now)[0].to_s
+          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:units].to_s} #{h[:period].to_s}' AS now"].map(:now)[0].to_s
     
         elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO
           units = n.to_i * h[:credits].to_i
@@ -521,7 +521,7 @@ module BlackStack
         }
             
         self.billing_period_from = i.billing_period_to
-        self.billing_period_to = DB["SELECT DATEADD(#{h[:period].to_s}, +#{h[:units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
+        self.billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:units].to_s} #{h[:period].to_s}' AS now"].map(:now)[0].to_s
         self.paypal_url = self.paypal_link
         self.paypal_url = nil if h[:type] == "S" # si se trata de una suscripcion, entonces esta factura se pagara automaticamente
         self.automatic_billing = 1 if h[:type] == "S" # si se trata de una suscripcion, entonces esta factura se pagara automaticamente
