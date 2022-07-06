@@ -40,7 +40,6 @@ module BlackStack
         "where x.id_client='#{self.client.id}' " +
         "and x.product_code='#{self.product_code}' "
       end
-#puts "Balance.calculate:q:#{q}:."
       row1 = DB[q1].first
       row2 = DB[q2].first
       self.amount = row1[:amount].to_f

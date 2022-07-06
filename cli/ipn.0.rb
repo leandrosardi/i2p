@@ -265,7 +265,7 @@ api_url = "http://74.208.28.38:81"
   end # def reproc
 
   def recalc(c)
-    BlackStack::InvoicingPaymentsProcessing::products_descriptor.each { |h|
+    BlackStack::I2P::products_descriptor.each { |h|
       self.logger.logs "Product:#{h[:code]}... "
       c.recalculate(h[:code])
       self.logger.done

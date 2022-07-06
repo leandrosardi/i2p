@@ -1,10 +1,10 @@
 require_relative '../lib/i2p'
 
-BlackStack::InvoicingPaymentsProcessing::set_plans([
+BlackStack::I2P::set_plans([
 # Dedicated Support - 
 {
   # recurrent billing plan
-  :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION,  
+  :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION,  
   
   :public=>true,
   
@@ -28,7 +28,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 },
 {
   # recurrent billing plan
-  :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION,  
+  :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION,  
   
   :public=>true,
   
@@ -51,5 +51,5 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
   :units=>"M", # billed monthy
 }])
 
-puts BlackStack::InvoicingPaymentsProcessing::plans_descriptor
+puts BlackStack::I2P::plans_descriptor
 # => [{...}, {...}] 

@@ -19,7 +19,7 @@ DB = BlackStack::Pampa::db_connection
 # Setup Sequel database classes.
 #
 BlackStack::Pampa::require_db_classes
-BlackStack::InvoicingPaymentsProcessing::require_db_classes
+BlackStack::I2P::require_db_classes
 
 # Load client 
 #

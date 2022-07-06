@@ -34,10 +34,10 @@ You can know the exact URL where PayPal will send the IPNs by running this code:
 ```ruby
 require 'i2p'
 
-puts BlackStack::InvoicingPaymentsProcessing::PAYPAL_HOOKS_URL
+puts BlackStack::I2P::PAYPAL_HOOKS_URL
 # => http://blackstack.io:80/
 
-puts BlackStack::InvoicingPaymentsProcessing::paypal_ipn_listener
+puts BlackStack::I2P::paypal_ipn_listener
 # => http://blackstack.io:80/api1.3/accounting/paypal/notify_new_invoice.json
 ```
 
@@ -46,11 +46,11 @@ puts BlackStack::InvoicingPaymentsProcessing::paypal_ipn_listener
 ```ruby
 require 'i2p'
 
-BlackStack::InvoicingPaymentsProcessing::set_paypal_business_email(
+BlackStack::I2P::set_paypal_business_email(
 	"sardi.leandro.daniel@gmail.com"	
 )
 
-puts BlackStack::InvoicingPaymentsProcessing::paypal_business_email
+puts BlackStack::I2P::paypal_business_email
 # => "sardi.leandro.daniel@gmail.com"	
 ```
 
@@ -59,13 +59,13 @@ puts BlackStack::InvoicingPaymentsProcessing::paypal_business_email
 ```ruby
 require 'i2p'
 
-BlackStack::InvoicingPaymentsProcessing::set_products([
+BlackStack::I2P::set_products([
 { 
 	:code=>'dedicated-support', 
 	:name=>'Dedicated Support', 
 	:unit_name=>'support agents', 
-	:consumption=>BlackStack::InvoicingPaymentsProcessing::BasePlan::CONSUMPTION_BY_TIME, 
-	:type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_AGENCY,
+	:consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
+	:type=>BlackStack::I2P::BasePlan::PRODUCT_AGENCY,
 	:description=>'Dedicated Support, Consultancy & Campaigns Management.',
 	:summary=>'Get One Account Manager for Your Campaigns.',
 	:thumbnail=>'https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png',
@@ -75,15 +75,15 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
 	:code=>'2020-event-ticket', 
 	:name=>'Ticket to the BlackStack eCommerce Summit 2020', 
 	:unit_name=>'tickets', 
-	:consumption=>BlackStack::InvoicingPaymentsProcessing::BasePlan::CONSUMPTION_BY_UNIT, 
-	:type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
+	:consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
+	:type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
 	:description=>'Ticket to the BlackStack eCommerce Summit 2020. Live Streaming of all the Converences.', 
 	:summary=>'The BlackStack eCommerce Summit is the larger event about building aggressive and cost effective marketing strategies using the BlackStack framework and many other resources.',
 	:thumbnail=>'https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png',
 	:return_path=>'https://yourwebsite.com/event2020/step1',
 }])
 
-puts BlackStack::InvoicingPaymentsProcessing::products_descriptor
+puts BlackStack::I2P::products_descriptor
 # => [{...}, {...}]	
 ```
 
@@ -92,11 +92,11 @@ puts BlackStack::InvoicingPaymentsProcessing::products_descriptor
 ```ruby
 require 'i2p'
 
-BlackStack::InvoicingPaymentsProcessing::set_plans([
+BlackStack::I2P::set_plans([
 # Dedicated Support
 {
 	# recurrent billing plan
-	:type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION,  
+	:type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION,  
 	
 	:public=>true,
 	
@@ -120,7 +120,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 },
 {
 	# recurrent billing plan
-	:type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION,  
+	:type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION,  
 	
 	:public=>true,
 	
@@ -143,7 +143,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 	:units=>"M", # billed monthy
 }])
 
-puts BlackStack::InvoicingPaymentsProcessing::plans_descriptor
+puts BlackStack::I2P::plans_descriptor
 # => [{...}, {...}]	
 ```
 

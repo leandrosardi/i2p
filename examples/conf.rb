@@ -28,14 +28,14 @@ BlackStack::Pampa::set_db_params({
 # -----------------------------------------------------------------------------------------------------
 # Setup products
 # -----------------------------------------------------------------------------------------------------
-BlackStack::InvoicingPaymentsProcessing::set_products([
+BlackStack::I2P::set_products([
   { 
     :code=>'thr', 
     :icon => "program.ssm.png", 
     :name=>"Processing Threads", 
     :unit_name=>"threads", 
-    :consumption=>BlackStack::InvoicingPaymentsProcessing::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"Dedicated Processing Threads for Bots.",
     :summary=>"Get many processing threads working in paralell in order to scale your bot farm.",
     :thumbnail=>"https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png",
@@ -49,8 +49,8 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
     :icon => "program.ssm.png", 
     :name=>"Account Storage", 
     :unit_name=>"MBs", 
-    :consumption=>BlackStack::InvoicingPaymentsProcessing::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
     :description=>"512MB Storage in your Account.",
     :summary=>"Disk Space for Browser Profiles, Logs, Pictures, Reports.",
     :thumbnail=>"https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png",
@@ -64,11 +64,11 @@ BlackStack::InvoicingPaymentsProcessing::set_products([
 # -----------------------------------------------------------------------------------------------------
 # Setup plans
 # -----------------------------------------------------------------------------------------------------
-BlackStack::InvoicingPaymentsProcessing::set_plans([
+BlackStack::I2P::set_plans([
 
   # Threads
   {
-    :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>'thr', 
@@ -85,7 +85,7 @@ BlackStack::InvoicingPaymentsProcessing::set_plans([
 
   # Storage
   {
-    :type=>BlackStack::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>'sto', 

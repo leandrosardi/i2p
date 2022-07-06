@@ -154,8 +154,8 @@ end
 						# TODO: no se porque los valores flotantes se imprimen como coma (,) en vez de punto (.), entonces tengo que hacer ese reemplazo espantoso .to_s.gsub(",",".")
 						bonuses = []
 						invoice.items.sort_by {|obj| obj.create_time}.each { |item|
-							plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
-							prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
+							plan = BlackStack::I2P.plan_descriptor(item.item_number)
+							prod = BlackStack::I2P.product_descriptor(plan[:product_code])
 							bonus_plans = plan[:bonus_plans]
 							bonuses += bonus_plans if !bonus_plans.nil?
 						%>
@@ -195,11 +195,11 @@ end
 							</tr>
 							<%
 							bonuses.each { |bonus|
-								#h = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |j| j[:item_number].to_s == bonus[:item_number] }.first
+								#h = BlackStack::I2P::plans_descriptor.select { |j| j[:item_number].to_s == bonus[:item_number] }.first
 								#raise "Bonus plan '#{bonus[:plan]}' not found." if h.nil?
 								
-								#i = BlackStack::InvoicingPaymentsProcessing::products_descriptor.select { |j| j[:code] == h[:product_code] }.first
-								#raise "Bonus product '#{h[:product_code]}' not found in #{BlackStack::InvoicingPaymentsProcessing::products_descriptor.to_s}" if i.nil?
+								#i = BlackStack::I2P::products_descriptor.select { |j| j[:code] == h[:product_code] }.first
+								#raise "Bonus product '#{h[:product_code]}' not found in #{BlackStack::I2P::products_descriptor.to_s}" if i.nil?
 
 								item_bonus = invoice.create_item(bonus[:item_number], 1, false)
 								%>
@@ -254,7 +254,7 @@ end
 					#.select { |obj| obj[:item_number] == item0.item_number }.first[:upsells]
 					if !upsells.nil?
 						upsells.each { |upsell_item_number|
-							add_plan = BlackStack::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == upsell_item_number }.first
+							add_plan = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == upsell_item_number }.first
 							if !add_plan.nil?
 								if upsell_plans.select { |obj| obj[:item_number] == add_plan[:item_number] }.first.nil?
 									upsell_plans << add_plan
@@ -287,7 +287,7 @@ end
 					<%
 						n = 0
 						compatible_upsell_plans.each { |upsell_plan|
-							upsell_product = BlackStack::InvoicingPaymentsProcessing::products_descriptor.select { |j| j[:code] == upsell_plan[:product_code] }.first
+							upsell_product = BlackStack::I2P::products_descriptor.select { |j| j[:code] == upsell_plan[:product_code] }.first
 							raise 'Product not found.' if upsell_product.nil?
 							
 							item = invoice.create_item(upsell_plan[:item_number])

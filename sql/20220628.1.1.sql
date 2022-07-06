@@ -1,3 +1,5 @@
+ALTER TABLE account ADD COLUMN IF NOT EXISTS disabled_trial BOOLEAN NULL; 
+
 CREATE TABLE IF NOT EXISTS buffer_paypal_notification (
 	id uuid NOT NULL PRIMARY KEY,
 	create_time timestamp NOT NULL,

@@ -4,8 +4,10 @@ module BlackStack
     # Add methods regarding the I2P extension.
     class Account < BlackStack::I2P::MySaaS::Account
       one_to_many :subscriptions, :class=>:'BlackStack::I2P::Subscription', :key=>:id_account
-      one_to_many :customplans, :class=>:'BlackStack::I2P::CustomPlan', :key=>:id_account
+      #one_to_many :customplans, :class=>:'BlackStack::I2P::CustomPlan', :key=>:id_account
 
+      # Return an array of movements of this account.
+      # 
       # This method replace the line:
       # one_to_many :movements, :class=>:'BlackStack::I2P::Movement', :key=>:id_account
       # 
@@ -28,61 +30,6 @@ module BlackStack
           end
         }
         ret
-      end
-
-      # how many minutes ago should have updated the table stat_balance with the amount and credits of this account, for each product.
-      # return a positive integer if either:
-      # 1. the account didn't update stats in the last 24 hours, or
-      # 2. the account has a new record in the table movements after its last update in the table stat_balance.
-      def stat_balance_delay_minutes
-        row = DB[
-          "SELECT TOP 1 m.id " +
-          "FROM account c WITH (NOLOCK) " +
-          "JOIN movement m WITH (NOLOCK INDEX(IX_movement__id_account__create_time_desc)) ON ( " +
-          " c.id=m.id_account AND " +
-          " m.create_time > ISNULL(c.last_stat_balance_update_time, '1900-01-01') " +
-          ") " +
-          "WHERE c.id = '#{self.id}' " +
-          "ORDER BY m.create_time DESC "
-        ].first
-        
-        if row.nil?
-          return 0
-        else
-          return DB["SELECT DATEDIFF(MI, m.create_time, GETDATE()) AS n FROM movement m WITH (NOLOCK) WHERE m.id='#{row[:id]}'"].first[:n]
-        end
-      end
-  
-      # update the table stat_balance with the amount and credits of this account, for each product.
-      def update_stat_balance(product_code=nil)
-          c = self
-          product_descriptors = BlackStack::I2P::InvoicingPaymentsProcessing::products_descriptor.clone     
-          product_descriptors.select! { |hprod| hprod[:code] == product_code } if !product_code.nil?
-          product_descriptors.each { |hprod|
-            row1 = DB["
-              select isnull(sum(isnull(m.credits,0)),0) as credits  
-              from movement m with (nolock index(IX_movement__id_account__product_code)) 
-              --from movement m with (nolock) 
-              where m.id_account='#{c.id}' 
-              and m.product_code='#{hprod[:code]}' 
-            "].first
-            row2 = DB["
-              select isnull(sum(isnull(m.amount,0)),0) as amount  
-              from movement m with (nolock index(IX_movement__id_account__product_code)) 
-              --from movement m with (nolock) 
-              where m.id_account='#{c.id}' 
-              and m.product_code='#{hprod[:code]}' 
-            "].first
-            credits = row1[:credits]
-            amount = row2[:amount]
-            row = DB["SELECT * FROM stat_balance WHERE id_account='#{c.id}' AND product_code='#{hprod[:code]}'"].first
-            if row.nil?
-              DB.execute("INSERT INTO stat_balance (id_account, product_code, amount, credits) VALUES ('#{c.id}', '#{hprod[:code]}', #{amount.to_s}, #{credits.to_s})")
-            else
-              DB.execute("UPDATE stat_balance SET amount=#{amount.to_s}, credits=#{credits.to_s} WHERE id_account='#{c.id}' AND product_code='#{hprod[:code]}'")
-            end
-            DB.execute("UPDATE account SET last_stat_balance_update_time=GETDATE() WHERE [id]='#{c.id}'")
-          }
       end
 
       # crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el accounte, para el producto indicado en product_code. 
@@ -109,7 +56,7 @@ module BlackStack
 				cons.expiration_time = nil
 				cons.save
 				# if there is negative credits
-				prod = BlackStack::I2P::InvoicingPaymentsProcessing.product_descriptor(product_code)
+				prod = BlackStack::I2P.product_descriptor(product_code)
 				total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, product_code).credits.to_f
 				total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, product_code).amount.to_f
 				sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
@@ -171,14 +118,9 @@ module BlackStack
 				amount_paid = 0.to_f
 				credits_paid = 0
 
-				#total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, product_code).credits.to_f
-				#total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, product_code).amount.to_f        
-
 				self.movements.select { |o| 
 					o.product_code.upcase == product_code.upcase
 				}.sort_by { |o| [o.create_time, o.type] }.each { |o| # se ordena por o.create_time, pero tmabien por o.type para procesar primero los pagos y bonos
-					#if o.credits.to_f < 0 # payment or bonus
-#					if o.credits.to_f > 0 && ( o.type==BlackStack::I2P::Movement::MOVEMENT_TYPE_CANCELATION || o.type==BlackStack::I2P::Movement::MOVEMENT_TYPE_EXPIRATION ) # consumption or expiration
 					# consumption or expiration or bonus
 					if ( 
 						o.type==BlackStack::I2P::Movement::MOVEMENT_TYPE_CANCELATION || 
@@ -203,139 +145,25 @@ module BlackStack
 					end
 				}
 			end 
-		
-      # TODO: el accounte deberia tener una FK a la tabla division. La relacion no puede ser N-N.
-      # TODO: se debe preguntar a la central
-      def division
-        q = 
-        "SELECT d.id as id " +
-        "FROM division d " +
-        "JOIN user_division ud ON d.id=ud.id_division " +
-        "JOIN [user] u ON u.id=ud.id_user " +
-        "WHERE u.id_account = '#{self.id}' "
-        row = DB[q].first
-        BlackStack::I2P::Division.where(:id=>row[:id]).first    
-      end
-    
-      # retorna true si este accounte no tiene ninguna generada con productos LGB2
-      def deserve_trial()
-        self.disabled_for_trial != true
-      end
-    
-      # 
-      def deserve_trial?
-        self.deserve_trial()
+		    
+      # return true if the account is no longer allowed to take a trial
+      def disabled_trial?
+        !self.disabled_for_trial.nil? && self.disabled_for_trial == true
       end
 
       # 
       def get_balance()
         n = 0
-        BlackStack::I2P::InvoicingPaymentsProcessing::products_descriptor.each { |code| 
+        BlackStack::I2P::products_descriptor.each { |code| 
           n += BlackStack::I2P::Balance.new(self.id, code).amount 
         }
         n
       end
 
-      # 
-      def get_movements(from_time, to_time, product_code=nil)
-        if from_time > to_time
-          raise "From time must be earlier than To time"
-        end
-        #if to_time.prev_year > from_time
-        #  raise "The time frame cannot be longer than 1 year."
-        #end
-        to_time += 1
-=begin
-      :id => movement.id,
-      :id_account => movement.id_account,
-      :product_code => movement.product_code,
-      :create_time => movement.create_time,
-      :type => movement.type.to_i,
-      :description => movement.description,
-      :paypal1_amount => movement.paypal1_amount.to_f,
-      :bonus_amount => movement.bonus_amount.to_f,
-      :amount => movement.amount.to_f,
-      :credits => movement.credits.to_f,
-      :profits_amount => movement.profits_amount.to_f,
-      :expiration_time => movement.expiration_time,
-      :expiration_description => movement.expiration_time.nil? ? '-' : ((movement.expiration_time - Time.now()).to_f / 60.to_f).to_i.to_time_spent 
-=end  
-        q =
-        "SELECT " +
-        " m.id_account, " +
-        " YEAR(m.create_time) AS creation_year, " + 
-        " MONTH(m.create_time) AS creation_month, " + 
-        " DAY(m.create_time) AS creation_day, " +
-        " YEAR(m.expiration_time) AS expiration_year, " + 
-        " MONTH(m.expiration_time) AS expiration_month, " + 
-        " DAY(m.expiration_time) AS expiration_day, " +
-        " m.type, " +
-        " m.product_code, " +
-        " CAST(m.description AS VARCHAR(500)) AS description, " +
-        " CAST(m.expiration_description AS VARCHAR(500)) AS expiration_description, " +
-        " SUM(ISNULL(m.paypal1_amount,0)) AS paypal1_amount, " + 
-        " SUM(ISNULL(m.bonus_amount,0)) AS bonus_amount, " + 
-        " SUM(ISNULL(m.amount,0)) AS amount, " + 
-        " SUM(ISNULL(m.credits,0)) AS credits, " + 
-        " SUM(ISNULL(m.profits_amount,0)) AS profits_amount " + 
-        "FROM movement m WITH (NOLOCK) " +
-        "WHERE m.id_account = '#{self.id}' "
-        
-        q += "AND m.product_code = '#{product_code}' " if !product_code.nil?
-        
-        q +=
-        "AND create_time >= '#{from_time.to_sql}' " +
-        "AND create_time <= '#{to_time.to_sql}' " +
-        "GROUP BY " +
-        " m.id_account, " + 
-        " YEAR(m.create_time), " + 
-        " MONTH(m.create_time), " + 
-        " DAY(m.create_time), " +
-        " YEAR(m.expiration_time), " + 
-        " MONTH(m.expiration_time), " + 
-        " DAY(m.expiration_time), " +
-        " m.type, " +
-        " m.product_code, " +
-        " CAST(m.description AS VARCHAR(500)), " +
-        " CAST(m.expiration_description AS VARCHAR(500)) "
-
-        DB[q].all
-      end
-
-      # 
-      def add_bonus(id_user_creator, product_code, bonus_credits, description, expiration_time)
-        bonus_amount = 0
-    #    balance = BlackStack::I2P::Balance.new(self.id, product_code)
-    #    amount = balance.amount.to_f
-    #    credits = balance.credits.to_f
-    #    if amount>=0 && credits>=0
-    #      bonus_amount = (amount / credits) * bonus_credits
-    ##    else
-    ##      h = BlackStack::I2P::InvoicingPaymentsProcessing.product_descriptor(product_code)
-    ##      bonus_amount = h[:default_fee_per_unit].to_f
-    #    end
-        m = BlackStack::I2P::Movement.new(
-          :id_account => self.id,
-          :create_time => now(),
-          :type => BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_BONUS,
-          :id_user_creator => id_user_creator,
-          :description => description,
-          :paypal1_amount => 0,
-          :bonus_amount => bonus_amount,
-          :amount => 0-bonus_amount,
-          :credits => 0-bonus_credits,
-          :profits_amount => 0,
-          :product_code => product_code,
-          :expiration_time => expiration_time
-        )
-        m.id = guid()
-        m.save
-      end
-
       # retorna true si existe algun item de factura relacionado al 'plan' ('item_number').
       # si el atributo 'amount' ademas es distinto a nil, se filtran items por ese monto.
       def has_item(item_number, amount=nil)
-        h = BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number].to_s == item_number.to_s }.first
+        h = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number].to_s == item_number.to_s }.first
         raise "Plan not found" if h.nil?
             
         q = 
@@ -359,12 +187,15 @@ module BlackStack
         return !DB[q].first.nil?
       end
     
-      # retorna los planes estandar definidos en el array BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor, y le concatena los arrays customizados de este accounte definidos en la tabla custom_plan
+      # retorna los planes estandar definidos en el array BlackStack::I2P::plans_descriptor, y le concatena los arrays customizados de este accounte definidos en la tabla custom_plan
+      # TODO: someday, add custom plans here
       def plans
-        a = BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor 
+        a = BlackStack::I2P::plans_descriptor 
+=begin
         self.customplans.each { |p|
           a << p.to_hash
         }
+=end
         a
       end
     end # class Account

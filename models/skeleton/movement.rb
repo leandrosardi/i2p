@@ -2,14 +2,14 @@ module BlackStack
   class I2P
     class Movement < Sequel::Model(:movement)    
       many_to_one :invoiceItem, :class=>:'BlackStack::I2P::InvoiceItem', :key=>:id_invoice_item
-      many_to_one :client, :class=>:'BlackStack::I2P::Client', :key=>:id_client
+      many_to_one :account, :class=>:'BlackStack::I2P::Account', :key=>:id_account
     
       MOVEMENT_TYPE_ADD_PAYMENT = 0
       MOVEMENT_TYPE_ADD_BONUS = 1
       MOVEMENT_TYPE_REASSIGN_BALANCE = 2
       MOVEMENT_TYPE_REFUND_BALANCE = 3
-      MOVEMENT_TYPE_CANCELATION = 4 # liability with the client is reduced due service delivery. it can be recalculated
-      MOVEMENT_TYPE_EXPIRATION = 5 # liability with the client is reduced due credits expiration. it can be recalculated
+      MOVEMENT_TYPE_CANCELATION = 4 # liability with the account is reduced due service delivery. it can be recalculated
+      MOVEMENT_TYPE_EXPIRATION = 5 # liability with the account is reduced due credits expiration. it can be recalculated
       MOVEMENT_TYPE_ADJUSTMENT = 6 # it can be recalculated
       MOVEMENT_TYPE_REFUND_ADJUSTMENT = 7 # it cannot be recalculated
     
@@ -82,12 +82,12 @@ module BlackStack
         raise 'Movement must be either a payment or bonus or refund' if type != MOVEMENT_TYPE_ADD_PAYMENT && type != MOVEMENT_TYPE_ADD_BONUS && type != MOVEMENT_TYPE_REFUND_BALANCE
         # 
         payment_time = Time.now() if payment_time.nil?
-        plan = BlackStack::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
-        prod = BlackStack::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
+        plan = BlackStack::I2P.plan_descriptor(item.item_number)
+        prod = BlackStack::I2P.product_descriptor(plan[:product_code])
         if (self.id==nil)
           self.id=guid()
         end
-        self.id_client = item.invoice.id_client
+        self.id_account = item.invoice.id_account
         self.id_invoice_item = id_item.nil? ? item.id : id_item
         self.create_time = item.invoice.billing_period_from #payment_time
         self.type = type
@@ -134,48 +134,22 @@ module BlackStack
         registraton_time = (Date.strptime(registraton_time.strftime("%Y-%m-%d"), "%Y-%m-%d").to_time + 24*60*60)			
         # the movment must be a payment or a bonus
         raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
-  #puts
-  #puts "id:#{self.id.to_guid}:."
-  #puts "product_code:#{self.product_code}:."
         # itero los pagos y bonos hechos por este mismo producto, desde el primer dia hasta este movimiento.
-  =begin
-        paid1 = 0
-        self.client.movements.select { |o| 
-          (o.type == MOVEMENT_TYPE_ADD_PAYMENT || o.type == MOVEMENT_TYPE_ADD_BONUS) &&
-          o.credits.to_f < 0 &&
-          o.product_code.upcase == self.product_code.upcase &&
-          o.create_time.to_time < registraton_time.to_time
-        }.sort_by { |o| o.create_time }.each { |o|
-          paid1 += (0.to_f - o.credits.to_f)
-          break if o.id.to_guid == self.id.to_guid
-        }
-  #puts "paid1:#{paid1.to_s}:."
-  =end
         q = 
           "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
-          "from movement m with (nolock index(IX_movement__type__id_client__product_code__create_time_desc__credits_desc)) " +
+          "from movement m with (nolock index(IX_movement__type__id_account__product_code__create_time_desc__credits_desc)) " +
           "where isnull(m.type, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}) in (#{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS.to_s}) " +
-          "and m.id_client='#{self.client.id.to_guid}' " +
+          "and m.id_account='#{self.account.id.to_guid}' " +
           "and isnull(m.credits,0) < 0 " +
           "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
           "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " +
           "and m.create_time <= (select m2.create_time from movement m2 with (nolock) where m2.id='#{self.id.to_guid}') "
         paid = 0 - DB[q].first[:n]
-  #puts "q:#{q.to_s}:."
-  #puts "paid:#{paid.to_s}:."
-  =begin
         # calculo los credito para este producto, desde el primer dia; incluyendo cosumo, expiraciones, ajustes.
-        consumed1 = self.client.movements.select { |o| 
-          o.credits.to_f > 0 &&
-          o.product_code.upcase == self.product_code.upcase &&
-          o.create_time.to_time < registraton_time.to_time
-        }.inject(0) { |sum, o| sum.to_f + o.credits.to_f }.to_f
-  #puts "consumed1:#{consumed1.to_s}:."     
-  =end
         q = 
           "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
-          "from movement m with (nolock index(IX_movement__id_client__product_code__create_time_desc__credits_asc)) " +
-          "where m.id_client='#{self.client.id.to_guid}' " +
+          "from movement m with (nolock index(IX_movement__id_account__product_code__create_time_desc__credits_asc)) " +
+          "where m.id_account='#{self.account.id.to_guid}' " +
           "and isnull(m.credits,0) > 0 " +
           "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
           "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " #+
@@ -225,7 +199,7 @@ module BlackStack
         self.expiration_tries = self.expiration_tries.to_i + 1
         self.save
         # 
-        balance = BlackStack::Balance.new(self.client.id, self.product_code, registraton_time)
+        balance = BlackStack::Balance.new(self.account.id, self.product_code, registraton_time)
         balance.calculate(false)
         total_credits = 0.to_f - balance.credits.to_f
         total_amount = 0.to_f - balance.amount.to_f
@@ -237,7 +211,7 @@ module BlackStack
         #
         exp = BlackStack::Movement.new
         exp.id = guid()
-        exp.id_client = self.client.id
+        exp.id_account = self.account.id
         exp.create_time = registraton_time.nil? ? now() : registraton_time
         exp.type = BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
         exp.id_user_creator = self.id_user_creator
@@ -261,7 +235,7 @@ module BlackStack
         # the movment must be a payment or a bonus or a refund
         raise 'Movement must be either a payment or bonus or refund' if type != MOVEMENT_TYPE_ADD_PAYMENT && type != MOVEMENT_TYPE_ADD_BONUS && type != MOVEMENT_TYPE_REFUND_BALANCE
         # recalculate amounts for all the consumptions and expirations
-        self.client.recalculate(self.product_code)
+        self.account.recalculate(self.product_code)
       end 
     end # class Movement
   end # module I2P

@@ -37,7 +37,7 @@ require 'sequel'
 #puts "Connector Descriptor: #{BlackStack::Pampa::connection_descriptor}"
 DB = BlackStack::Pampa::db_connection
 BlackStack::Pampa::require_db_classes
-BlackStack::InvoicingPaymentsProcessing::require_db_classes
+BlackStack::I2P::require_db_classes
 
 # 
 class MyCLIProcess < BlackStack::MyLocalProcess

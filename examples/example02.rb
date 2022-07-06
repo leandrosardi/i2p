@@ -1,8 +1,8 @@
 require_relative '../lib/i2p'
 
-BlackStack::InvoicingPaymentsProcessing::set_paypal_business_email(
+BlackStack::I2P::set_paypal_business_email(
   "sardi.leandro.daniel.x@gmail.com"  
 )
 
-puts BlackStack::InvoicingPaymentsProcessing::paypal_business_email
+puts BlackStack::I2P::paypal_business_email
 # => "sardi.leandro.daniel.x@gmail.com" 

@@ -74,7 +74,7 @@ module BlackStack
       end
 
       # 
-      def deserve_trial?
+      def disabled_trial?
         return self.disabled_for_trial == false || self.disabled_for_trial == nil
       end
     
@@ -137,7 +137,7 @@ module BlackStack
           raise "Plan not found"      
         end
     
-        product_descriptor = BlackStack::I2P::InvoicingPaymentsProcessing::products_descriptor.select { |j| j[:code].to_s == plan_descriptor[:product_code].to_s }.first
+        product_descriptor = BlackStack::I2P::products_descriptor.select { |j| j[:code].to_s == plan_descriptor[:product_code].to_s }.first
         if product_descriptor.nil?
           raise "Product not found"      
         end
@@ -145,7 +145,7 @@ module BlackStack
         item_name = ""
         n = 0
         self.items.each { |t|
-          h = BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number].to_s == t.item_number.to_s }.first 
+          h = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number].to_s == t.item_number.to_s }.first 
           item_name += '; ' if n>0
           item_name += h[:name]
           if item_name.size >= 65
@@ -158,7 +158,7 @@ module BlackStack
         return_path = product_descriptor[:return_path]
         id_invoice = self.id
         id_account = self.account.id
-        allow_trials = self.deserve_trial?
+        allow_trials = self.disabled_trial?
         
         bIsSubscription = false
         bIsSubscription = true if plan_descriptor[:type]=="S"
@@ -169,7 +169,7 @@ module BlackStack
         values = {}
         
         # common parameters for all the situations
-        values[:business] = BlackStack::I2P::InvoicingPaymentsProcessing::paypal_business_email
+        values[:business] = BlackStack::I2P::paypal_business_email
         values[:lc] = "en_US"
         
         if bIsSubscription
@@ -183,7 +183,7 @@ module BlackStack
         values[:return] = BlackStack::I2P::Netting::add_param(return_path, "track_object_id", id_invoice.to_guid)
         values[:return_url] = BlackStack::I2P::Netting::add_param(return_path, "track_object_id", id_invoice.to_guid)
         values[:rm] = 1
-        values[:notify_url] = BlackStack::I2P::InvoicingPaymentsProcessing::paypal_ipn_listener
+        values[:notify_url] = BlackStack::I2P::paypal_ipn_listener
         
         values[:invoice] = id_invoice
         values[:item_name] = item_name
@@ -232,7 +232,7 @@ module BlackStack
         end
           
         # return url
-        "#{BlackStack::I2P::InvoicingPaymentsProcessing::paypal_orders_url}/cgi-bin/webscr?" + URI.encode_www_form(values)
+        "#{BlackStack::I2P::paypal_orders_url}/cgi-bin/webscr?" + URI.encode_www_form(values)
       end
     
       # retorna true si el estado de la factura sea NULL o UNPAID
@@ -322,15 +322,15 @@ module BlackStack
         # registro los asientos contables
         InvoiceItem.where(:id_invoice=>self.id).all { |item|
           # obtengo descriptor del plan
-          plan = BlackStack::I2P::InvoicingPaymentsProcessing.plan_descriptor(item.item_number)
+          plan = BlackStack::I2P.plan_descriptor(item.item_number)
           # obtengo descriptor del producto
-          prod = BlackStack::I2P::InvoicingPaymentsProcessing.product_descriptor(plan[:product_code])
+          prod = BlackStack::I2P.product_descriptor(plan[:product_code])
           # registro el pago
           BlackStack::I2P::Movement.new().parse(item, BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_PAYMENT, "Payment of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.", payment_time, item.id).save()
           # agrego los bonos de este plan
           if !plan[:bonus_plans].nil?
             plan[:bonus_plans].each { |h|
-              plan_bonus = BlackStack::I2P::InvoicingPaymentsProcessing.plan_descriptor(h[:item_number])
+              plan_bonus = BlackStack::I2P.plan_descriptor(h[:item_number])
               raise "bonus plan not found" if plan_bonus.nil?					
               bonus = BlackStack::I2P::InvoiceItem.new
               bonus.id = guid()
@@ -423,12 +423,12 @@ module BlackStack
           billing_period_to = DB["SELECT DATEADD(#{h[:trial2_period].to_s}, +#{h[:trial2_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
 
         # si el plan tiene un fee, y
-        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::InvoicingPaymentsProcessing::BasePlan::PAYMENT_SUBSCRIPTION
+        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION
           units = n.to_i * h[:credits].to_i
           unit_price = h[:fee].to_f / h[:credits].to_f
           billing_period_to = DB["SELECT DATEADD(#{h[:period].to_s}, +#{h[:units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
     
-        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::InvoicingPaymentsProcessing::BasePlan::PAYMENT_PAY_AS_YOU_GO
+        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO
           units = n.to_i * h[:credits].to_i
           unit_price = h[:fee].to_f / h[:credits].to_f
           billing_period_to = billing_period_from
@@ -466,8 +466,8 @@ module BlackStack
     
       def plan_payment_description(h)
         ret = ""
-        ret += "$#{h[:trial_fee]} trial. " if self.deserve_trial? && !h[:trial_fee].nil?
-        ret += "$#{h[:trial2_fee]} one-time price. " if self.deserve_trial? && !h[:trial2_fee].nil?
+        ret += "$#{h[:trial_fee]} trial. " if self.disabled_trial? && !h[:trial_fee].nil?
+        ret += "$#{h[:trial2_fee]} one-time price. " if self.disabled_trial? && !h[:trial2_fee].nil?
         ret += "$#{h[:fee]}/#{h[:period]}. " if h[:units].to_i <= 1 
         ret += "$#{h[:fee]}/#{h[:units]}#{h[:period]}. " if h[:units].to_i > 1 
         ret += "#{h[:credits]} credits. " if h[:credits].to_i > 1
@@ -500,7 +500,7 @@ module BlackStack
         c = BlackStack::I2P::Account.where(:id=>id_account).first
         raise "Account not found" if c.nil?
         
-        h = BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number].to_s == i.items.first.item_number.to_s }.first
+        h = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number].to_s == i.items.first.item_number.to_s }.first
         raise "Plan not found" if h.nil?
     
         return_path = h[:return_path]
@@ -571,7 +571,7 @@ module BlackStack
         # Si el monto de la factura es distinto al moneto del reembolso, entonces se levanta una excepcion.
         elsif total == -payment_gross
           i.items.each { |u|
-            h = BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == u.item_number }.first
+            h = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == u.item_number }.first
             raise "Plan not found" if h.nil?
             item1 = BlackStack::I2P::InvoiceItem.new()
             item1.id = guid()
@@ -598,8 +598,8 @@ module BlackStack
             # si el balance quedo en negativo, entonces aplico otro ajuste
             if !h[:bonus_plans].nil?
               h[:bonus_plans].each { |bonus|
-                i = BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == bonus[:item_number] }.first
-                j = BlackStack::I2P::InvoicingPaymentsProcessing::products_descriptor.select { |obj| obj[:code] == i[:product_code] }.first
+                i = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == bonus[:item_number] }.first
+                j = BlackStack::I2P::products_descriptor.select { |obj| obj[:code] == i[:product_code] }.first
                 item2 = BlackStack::I2P::InvoiceItem.new()
                 item2.id = guid()
                 item2.id_invoice = self.id
@@ -634,7 +634,7 @@ module BlackStack
           float_units = (amount / unit_price.to_f)
           units = float_units.round.to_i
           # 
-          h = BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == t.item_number }.first
+          h = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == t.item_number }.first
           raise "Plan not found" if h.nil?
           item1 = BlackStack::I2P::InvoiceItem.new()
           item1.id = guid()
@@ -672,8 +672,8 @@ module BlackStack
             # hago el reembolso de cada bono de este item
             # si el balance quedo en negativo, entonces aplico otro ajuste
             h[:bonus_plans].each { |bonus|
-              i = BlackStack::I2P::InvoicingPaymentsProcessing::plans_descriptor.select { |obj| obj[:item_number] == bonus[:item_number] }.first
-              j = BlackStack::I2P::InvoicingPaymentsProcessing::products_descriptor.select { |obj| obj[:code] == i[:product_code] }.first
+              i = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == bonus[:item_number] }.first
+              j = BlackStack::I2P::products_descriptor.select { |obj| obj[:code] == i[:product_code] }.first
               item2 = BlackStack::I2P::InvoiceItem.new()
               item2.id = guid()
               item2.id_invoice = self.id
