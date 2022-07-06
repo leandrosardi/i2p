@@ -20,35 +20,35 @@ module BlackStack
       # no guarda el objeto en la base de datos.
       # retorna el objeto creado.
       def self.create(params)
-          s = BlackStack::Subscription.new()
-          s.subscr_id = params['subscr_id'].to_s
-          s.last_name = params['last_name'].to_s
-          s.residence_country = params['residence_country'].to_s
-          s.mc_currency = params['mc_currency'].to_s
-          #s.item_name = params['item_name'].to_s
-          s.amount1 = params['amount1'].to_s
-          s.business = params['business'].to_s
-          s.amount3 = params['amount3'].to_s
-          s.recurring = params['recurring'].to_s
-          s.verify_sign = params['verify_sign'].to_s
-          s.payer_status = params['payer_status'].to_s
-          s.test_ipn = params['test_ipn'].to_s
-          s.payer_email = params['payer_email'].to_s
-          s.first_name = params['first_name'].to_s
-          s.receiver_email = params['receiver_email'].to_s
-          s.payer_id = params['payer_id'].to_s
-          s.invoice = params['invoice'].to_s
-          s.reattempt = params['reattempt'].to_s
-          #s.item_number = params['item_number'].to_s
-          s.subscr_date = params['subscr_date'].to_s
-          s.charset = params['charset'].to_s
-          s.notify_version = params['notify_version'].to_s
-          s.period1 = params['period1'].to_s
-          s.mc_amount1 = params['mc_amount1'].to_s
-          s.period3 = params['period3'].to_s
-          s.mc_amount3 = params['mc_amount3'].to_s
-          s.ipn_track_id = params['ipn_track_id'].to_s
-          s
+        s = BlackStack::Subscription.new()
+        s.subscr_id = params['subscr_id'].to_s
+        s.last_name = params['last_name'].to_s
+        s.residence_country = params['residence_country'].to_s
+        s.mc_currency = params['mc_currency'].to_s
+        #s.item_name = params['item_name'].to_s
+        s.amount1 = params['amount1'].to_s
+        s.business = params['business'].to_s
+        s.amount3 = params['amount3'].to_s
+        s.recurring = params['recurring'].to_s
+        s.verify_sign = params['verify_sign'].to_s
+        s.payer_status = params['payer_status'].to_s
+        s.test_ipn = params['test_ipn'].to_s
+        s.payer_email = params['payer_email'].to_s
+        s.first_name = params['first_name'].to_s
+        s.receiver_email = params['receiver_email'].to_s
+        s.payer_id = params['payer_id'].to_s
+        s.invoice = params['invoice'].to_s
+        s.reattempt = params['reattempt'].to_s
+        #s.item_number = params['item_number'].to_s
+        s.subscr_date = params['subscr_date'].to_s
+        s.charset = params['charset'].to_s
+        s.notify_version = params['notify_version'].to_s
+        s.period1 = params['period1'].to_s
+        s.mc_amount1 = params['mc_amount1'].to_s
+        s.period3 = params['period3'].to_s
+        s.mc_amount3 = params['mc_amount3'].to_s
+        s.ipn_track_id = params['ipn_track_id'].to_s
+        s
       end
     
       # retorna un hash descriptor de este objecto
@@ -115,7 +115,7 @@ module BlackStack
         if self.subscr_id.to_s.size > 0
           DB[
           "SELECT DISTINCT i.id " +
-          "FROM invoice i WITH (NOLOCK) " + 
+          "FROM invoice i " + 
           "WHERE i.subscr_id='#{self.subscr_id.to_s}' "
           ].all { |row|
             a << BlackStack::Invoice.where(:id=>row[:id]).first

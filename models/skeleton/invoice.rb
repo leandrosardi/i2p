@@ -180,8 +180,8 @@ module BlackStack
         
         values[:upload] = 1
         values[:no_shipping] = 1
-        values[:return] = BlackStack::I2P::Netting::add_param(return_path, "track_object_id", id_invoice.to_guid)
-        values[:return_url] = BlackStack::I2P::Netting::add_param(return_path, "track_object_id", id_invoice.to_guid)
+        values[:return] = BlackStack::Netting::add_param(return_path, "track_object_id", id_invoice.to_guid)
+        values[:return_url] = BlackStack::Netting::add_param(return_path, "track_object_id", id_invoice.to_guid)
         values[:rm] = 1
         values[:notify_url] = BlackStack::I2P::paypal_ipn_listener
         
@@ -412,7 +412,7 @@ module BlackStack
         if h[:trial_fee] != nil && prev1.nil? && !self.disabled_trial
           units = h[:trial_credits].to_i
           unit_price = h[:trial_fee].to_f / h[:trial_credits].to_f
-          billing_period_to = DB["SELECT DATEADD(#{h[:trial_period].to_s}, +#{h[:trial_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
+          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:trial_period].to_s} #{h[:trial_units].to_s}' AS now"].map(:now)[0].to_s
 
         # si el plan tiene un segundo trial, y
         # es la segunda factura, entonces:
@@ -420,13 +420,13 @@ module BlackStack
         elsif h[:trial2_fee] != nil && !prev1.nil? && prev2.nil?
           units = h[:trial2_credits].to_i
           unit_price = h[:trial2_fee].to_f / h[:trial2_credits].to_f
-          billing_period_to = DB["SELECT DATEADD(#{h[:trial2_period].to_s}, +#{h[:trial2_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
+          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:trial2_period].to_s} #{h[:trial2_units].to_s}' AS now"].map(:now)[0].to_s
 
         # si el plan tiene un fee, y
         elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::PAYMENT_SUBSCRIPTION
           units = n.to_i * h[:credits].to_i
           unit_price = h[:fee].to_f / h[:credits].to_f
-          billing_period_to = DB["SELECT DATEADD(#{h[:period].to_s}, +#{h[:units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
+          billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:period].to_s} #{h[:units].to_s}' AS now"].map(:now)[0].to_s
     
         elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO
           units = n.to_i * h[:credits].to_i
@@ -468,7 +468,7 @@ module BlackStack
         ret = ""
         ret += "$#{h[:trial_fee]} trial. " if self.disabled_trial? && !h[:trial_fee].nil?
         ret += "$#{h[:trial2_fee]} one-time price. " if self.disabled_trial? && !h[:trial2_fee].nil?
-        ret += "$#{h[:fee]}/#{h[:period]}. " if h[:units].to_i <= 1 
+        ret += "$#{h[:fee]}/#{h[:units]}. " if h[:units].to_i <= 1 
         ret += "$#{h[:fee]}/#{h[:units]}#{h[:period]}. " if h[:units].to_i > 1 
         ret += "#{h[:credits]} credits. " if h[:credits].to_i > 1
         ret

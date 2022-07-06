@@ -104,7 +104,9 @@ module BlackStack
         self.profits_amount = 0
         self.description = description
         if (type == MOVEMENT_TYPE_ADD_BONUS || type == MOVEMENT_TYPE_ADD_PAYMENT)
-          self.expiration_time = DB["SELECT DATEADD(#{prod[:credits_expiration_period].to_s}#{prod[:credits_expiration_period].to_s}, +#{prod[:credits_expiration_units].to_s}, '#{payment_time.to_sql}') AS d"].first[:d].to_s
+          self.expiration_time = DB["
+            SELECT TIMESTAMP '#{payment_time.to_sql}' + INTERVAL '#{prod[:credits_expiration_units].to_s} #{prod[:credits_expiration_period].to_s}' AS d
+          "].first[:d].to_s
         end
         self.expiration_on_next_payment = plan[:expiration_on_next_payment]
         self.expiration_lead_period = plan[:expiration_lead_period]
@@ -135,25 +137,26 @@ module BlackStack
         # the movment must be a payment or a bonus
         raise 'Movement must be either a payment or a bonus' if self.type != MOVEMENT_TYPE_ADD_PAYMENT && self.type != MOVEMENT_TYPE_ADD_BONUS
         # itero los pagos y bonos hechos por este mismo producto, desde el primer dia hasta este movimiento.
-        q = 
-          "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
-          "from movement m with (nolock index(IX_movement__type__id_account__product_code__create_time_desc__credits_desc)) " +
-          "where isnull(m.type, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}) in (#{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS.to_s}) " +
-          "and m.id_account='#{self.account.id.to_guid}' " +
-          "and isnull(m.credits,0) < 0 " +
-          "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
-          "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " +
-          "and m.create_time <= (select m2.create_time from movement m2 with (nolock) where m2.id='#{self.id.to_guid}') "
+        q = "
+          select COALESCE(SUM(COALESCE(m.credits,0)),0) AS n 
+          from movement m  
+          where COALESCE(m.type, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}) in (#{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS.to_s}) 
+          and m.id_account='#{self.account.id.to_guid}' 
+          and COALESCE(m.credits,0) < 0 
+          and UPPER(COALESCE(m.product_code, '')) = '#{self.product_code.upcase}' 
+          and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' 
+          and m.create_time <= (select m2.create_time from movement m2 where m2.id='#{self.id.to_guid}') 
+        "
         paid = 0 - DB[q].first[:n]
         # calculo los credito para este producto, desde el primer dia; incluyendo cosumo, expiraciones, ajustes.
-        q = 
-          "select ISNULL(SUM(ISNULL(m.credits,0)),0) AS n " +
-          "from movement m with (nolock index(IX_movement__id_account__product_code__create_time_desc__credits_asc)) " +
-          "where m.id_account='#{self.account.id.to_guid}' " +
-          "and isnull(m.credits,0) > 0 " +
-          "and upper(isnull(m.product_code, '')) = '#{self.product_code.upcase}' " +
-          "and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}' " #+
-  #        "and m.id <> '#{self.id.to_guid}' "
+        q = " 
+          select COALESCE(SUM(COALESCE(m.credits,0)),0) AS n 
+          from movement m 
+          where m.id_account='#{self.account.id.to_guid}' 
+          and COALESCE(m.credits,0) > 0 
+          and UPPER(COALESCE(m.product_code, '')) = '#{self.product_code.upcase}' 
+          and m.create_time < '#{registraton_time.to_time.strftime('%Y-%m-%d')}'  
+        "
         consumed = DB[q].first[:n]
 
         # calculo los creditos de este movimiento que voy a cancelar

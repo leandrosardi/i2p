@@ -26,7 +26,11 @@ module BlackStack
       end
     
       def self.revenue
-        DB["SELECT ISNULL(SUM(CAST(payment_gross AS NUMERIC(18,4))),0) AS revenue FROM buffer_paypal_notification WITH (NOLOCK) WHERE txn_type='#{BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_PAYMENT}'"].first[:revenue]
+        DB["
+          SELECT COALESCE(SUM(CAST(payment_gross AS NUMERIC(18,4))),0) AS revenue 
+          FROM buffer_paypal_notification 
+          WHERE txn_type='#{BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_PAYMENT}'
+        "].first[:revenue]
       end
 
       # get the id of the first invoice of the series of IPNs that started with the same invoice.
@@ -193,13 +197,15 @@ module BlackStack
           # de la segunda factura en adelante, se generan con un ID diferente, pero se le guarda a subscr_id para identificar cuado llegue el pago de esa factura
           if i.nil?
             # busco una factura en estado UNPAID que este vinculada a esta suscripcion
-            q =
-            "SELECT TOP 1 i.id AS iid " + 
-            "FROM invoice i WITH (NOLOCK) " +
-            "WHERE i.id_client='#{cid}' " +
-            "AND ISNULL(i.status,#{BlackStack::I2P::Invoice::STATUS_UNPAID})=#{Invoice::STATUS_UNPAID} " +
-            "AND i.subscr_id = '#{self.subscr_id}' " +
-            "ORDER BY i.billing_period_from ASC "
+            q = "
+              SELECT i.id AS iid 
+              FROM invoice i 
+              WHERE i.id_client='#{cid}' 
+              AND COALESCE(i.status,#{BlackStack::I2P::Invoice::STATUS_UNPAID})=#{Invoice::STATUS_UNPAID} 
+              AND i.subscr_id = '#{self.subscr_id}'
+              ORDER BY i.billing_period_from ASC
+              LIMIT 1
+            "
             row = DB[q].first
             if row != nil
               i = BlackStack::I2P::Invoice.where(:id=>row[:iid]).first
@@ -290,13 +296,14 @@ module BlackStack
             end
               
             # obtengo la ultima factura pagada, vinculada a un IPN con el mismo codigo invoice
-            row = DB[
-              "SELECT TOP 1 i.id " +
-              "FROM buffer_paypal_notification b " +
-              "JOIN invoice i ON ( self.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::I2P::Invoice::STATUS_PAID.to_s} ) " +
-              "WHERE self.invoice='#{self.invoice}' " +
-              "ORDER BY i.create_time DESC "
-            ].first
+            row = DB["
+              SELECT i.id 
+              FROM buffer_paypal_notification b 
+              JOIN invoice i ON ( self.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::I2P::Invoice::STATUS_PAID.to_s} ) 
+              WHERE self.invoice='#{self.invoice}' 
+              ORDER BY i.create_time DESC 
+              LIMIT 1
+            "].first
             if row.nil?
               raise 'Previous Paid Invoice not found.'
             end

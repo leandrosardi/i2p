@@ -52,7 +52,7 @@ module IPNReprocessing
       "select id " +
       "from #{dname}..movement with (nolock index(IX_movment__id_client__type)) " +
       "where id_client='#{c.id}' " +
-      "and isnull([type],0)<>#{BlackStack::Movement::MOVEMENT_TYPE_CANCELATION.to_s}"
+      "and COALESCE([type],0)<>#{BlackStack::Movement::MOVEMENT_TYPE_CANCELATION.to_s}"
     ].all { |row|
       DB.execute("delete #{dname}..movement where id='#{row[:id]}'")
       DB.disconnect
