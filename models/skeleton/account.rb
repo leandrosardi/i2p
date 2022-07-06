@@ -1,8 +1,8 @@
 module BlackStack
   module I2P
-    # Inherit from BlackStack::I2P::MySaaS::Account.
+    # Inherit from BlackStack::MySaaS::Account.
     # Add methods regarding the I2P extension.
-    class Account < BlackStack::I2P::MySaaS::Account
+    class Account < BlackStack::MySaaS::Account
       one_to_many :subscriptions, :class=>:'BlackStack::I2P::Subscription', :key=>:id_account
       #one_to_many :customplans, :class=>:'BlackStack::I2P::CustomPlan', :key=>:id_account
 
@@ -148,7 +148,7 @@ module BlackStack
 		    
       # return true if the account is no longer allowed to take a trial
       def disabled_trial?
-        !self.disabled_for_trial.nil? && self.disabled_for_trial == true
+        !self.disabled_trial.nil? && self.disabled_trial == true
       end
 
       # 

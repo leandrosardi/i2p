@@ -99,7 +99,7 @@ client = BlackStack::Client.where(:id=>user.id_client).first
 								<%
 								product_type = BlackStack::I2P::products_descriptor.select { |o| o[:code] == t.product_code }.first[:type]
 								%>
-								<i class='<%=BlackStack::I2P::BasePlan.product_type_icon(product_type)%>' title='<%=CGI.escapeHTML(product_type)%>'></i> <%=t.description%>. <b><%=t.detail%></b>.
+								<i class='<%=BlackStack::I2P.product_type_icon(product_type)%>' title='<%=CGI.escapeHTML(product_type)%>'></i> <%=t.description%>. <b><%=t.detail%></b>.
 							</td>						
 						</tr>
 						<%

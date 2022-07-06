@@ -92,7 +92,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 				j.id = guid()
 				j.id_client = c.id
 				j.create_time = now()
-				j.disabled_for_trial = c.disabled_for_trial
+				j.disabled_trial = c.disabled_trial
 				j.save()
 			
 				# genero los datos de esta factura, como la siguiente factura a la que estoy pagando en este momento

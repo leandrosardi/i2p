@@ -7,7 +7,7 @@ module BlackStack
       PARAMS_FLOAT_MULTIPLICATION_FACTOR = 10000
         
       many_to_one :buffer_paypal_notification, :class=>:'BlackStack::I2P::BufferPayPalNotification', :key=>:id_buffer_paypal_notification
-      many_to_one :account, :class=>:'BlackStack::MySaaS::Account', :key=>:id_account
+      many_to_one :account, :class=>:'BlackStack::I2P::Account', :key=>:id_account
       many_to_one :previous, :class=>:'BlackStack::I2P::Invoice', :key=>:id_previous_invoice
       one_to_many :items, :class=>:'BlackStack::I2P::InvoiceItem', :key=>:id_invoice
     
@@ -75,12 +75,12 @@ module BlackStack
 
       # 
       def disabled_trial?
-        return self.disabled_for_trial == false || self.disabled_for_trial == nil
+        return self.disabled_trial == false || self.disabled_trial == nil
       end
     
       # 
       def allowedToAddRemoveItems?
-        return (self.status == STATUS_UNPAID || self.status == nil) && (self.disabled_for_add_remove_items == false || self.disabled_for_add_remove_items == nil)
+        return (self.status == STATUS_UNPAID || self.status == nil) && (self.disabled_modification == false || self.disabled_modification == nil)
       end
       
       # 
@@ -409,7 +409,7 @@ module BlackStack
         # si el plan tiene un primer trial, y
         # es la primer factura, entonces:
         # => se trata del primer pago por trial
-        if h[:trial_fee] != nil && prev1.nil? && !self.disabled_for_trial
+        if h[:trial_fee] != nil && prev1.nil? && !self.disabled_trial
           units = h[:trial_credits].to_i
           unit_price = h[:trial_fee].to_f / h[:trial_credits].to_f
           billing_period_to = DB["SELECT DATEADD(#{h[:trial_period].to_s}, +#{h[:trial_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
@@ -423,12 +423,12 @@ module BlackStack
           billing_period_to = DB["SELECT DATEADD(#{h[:trial2_period].to_s}, +#{h[:trial2_units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
 
         # si el plan tiene un fee, y
-        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION
+        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::PAYMENT_SUBSCRIPTION
           units = n.to_i * h[:credits].to_i
           unit_price = h[:fee].to_f / h[:credits].to_f
           billing_period_to = DB["SELECT DATEADD(#{h[:period].to_s}, +#{h[:units].to_s}, '#{self.billing_period_from.to_s}') AS [now]"].map(:now)[0].to_s
     
-        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO
+        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO
           units = n.to_i * h[:credits].to_i
           unit_price = h[:fee].to_f / h[:credits].to_f
           billing_period_to = billing_period_from
@@ -511,7 +511,7 @@ module BlackStack
         self.id_buffer_paypal_notification = nil
         self.id_previous_invoice = i.id
         self.subscr_id = i.subscr_id 
-        self.disabled_for_add_remove_items = true
+        self.disabled_modification = true
 
         i.items.each { |t| 
           self.add_item(t.item_number, t.number_of_packages)
@@ -710,13 +710,13 @@ module BlackStack
         j.id = guid()
         j.id_account = c.id
         j.create_time = now()
-        j.disabled_for_trial = c.disabled_for_trial
+        j.disabled_trial = c.disabled_trial
         j.id_buffer_paypal_notification = nil
         j.status = BlackStack::I2P::Invoice::STATUS_REFUNDED
         j.billing_period_from = self.billing_period_from
         j.billing_period_to = self.billing_period_to
         j.paypal_url = nil
-        j.disabled_for_add_remove_items = true
+        j.disabled_modification = true
         j.subscr_id = self.subscr_id
         j.id_previous_invoice = self.id
         j.save()

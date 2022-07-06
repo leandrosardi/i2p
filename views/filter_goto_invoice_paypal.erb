@@ -2,7 +2,7 @@
 <%
 iid = params[:iid]
 invoice = BlackStack::Invoice.where(:id=>iid).first
-invoice.disabled_for_add_remove_items = true
+invoice.disabled_modification = true
 invoice.save
 redirect invoice.paypal_url
 %>

@@ -1,26 +1,48 @@
-require 'blackstack_commons'
-require 'pampa_workers'
-
-# 
-# 
-# 
 module BlackStack
   module I2P
     # constants
     PAYPAL_ORDERS_URL = "https://www.paypal.com"
     
     # static attributes
-    @@paypal_business_email = "sardi.leandro.daniel@gmail.com"
+    @@paypal_business_email = nil # "sardi.leandro.daniel@gmail.com"
     @@paypal_orders_url = BlackStack::I2P::PAYPAL_ORDERS_URL
-    @@paypal_ipn_listener = "#{CS_HOME_WEBSITE}/api1.3/accounting/paypal/notify_new_invoice.json"
+    @@paypal_ipn_listener = nil # "#{CS_HOME_WEBSITE}/api1.0/i2p/paypal/ipn.json"
     @@products_descriptor = []
     @@plans_descriptor = []
     
+    # constant values for different type of plans (pay as you go, subscription)
+    PAYMENT_PAY_AS_YOU_GO = 0
+    PAYMENT_SUBSCRIPTION = 1
+
+    # constant values for different type of consumtion (consume by unit, or consume by period of time)
+    CONSUMPTION_BY_UNIT = 0 # el producto se conume credito por credito. Ejemplo: lead records.
+    CONSUMPTION_BY_TIME = 1 # el producto exira al final del periodo de la factura. Ejemplos: Publicidad. Membresía.  
+
+    #
+    def self.payment_types()
+      [PAYMENT_PAY_AS_YOU_GO, PAYMENT_SUBSCRIPTION]
+    end
+
+    def self.payment_type_description(type)
+      return 'Pay as You Go' if type == PAYMENT_PAY_AS_YOU_GO
+      return 'Subscription' if type == PAYMENT_SUBSCRIPTION
+    end
+
+    #
+    def self.consumption_types()
+      [CONSUMPTION_BY_UNIT, CONSUMPTION_BY_TIME]
+    end
+
+    def self.consumption_type_description(type)
+      return 'Pay as You Go' if type == CONSUMPTION_BY_UNIT
+      return 'Subscription' if type == CONSUMPTION_BY_TIME
+    end
+
     # getters & setters
-    def self.set_config(h)
-      @@paypal_business_email = h[:paypal_business_email]
-      @@paypal_orders_url = h[:paypal_orders_url]
-      @@paypal_ipn_listener = h[:paypal_ipn_listener]
+    def self.set(h)
+      @@paypal_business_email = h['paypal_business_email'] if h.has_key?('paypal_business_email')
+      @@paypal_orders_url = h['paypal_orders_url'] if h.has_key?('paypal_orders_url')
+      @@paypal_ipn_listener = h['paypal_ipn_listener'] if h.has_key?('paypal_ipn_listener')
     end
       
     def self.set_paypal_business_email(email)
@@ -66,52 +88,5 @@ module BlackStack
       raise "Product not found" if ret.nil?
       ret 
     end
-
-    class BasePlan
-      PAYMENT_PAY_AS_YOU_GO = 'G'
-      PAYMENT_SUBSCRIPTION = 'S'
-
-      CONSUMPTION_BY_UNIT = 0 # el producto se conume credito por credito. Ejemplo: lead records.
-      CONSUMPTION_BY_TIME = 1 # el producto exira al final del periodo de la factura. Ejemplos: Publicidad. Membresía.  
-
-      PRODUCT_WAREHOUSE = 'Warehouse Service'
-      PRODUCT_SOFTWARE = 'Software Service'
-      PRODUCT_AGENCY = 'Agency Service'
-      PRODUCT_EDUCATION = 'Education Service'
-      PRODUCT_OTHER = 'Other Service'
-  
-      #
-      def self.payment_types()
-        [PAYMENT_PAY_AS_YOU_GO, PAYMENT_SUBSCRIPTION]
-      end
-
-      def self.payment_type_description(type)
-        return 'Pay as You Go' if type == PAYMENT_PAY_AS_YOU_GO
-        return 'Subscription' if type == PAYMENT_SUBSCRIPTION
-      end
-
-      #
-      def self.consumption_types()
-        [CONSUMPTION_BY_UNIT, CONSUMPTION_BY_TIME]
-      end
-
-      def self.consumption_type_description(type)
-        return 'Pay as You Go' if type == CONSUMPTION_BY_UNIT
-        return 'Subscription' if type == CONSUMPTION_BY_TIME
-      end
-
-      # 
-      def self.product_types()
-        [PRODUCT_WAREHOUSE, PRODUCT_SOFTWARE, PRODUCT_AGENCY, PRODUCT_EDUCATION, PRODUCT_OTHER]  
-      end
-
-      def self.product_type_icon(s)
-        return "icon-cloud" if s == PRODUCT_WAREHOUSE
-        return "icon-desktop" if s == PRODUCT_SOFTWARE
-        return "icon-coffee" if s == PRODUCT_AGENCY 
-        return "icon-book" if s == PRODUCT_EDUCATION
-        return "icon-help" if s == PRODUCT_OTHER
-      end
-    end # class BasePlan
   end # module I2P
 end # module BlackStack

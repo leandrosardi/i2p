@@ -1,5 +1,5 @@
 module BlackStack
-  class I2P
+  module I2P
     class Movement < Sequel::Model(:movement)    
       many_to_one :invoiceItem, :class=>:'BlackStack::I2P::InvoiceItem', :key=>:id_invoice_item
       many_to_one :account, :class=>:'BlackStack::I2P::Account', :key=>:id_account

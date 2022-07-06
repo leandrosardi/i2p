@@ -64,8 +64,8 @@ BlackStack::I2P::set_products([
 	:code=>'dedicated-support', 
 	:name=>'Dedicated Support', 
 	:unit_name=>'support agents', 
-	:consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-	:type=>BlackStack::I2P::BasePlan::PRODUCT_AGENCY,
+	:consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+	:type=>BlackStack::I2P::PRODUCT_AGENCY,
 	:description=>'Dedicated Support, Consultancy & Campaigns Management.',
 	:summary=>'Get One Account Manager for Your Campaigns.',
 	:thumbnail=>'https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png',
@@ -75,8 +75,8 @@ BlackStack::I2P::set_products([
 	:code=>'2020-event-ticket', 
 	:name=>'Ticket to the BlackStack eCommerce Summit 2020', 
 	:unit_name=>'tickets', 
-	:consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-	:type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+	:consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+	:type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
 	:description=>'Ticket to the BlackStack eCommerce Summit 2020. Live Streaming of all the Converences.', 
 	:summary=>'The BlackStack eCommerce Summit is the larger event about building aggressive and cost effective marketing strategies using the BlackStack framework and many other resources.',
 	:thumbnail=>'https://portfolio-openxcell.s3.amazonaws.com/resource/77/cover/cover.png',
@@ -96,7 +96,7 @@ BlackStack::I2P::set_plans([
 # Dedicated Support
 {
 	# recurrent billing plan
-	:type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION,  
+	:type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,  
 	
 	:public=>true,
 	
@@ -120,7 +120,7 @@ BlackStack::I2P::set_plans([
 },
 {
 	# recurrent billing plan
-	:type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION,  
+	:type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,  
 	
 	:public=>true,
 	

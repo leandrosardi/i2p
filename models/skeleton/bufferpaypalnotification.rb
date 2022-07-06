@@ -226,7 +226,7 @@ module BlackStack
           j.id = guid()
           j.id_client = c.id
           j.create_time = now()
-          j.disabled_for_trial = c.disabled_for_trial
+          j.disabled_trial = c.disabled_trial
           j.save()
       
           # genero los datos de esta factura, como la siguiente factura a la que estoy pagando en este momento
@@ -267,48 +267,47 @@ module BlackStack
               s.save
             end
       
-          elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_FAILED)
-            # TODO: actualizar registro en la tabla subscriptions. notificar al usuario
+        elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_FAILED)
+          # TODO: actualizar registro en la tabla subscriptions. notificar al usuario
       
-          elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_MODIFY)
-            # TODO: ?
+        elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_MODIFY)
+          # TODO: ?
       
-          elsif (self.txn_type.to_s == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_REFUND)
-            # PROBLEMA: Los IPN no dicen de a quÃ© pago corresponde el reembolso
+        elsif (self.txn_type.to_s == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_REFUND)
+          # PROBLEMA: Los IPN no dicen de a quÃ© pago corresponde el reembolso
             
-            payment_gross = 0
-            if self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_CENCELED_REVERSAL
-              payment_gross = 0 - self.payment_gross.to_f - self.payment_fee.to_f 
-            elsif self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_REFUNDED || self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_REVERSED
-              payment_gross = self.payment_gross.to_f # en negativo 
-            end
-            if payment_gross < 0
-              # validation: verifico que la factura por este IPN no exista
-              j = BlackStack::I2P::Invoice.where(:id_buffer_paypal_notification=>self.id).first
-              if !j.nil?
-                raise 'Invoice already exists.'
-              end
-              
-              # obtengo la ultima factura pagada, vinculada a un IPN con el mismo codigo invoice
-              row = DB[
-                "SELECT TOP 1 i.id " +
-                "FROM buffer_paypal_notification b " +
-                "JOIN invoice i ON ( self.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::I2P::Invoice::STATUS_PAID.to_s} ) " +
-                "WHERE self.invoice='#{self.invoice}' " +
-                "ORDER BY i.create_time DESC "
-              ].first
-              if row.nil?
-                raise 'Previous Paid Invoice not found.'
-              end
-              k = BlackStack::I2P::Invoice.where(:id=>row[:id]).first
-              
-              # creo la factura por el reembolso
-              k.refund(payment_gross)  
-            end
-          else
-            # unknown
+          payment_gross = 0
+          if self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_CENCELED_REVERSAL
+            payment_gross = 0 - self.payment_gross.to_f - self.payment_fee.to_f 
+          elsif self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_REFUNDED || self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_REVERSED
+            payment_gross = self.payment_gross.to_f # en negativo 
           end
-        end # DB.transaction
+          if payment_gross < 0
+            # validation: verifico que la factura por este IPN no exista
+            j = BlackStack::I2P::Invoice.where(:id_buffer_paypal_notification=>self.id).first
+            if !j.nil?
+              raise 'Invoice already exists.'
+            end
+              
+            # obtengo la ultima factura pagada, vinculada a un IPN con el mismo codigo invoice
+            row = DB[
+              "SELECT TOP 1 i.id " +
+              "FROM buffer_paypal_notification b " +
+              "JOIN invoice i ON ( self.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::I2P::Invoice::STATUS_PAID.to_s} ) " +
+              "WHERE self.invoice='#{self.invoice}' " +
+              "ORDER BY i.create_time DESC "
+            ].first
+            if row.nil?
+              raise 'Previous Paid Invoice not found.'
+            end
+            k = BlackStack::I2P::Invoice.where(:id=>row[:id]).first
+              
+            # creo la factura por el reembolso
+            k.refund(payment_gross)  
+          end
+        else
+          # unknown
+        end
       end # def process
     end # class
   end # module I2P

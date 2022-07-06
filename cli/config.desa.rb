@@ -77,8 +77,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Dedicated Support", 
     :unit_name=>"agent", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_AGENCY,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_AGENCY,
     :description=>"Dedicated Support, Optimization & Campaigns Management.",
     :summary=>"Get One Account Manager for Your Campaigns.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -93,8 +93,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"SocialSellingMachine", 
     :unit_name=>"warm leads", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_AGENCY,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+    :type=>BlackStack::I2P::PRODUCT_AGENCY,
     :description=>"SocialSellingMachine Program", 
     :summary=>"Receive emails of people interested in what you offer.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -111,8 +111,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Processing Threads", 
     :unit_name=>"threads", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
     :description=>"Additional Processing Threads for your Automation.",
     :summary=>"Get many processing threads working in paralell in order to scale your campaign.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -126,8 +126,8 @@ BlackStack::I2P::set_products([
     :code=>PRODUCT_SRV, 
     :name=>"Dedicated Servers", 
     :unit_name=>"servers", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
     :description=>"Dedicated Server for Isolated Fingerprinting.",
     :summary=>"You can assign a limited number of accounts to each dedicated server, so you can control the stealth of your whole farm.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -138,8 +138,8 @@ BlackStack::I2P::set_products([
     :code=>PRODUCT_SBR, 
     :name=>"Stealth Browser Profiles", 
     :unit_name=>"profiles", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
     :description=>"Stealth Browser Profiles with Counter-Fingerprinting Technology Included.",
     :summary=>"Each Stealth Browser Profile will spoof both: software and hardward fingerprints. It's good to launch as many accounts as you want in one single thread.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -153,8 +153,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Account Storage", 
     :unit_name=>"MBs", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
     :description=>"512MB Storage in your Account.",
     :summary=>"Disk Space for Browser Profiles, Logs, Pictures, Reports.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -169,8 +169,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Cloud Logging", 
     :unit_name=>"logfiles", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_SOFTWARE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_SOFTWARE,
     :description=>"Save and analyze your logs in the cloud.",
     :summary=>"Save and analyze your logs in the cloud. Publish your logs in any website.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -185,8 +185,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Host Monitoring", 
     :unit_name=>"hosts", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_SOFTWARE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_SOFTWARE,
     :description=>"Real-time monitor of CPU, RAM and disk space.",
     :summary=>"Setup threashold alerts and get email notifications before your servers break down.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -201,8 +201,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Linked Prospector", 
     :unit_name=>"invitations", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_SOFTWARE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_SOFTWARE,
     :description=>"Generate Sales on LinkedIn through automated prospecting.",
     :summary=>"Unlimited accounts allowed. Setup automated invitations & messages follow-ups. Manage one unique conversation with every lead. Manage the chat of thousands of accounts from one single dashboard. Proprietary browser with counter-fingerprinting technology.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -217,8 +217,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Automation", 
     :unit_name=>"rules", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_SOFTWARE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_SOFTWARE,
     :description=>"Move leads between pipelines.",
     :summary=>"Move leads between pipelines, in order to do a high customized campaign.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -233,8 +233,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Linked Scraper", 
     :unit_name=>"searches", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_SOFTWARE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_SOFTWARE,
     :description=>"Replacate and Scrape Sales Navigator Searches.",
     :summary=>"Scrape 90% of any LinkedIn search, even if the search is larger than 10,000 results.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -249,8 +249,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Farming", 
     :unit_name=>"accounts", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_SOFTWARE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_SOFTWARE,
     :description=>"More Slots to Upload Your Own Accounts.",
     :summary=>"Automated Signup, Email Confirmation, Profile Edition. SMS Verifictions. Captcha Resolving. One Stealth Browser Profiles for each Account with Counter-Fingerprinting Technology.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -265,8 +265,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Phone Verified Accounts", 
     :unit_name=>"pva credits", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
     :description=>"LinkedIn Accounts for Sale.",
     :summary=>"Every account is worth $1 or more depending upon how old is it and how many connections it already has. Don't include proxies.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -281,8 +281,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"IPv6 Proxies", 
     :unit_name=>"proxies", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
     :description=>"Mass Bulk Fresh IPv6 Proxies.",
     :summary=>"Mass warehouse of IPv6 proxies for social accounts.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -297,8 +297,8 @@ BlackStack::I2P::set_products([
     :icon => "program.ssm.png", 
     :name=>"Social Accounts for Rent", 
     :unit_name=>"accounts", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
     :description=>"Social Accounts Rental. Include Proxies.",
     :summary=>"Social accounts rental. Include proxies. You can't login the accounts yourself. But you can handle them through our platform and watch their activity.",
     :thumbnail=>"#{CS_HOME_WEBSITE}/apps/images/modules.png",
@@ -312,44 +312,44 @@ BlackStack::I2P::set_products([
     :public=>false,
     :name=>"Email Forwarding", 
     :unit_name=>"email addresses", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_SOFTWARE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_SOFTWARE,
   },
 =begin
   { 
     :code=>PRODUCT_FLD, 
     :name=>"FreeLeadsData", 
     :unit_name=>"records", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_SOFTWARE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+    :type=>BlackStack::I2P::PRODUCT_SOFTWARE,
   },
   { 
     :code=>PRODUCT_IPJ, 
     :name=>"InvitePeopleToJoin", 
     :unit_name=>"members", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_AGENCY,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+    :type=>BlackStack::I2P::PRODUCT_AGENCY,
   },
   { 
     :code=>PRODUCT_IP4, 
     :name=>"IPv4 Proxies", 
     :unit_name=>"proxies", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
   },
   { 
     :code=>PRODUCT_IPM, 
     :name=>"Mobile Proxies", 
     :unit_name=>"proxies", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_UNIT, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_WAREHOUSE,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_UNIT, 
+    :type=>BlackStack::I2P::PRODUCT_WAREHOUSE,
   },
   { 
     :code=>PRODUCT_EDU, 
     :name=>"BlackStack Seminars", 
     :unit_name=>"seminar", 
-    :consumption=>BlackStack::I2P::BasePlan::CONSUMPTION_BY_TIME, 
-    :type=>BlackStack::I2P::BasePlan::PRODUCT_EDUCATION,
+    :consumption=>BlackStack::I2P::CONSUMPTION_BY_TIME, 
+    :type=>BlackStack::I2P::PRODUCT_EDUCATION,
   },
 =end
 ])
@@ -358,7 +358,7 @@ BlackStack::I2P::set_plans([
 =begin
   # Programas de Educacion
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO,
+    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO,
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_EDU, 
@@ -375,7 +375,7 @@ BlackStack::I2P::set_plans([
   },
   
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_EDU, 
@@ -399,7 +399,7 @@ BlackStack::I2P::set_plans([
 
   # Dedicated Support
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SUP, 
@@ -431,7 +431,7 @@ BlackStack::I2P::set_plans([
 # 
   # LinkedIn Prospector
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_DRX, 
@@ -462,7 +462,7 @@ BlackStack::I2P::set_plans([
 
   # Programa SSM - Planes Mensuales
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true, # used in the landing page
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -495,7 +495,7 @@ BlackStack::I2P::set_plans([
   
   # Programa SSM - Planes Mensuales
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true, # used in the landing page
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -534,7 +534,7 @@ BlackStack::I2P::set_plans([
 
   # Programa SSM - Planes Mensuales
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -565,7 +565,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 3, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -598,7 +598,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 3, # default 0
   }, 
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -633,7 +633,7 @@ BlackStack::I2P::set_plans([
 
   # Programa SSM - Abonos Fijos por Unica Vez
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
+    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -660,7 +660,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 3, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
+    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -687,7 +687,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 3, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
+    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -715,7 +715,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 3, # default 0
   }, 
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
+    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM, 
@@ -745,7 +745,7 @@ BlackStack::I2P::set_plans([
 
   # Programa SSM - Ofertas - Flash Sales - Tripwires
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION,
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,
     :public=>false,
     :one_time_offer=>true, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SSM,
@@ -775,7 +775,7 @@ BlackStack::I2P::set_plans([
   
   # Threads
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_THR, 
@@ -804,7 +804,7 @@ BlackStack::I2P::set_plans([
 =begin
   # Dedicated Servers
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SRV, 
@@ -821,7 +821,7 @@ BlackStack::I2P::set_plans([
 
   # Stealth Browsers
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SBR, 
@@ -838,7 +838,7 @@ BlackStack::I2P::set_plans([
 =end
   # Storage
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_STO, 
@@ -860,7 +860,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_STO, 
@@ -882,7 +882,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_STO, 
@@ -906,7 +906,7 @@ BlackStack::I2P::set_plans([
 
   # Simple Hosts Monitoring - Small
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SHM, 
@@ -930,7 +930,7 @@ BlackStack::I2P::set_plans([
 
   # Simple Hosts Monitoring - Medium
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SHM, 
@@ -954,7 +954,7 @@ BlackStack::I2P::set_plans([
 
   # Simple Hosts Monitoring - Large
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_SHM, 
@@ -978,7 +978,7 @@ BlackStack::I2P::set_plans([
 
   # LinkedIn Prospector
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_DRX, 
@@ -1007,7 +1007,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_DRX, 
@@ -1036,7 +1036,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_DRX, 
@@ -1067,7 +1067,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_EDB, 
@@ -1095,7 +1095,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_EDB, 
@@ -1123,7 +1123,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_EDB, 
@@ -1151,7 +1151,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_MAC, 
@@ -1177,7 +1177,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_MAC, 
@@ -1203,7 +1203,7 @@ BlackStack::I2P::set_plans([
 		:expiration_lead_units => 7, # default 0
   },
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_MAC, 
@@ -1231,8 +1231,8 @@ BlackStack::I2P::set_plans([
 
   #
   {
-#    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION,   
+#    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,   
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_PVA, 
@@ -1260,7 +1260,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
+    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_PVA, 
@@ -1288,7 +1288,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
+    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_PVA, 
@@ -1316,7 +1316,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_PAY_AS_YOU_GO, 
+    :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_PVA, 
@@ -1344,7 +1344,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_IP6, 
@@ -1368,7 +1368,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_ACC, 
@@ -1397,7 +1397,7 @@ BlackStack::I2P::set_plans([
 =begin
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_FLD, 
@@ -1422,7 +1422,7 @@ BlackStack::I2P::set_plans([
 
   #
   {
-    :type=>BlackStack::I2P::BasePlan::PAYMENT_SUBSCRIPTION, 
+    :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
     :product_code=>PRODUCT_IPJ, 

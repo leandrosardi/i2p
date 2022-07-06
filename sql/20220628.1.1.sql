@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS invoice (
 	paypal_url varchar(8000) NULL,
 	automatic_billing boolean NULL,
 	subscr_id varchar(500) NULL,
-	disabled_for_trial boolean NULL,
-	disabled_for_add_remove_items boolean NULL,
+	disabled_trial boolean NULL,
+	disabled_modification boolean NULL,
 	id_previous_invoice uuid NULL REFERENCES invoice(id),
 	delete_time timestamp NULL
 );
@@ -136,3 +136,6 @@ CREATE TABLE IF NOT EXISTS subscription (
 	stat_cencelation_notification_time timestamp NULL,
 	stat_creation_notification_time timestamp NULL
 );
+
+ALTER TABLE invoice RENAME disabled_trial TO disabled_trial;
+ALTER TABLE invoice RENAME disabled_modification TO disabled_modification;
