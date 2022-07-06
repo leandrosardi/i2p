@@ -3,7 +3,7 @@
 <%
 login = @login
 user = BlackStack::User.where(:id=>login.id_user).first
-client = BlackStack::Client.where(:id=>user.id_client).first
+account = BlackStack::Client.where(:id=>user.id_account).first
 %>
 
 
@@ -25,7 +25,7 @@ client = BlackStack::Client.where(:id=>user.id_client).first
 					<table>
 					<%
 					n = 0
-					client.subscriptions.each { |subs|
+					account.subscriptions.each { |subs|
 						%>
 						<tr>
 							<td colspan=10>
@@ -119,7 +119,7 @@ client = BlackStack::Client.where(:id=>user.id_client).first
 					# libero recursos
 					GC.start
 					DB.disconnect
-					} # client.subscriptions.each
+					} # account.subscriptions.each
 					%>
 					</table>
 					

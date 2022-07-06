@@ -3,7 +3,7 @@
 <%
 login = @login
 user = BlackStack::User.where(:id=>login.id_user).first
-c = BlackStack::Client.where(:id=>user.id_client).first
+c = BlackStack::Client.where(:id=>user.id_account).first
 %>
 
 
@@ -66,7 +66,7 @@ c = BlackStack::Client.where(:id=>user.id_client).first
 
 						<%
 						n = 0
-						BlackStack::Movement.where(:id_client=>login.user.client.id).order(:create_time).all { |m|
+						BlackStack::Movement.where(:id_account=>login.user.account.id).order(:create_time).all { |m|
 							n += 1
 							prod = BlackStack::I2P::products_descriptor.select { |p| p[:code] == m.product_code }.first
 						%>

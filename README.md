@@ -100,7 +100,7 @@ BlackStack::I2P::set_plans([
 	
 	:public=>true,
 	
-	# true: this plan is available only if the client has not any other invoice including this plan
+	# true: this plan is available only if the account has not any other invoice including this plan
 	# false: this plan can be purchased many times
 	:one_time_offer=>false,  
 	
@@ -114,7 +114,7 @@ BlackStack::I2P::set_plans([
 	# billing details
 	:credits=>1, # only 1 support agent
 	:normal_fee=>299, # cognitive bias: expensive fee to show it strikethrough, as the normal price. But it's a lie. 
-	:fee=>99, # this is the fee that your will charge to the client, as a special offer price.
+	:fee=>99, # this is the fee that your will charge to the account, as a special offer price.
 	:period=>1,
 	:units=>"M", # billed monthy
 },
@@ -124,7 +124,7 @@ BlackStack::I2P::set_plans([
 	
 	:public=>true,
 	
-	# true: this plan is available only if the client has not any other invoice including this plan
+	# true: this plan is available only if the account has not any other invoice including this plan
 	# false: this plan can be purchased many times
 	:one_time_offer=>false,  
 	
@@ -138,7 +138,7 @@ BlackStack::I2P::set_plans([
 	# billing details
 	:credits=>2, # Oh! 2 support agents!!
 	:normal_fee=>499, # cognitive bias: expensive fee to show it strikethrough, as the normal price. But it's a lie. 
-	:fee=>199, # this is the fee that your will charge to the client, as a special offer price.
+	:fee=>199, # this is the fee that your will charge to the account, as a special offer price.
 	:period=>1,
 	:units=>"M", # billed monthy
 }])
@@ -216,7 +216,7 @@ puts BlackStack::I2P::plans_descriptor
 
 ### Registering Bonus
 
-*(pending: there is not any amount, before such credits are for free, and if the client request refund, you will not refund free credits given to the client)*
+*(pending: there is not any amount, before such credits are for free, and if the account request refund, you will not refund free credits given to the account)*
 
 ### Moving Credits Betwheen Services
 

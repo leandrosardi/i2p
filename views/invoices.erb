@@ -54,7 +54,7 @@ user = @login.user
 
 						<%
 						n = 0
-						BlackStack::Invoice.where(:id_client=>user.client.id, :delete_time=>nil).reverse(:billing_period_from).all { |invoice|
+						BlackStack::Invoice.where(:id_account=>user.account.id, :delete_time=>nil).reverse(:billing_period_from).all { |invoice|
 							n += 1
 						%>
 						<tr>

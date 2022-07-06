@@ -21,7 +21,7 @@ DB = BlackStack::Pampa::db_connection
 BlackStack::Pampa::require_db_classes
 BlackStack::I2P::require_db_classes
 
-# Load client 
+# Load account 
 #
 c = BlackStack::Client.where(:api_key=>BlackStack::Pampa::api_key).first
 

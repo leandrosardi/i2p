@@ -2,7 +2,7 @@ module BlackStack
   module I2P
     class Subscription < Sequel::Model(:subscription)
       many_to_one :buffer_paypal_notification, :class=>:'BlackStack::I2P::BufferPayPalNotification', :key=>:id_buffer_paypal_notification
-      many_to_one :client, :class=>:'BlackStack::I2P::Client', :key=>:id_client
+      many_to_one :account, :class=>:'BlackStack::I2P::Client', :key=>:id_account
       one_to_many :invoices, :class=>:'BlackStack::I2P::Invoice', :key=>:id_subscription
       
       # ----------------------------------------------------------------------------------------- 
@@ -13,14 +13,14 @@ module BlackStack
       # retorna true si existe un registro en :subscription con el mismo valor subscr_id.
       # sin retorna false.
       def self.load(params)
-        BlackStack::Subscription.where(:subscr_id=>params['subscr_id']).first
+        BlackStack::I2P::Subscription.where(:subscr_id=>params['subscr_id']).first
       end
     
       # crea un nuevo objeto BufferPayPalNotification, y le mapea los atributos en el hash params.
       # no guarda el objeto en la base de datos.
       # retorna el objeto creado.
       def self.create(params)
-        s = BlackStack::Subscription.new()
+        s = BlackStack::I2P::Subscription.new()
         s.subscr_id = params['subscr_id'].to_s
         s.last_name = params['last_name'].to_s
         s.residence_country = params['residence_country'].to_s
@@ -57,7 +57,7 @@ module BlackStack
         # campos de uso interno
         ret['id'] = self.id 
         ret['create_time'] = self.create_time.datetime_sql_to_api 
-        ret['id_client'] = self.id_client 
+        ret['id_account'] = self.id_account 
         ret['id_buffer_paypal_notification'] = self.id_buffer_paypal_notification 
         ret['active'] = self.active 
         # vinculacion a objetos
@@ -118,7 +118,7 @@ module BlackStack
           "FROM invoice i " + 
           "WHERE i.subscr_id='#{self.subscr_id.to_s}' "
           ].all { |row|
-            a << BlackStack::Invoice.where(:id=>row[:id]).first
+            a << BlackStack::I2P::Invoice.where(:id=>row[:id]).first
             # release resources 
             DB.disconnect
             GC.start

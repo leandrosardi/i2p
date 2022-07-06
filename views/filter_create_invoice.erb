@@ -2,7 +2,7 @@
 <%
 login = BlackStack::Login.where(:id=>session['login.id']).first
 user = BlackStack::User.where(:id=>login.id_user).first
-c = BlackStack::Client.where(:id=>user.id_client).first
+c = BlackStack::Client.where(:id=>user.id_account).first
 item_number = params["item_number"]
 n = params["n"]
 hPlan = c.plans.select { |h| h[:item_number] == item_number }.first
@@ -22,7 +22,7 @@ end
 # creo la factura
 i = BlackStack::Invoice.new()
 i.id = guid()
-i.id_client = c.id
+i.id_account = c.id
 i.create_time = now()
 i.disabled_trial = c.disabled_trial
 

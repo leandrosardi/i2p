@@ -1,8 +1,8 @@
 <%
 login = BlackStack::Login.where(:id=>session['login.id']).first
 user = login.user
-client = user.client
-division = client.division
+account = user.account
+division = account.division
 
 iid = params[:iid]
 
@@ -114,16 +114,16 @@ end
 
 		<div class="row-fluid">
 			<div class="span10">
-				<strong><%=client.name%></strong>
+				<strong><%=account.name%></strong>
 				<br/>
 				<%
-				if client.hasBillingAddress?
+				if account.hasBillingAddress?
 				%>
-				<%=client.billing_address.to_s%>
+				<%=account.billing_address.to_s%>
 				<br/>
-				<%=client.billing_city.to_s%>, <%=client.billing_state.to_s%>, <%=client.billing_zipcode.to_s%>.
+				<%=account.billing_city.to_s%>, <%=account.billing_state.to_s%>, <%=account.billing_zipcode.to_s%>.
 				<br/>
-				<%=client.billingCountry.name.to_s%>.
+				<%=account.billingCountry.name.to_s%>.
 				<%
 				end
 				%>
@@ -268,7 +268,7 @@ end
 				compatible_upsell_plans = upsell_plans.select { |obj|
 					BlackStack::Invoice.compatibility?( invoice.items.first.plan_descriptor, obj ) &&
 					obj[:public] == true &&
-					!( obj[:one_time_offer] == true && client.has_item(obj[:item_number]) ) &&
+					!( obj[:one_time_offer] == true && account.has_item(obj[:item_number]) ) &&
 					invoice.items.select { |item0| item0.plan_descriptor[:item_number] == obj[:item_number] }.first.nil?
 				}.uniq
 				

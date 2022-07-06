@@ -414,7 +414,7 @@ BlackStack::I2P::set_plans([
     :trial_fee=>1, 
     :trial_units=>15, 
     :trial_period=>"D", 
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -451,7 +451,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "MAC.Plan-20", :period => 1 },
       { :item_number => "STO.Small-Plan", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -484,7 +484,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "ACC.Plan-20", :period => 1 },
       { :item_number => "EDB.Plan-5", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -518,7 +518,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "EDB.Plan-5", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -556,7 +556,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "EDB.Plan-5", :period => 1 },
 #      { :item_number => "MAC.Plan-20", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -589,7 +589,7 @@ BlackStack::I2P::set_plans([
 #      { :item_number => "MAC.Plan-20", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -622,7 +622,7 @@ BlackStack::I2P::set_plans([
 #      { :item_number => "MAC.Plan-45", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -651,7 +651,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "EDB.Plan-5", :period => 1 },
 #      { :item_number => "MAC.Plan-20", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -678,7 +678,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "EDB.Plan-5", :period => 1 },
 #      { :item_number => "MAC.Plan-20", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -706,7 +706,7 @@ BlackStack::I2P::set_plans([
 #      { :item_number => "MAC.Plan-20", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -734,7 +734,7 @@ BlackStack::I2P::set_plans([
 #      { :item_number => "MAC.Plan-45", :period => 1 },
       { :item_number => "SUP.Dedicated-Support", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -764,7 +764,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "EDB.Plan-5", :period => 1 },
 #      { :item_number => "MAC.Plan-20", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -793,7 +793,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>[],
     #:bonus_plans=>[],
-    # Force credits expiration in the moment when the client 
+    # Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -851,7 +851,7 @@ BlackStack::I2P::set_plans([
     :period=>"M", 
     #:upsells=>[],
     #:bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -873,7 +873,7 @@ BlackStack::I2P::set_plans([
     :period=>"M", 
     #:upsells=>[],
     #:bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -895,7 +895,7 @@ BlackStack::I2P::set_plans([
     :period=>"M", 
     #:upsells=>[],
     #:bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -919,7 +919,7 @@ BlackStack::I2P::set_plans([
     :period=>"M", 
     #:upsells=>[],
     #:bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -943,7 +943,7 @@ BlackStack::I2P::set_plans([
     :period=>"M", 
     #:upsells=>[],
     #:bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -967,7 +967,7 @@ BlackStack::I2P::set_plans([
     :period=>"M", 
     #:upsells=>[],
     #:bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -998,7 +998,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "EDB.Plan-5", :period => 1 },
       { :item_number => "MAC.Plan-20", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1027,7 +1027,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "EDB.Plan-15", :period => 1 },
       { :item_number => "MAC.Plan-20", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1056,7 +1056,7 @@ BlackStack::I2P::set_plans([
       { :item_number => "EDB.Plan-50", :period => 1 },
       { :item_number => "MAC.Plan-45", :period => 1 },
     ],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1084,7 +1084,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["PVA.Plan-20", "IP6.Plan-20", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1112,7 +1112,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["PVA.Plan-20", "IP6.Plan-20", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1140,7 +1140,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["PVA.Plan-20", "IP6.Plan-20", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1168,7 +1168,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["PVA.Plan-20", "IP6.Plan-20", "EDB.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1194,7 +1194,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["PVA.Plan-20", "IP6.Plan-20", "EDB.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1220,7 +1220,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["PVA.Plan-20", "IP6.Plan-20", "EDB.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1249,7 +1249,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["DRX.Unique-Plan", "EDB.Unique-Plan", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -1277,7 +1277,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["DRX.Unique-Plan", "EDB.Unique-Plan", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -1305,7 +1305,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["DRX.Unique-Plan", "EDB.Unique-Plan", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -1333,7 +1333,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["DRX.Unique-Plan", "EDB.Unique-Plan", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => false, # default true
@@ -1357,7 +1357,7 @@ BlackStack::I2P::set_plans([
     :period=>"M", 
     #:upsells=>["DRX.Unique-Plan", "EDB.Unique-Plan", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true
@@ -1385,7 +1385,7 @@ BlackStack::I2P::set_plans([
     :trial_period=>"D", 
     #:upsells=>["DRX.Unique-Plan", "EDB.Unique-Plan", "MAC.Unique-Plan"],
     :bonus_plans=>[],
-		# Force credits expiration in the moment when the client 
+		# Force credits expiration in the moment when the account 
 		# renew with a new payment from the same subscription.
 		# Activate this option for every allocation service.
 		:expiration_on_next_payment => true, # default true

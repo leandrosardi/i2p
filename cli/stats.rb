@@ -14,9 +14,9 @@ require_relative './config'
 PARSER = BlackStack::SimpleCommandLineParser.new(
   :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
-    :name=>'id_clients', 
+    :name=>'id_accounts', 
     :mandatory=>true, 
-    :description=>'ID of the client who is consuming credits.', 
+    :description=>'ID of the account who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
     :name=>'name', 
@@ -55,16 +55,16 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     # process 
     begin					
       n = 0
-      PARSER.value('id_clients').split(/,/).each { |cid|
-        # get the client
-        self.logger.logs "Get the client #{cid.to_guid}... "
+      PARSER.value('id_accounts').split(/,/).each { |cid|
+        # get the account
+        self.logger.logs "Get the account #{cid.to_guid}... "
         c = BlackStack::Client.where(:id=>cid).first
         raise 'Client not found' if c.nil?
         self.logger.logf("done (#{c.name})");
 
         n += 1
 
-        # starting client
+        # starting account
         self.logger.logs "Client #{c.name} (#{c.id})... "
         # iterate the list of products
         BlackStack::I2P::products_descriptor.clone.each { |hprod|
@@ -75,7 +75,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           #
           self.logger.done
         }
-        # client done
+        # account done
         self.logger.done
       }
       self.logger.log "#{n.to_s} clients processed!"

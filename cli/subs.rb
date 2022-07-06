@@ -56,12 +56,12 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       self.logger.logs 'Get the invoice... '
 			i = BlackStack::Invoice.where(:id=>PARSER.value('id_invoice')).first
       raise 'Invoice not found' if i.nil?
-      #raise 'Invoice is beling another client' if i.id_client.to_guid != c.id.to_guid
+      #raise 'Invoice is beling another account' if i.id_account.to_guid != c.id.to_guid
 			#raise 'Invoice already linked to another subscription' if !i.subscr_id.nil?
 			self.logger.done
 
-  #      self.logger.logs 'Get the client... '
-      c = i.client
+  #      self.logger.logs 'Get the account... '
+      c = i.account
 #      self.logger.done      
 
       # create the subscription
@@ -71,7 +71,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       s.subscr_id = PARSER.value('code')
       s.id_buffer_paypal_notification = nil
       s.create_time = now
-      s.id_client = c.id
+      s.id_account = c.id
       s.active = true
       s.save
 #      self.logger.done

@@ -9,9 +9,9 @@ require_relative './ipn.0.rb'
 PARSER = BlackStack::SimpleCommandLineParser.new(
   :description => 'Create a movement about a payment received. If this payment is associated to a PayPal subscription, the command will create a new invoice for the next billing cycle too. This command will also run both recalculations and expiration of credits.', 
   :configuration => [{
-    :name=>'id_clients', 
+    :name=>'id_accounts', 
     :mandatory=>true, 
-    :description=>'ID of the client who is consuming credits.', 
+    :description=>'ID of the account who is consuming credits.', 
     :type=>BlackStack::SimpleCommandLineParser::STRING,
   }, {
     :name=>'name', 
@@ -52,9 +52,9 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     
     # process 
     begin					
-      PARSER.value('id_clients').split(/,/).each { |cid|
-        # get the client
-        self.logger.logs "Get the client #{cid.to_guid}... "
+      PARSER.value('id_accounts').split(/,/).each { |cid|
+        # get the account
+        self.logger.logs "Get the account #{cid.to_guid}... "
         report = {:cid=>cid}
         begin
           c = BlackStack::Client.where(:id=>cid).first
@@ -71,7 +71,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           self.logger.logf("done (#{dname})")
       
           # validar que no se tratade la division central
-          self.logger.logs "Validate client's division is not the central... "
+          self.logger.logs "Validate account's division is not the central... "
           raise 'Client assigned to central division' if d.central
           raise "Division #{dname} is known as the central division" if dname == 'kepler'
           self.logger.done
@@ -107,7 +107,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
           report[:result] = 'error'
         end
         reports << report
-      } # PARSER.value('id_clients').split(/,/).each	
+      } # PARSER.value('id_accounts').split(/,/).each	
     rescue => e
       self.logger.error(e)
     end

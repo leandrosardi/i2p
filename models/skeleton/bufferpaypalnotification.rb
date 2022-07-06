@@ -82,6 +82,7 @@ module BlackStack
       # no guarda el objeto en la base de datos.
       # retorna el objeto creado.
       def initialize(params)
+          super()
           self.id = guid
           self.create_time = now
           self.txn_type = params['txn_type'].to_s
@@ -176,12 +177,12 @@ module BlackStack
         end      
         # validation: the IPN must be linked to an account
         a = self.account
-        if c.nil?
+        if a.nil?
           raise "Client not found (payer_email=#{self.payer_email.to_s})."
         end
         
-        # parseo en numero de factura formado por id_client.id_invoice
-        cid = c.id.to_guid
+        # parseo en numero de factura formado por id_account.id_invoice
+        cid = a.id.to_guid
         iid = self.first_invoice_id
     
         # si es un pago por un primer trial, sengundo trial o pago recurrente de suscripcion,
@@ -200,7 +201,7 @@ module BlackStack
             q = "
               SELECT i.id AS iid 
               FROM invoice i 
-              WHERE i.id_client='#{cid}' 
+              WHERE i.id_account='#{cid}' 
               AND COALESCE(i.status,#{BlackStack::I2P::Invoice::STATUS_UNPAID})=#{Invoice::STATUS_UNPAID} 
               AND i.subscr_id = '#{self.subscr_id}'
               ORDER BY i.billing_period_from ASC
@@ -230,9 +231,9 @@ module BlackStack
           # crea una factura para el periodo siguiente (dia, semana, mes, anio)
           j = BlackStack::I2P::Invoice.new()
           j.id = guid()
-          j.id_client = c.id
+          j.id_account = a.id
           j.create_time = now()
-          j.disabled_trial = c.disabled_trial
+          j.disabled_trial = a.disabled_trial
           j.save()
       
           # genero los datos de esta factura, como la siguiente factura a la que estoy pagando en este momento
@@ -249,7 +250,7 @@ module BlackStack
             s.id = guid
             s.id_buffer_paypal_notification = self.id
             s.create_time = now       
-            s.id_client = c.id
+            s.id_account = a.id
             s.active = true
             s.save              
             # obtengo la factura que se creo con esta suscripcion

@@ -27,7 +27,7 @@ BlackStack::I2P::set_plans([
   # billing details
   :credits=>1, # only 1 support agent
   :normal_fee=>299, # cognitive bias: expensive fee to show it strikethrough, as the normal price. But it's a lie. 
-  :fee=>29, # this is the fee that your will charge to the client, as a special offer price.
+  :fee=>29, # this is the fee that your will charge to the account, as a special offer price.
   :period=>1,
   :units=>"M", # billed monthy
 }, {
@@ -47,7 +47,7 @@ BlackStack::I2P::set_plans([
   # billing details
   :credits=>1, # only 1 support agent
   :normal_fee=>899, # cognitive bias: expensive fee to show it strikethrough, as the normal price. But it's a lie. 
-  :fee=>79, # this is the fee that your will charge to the client, as a special offer price.
+  :fee=>79, # this is the fee that your will charge to the account, as a special offer price.
   :period=>1,
   :units=>"M", # billed monthy
 }])

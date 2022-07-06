@@ -1,39 +1,24 @@
-require_relative '../lib/i2p'
-require_relative './conf'
+# load gem and connect database
+require 'mysaas'
+require 'lib/stubs'
+require 'config'
+require 'version'
+DB = BlackStack::CRDB::connect
+require 'lib/skeletons'
+require 'extensions/i2p/lib/skeletons'
+require 'extensions/i2p/i2p'
 
-# We'll create and simulate payments to an invoice with this ID.
-# 
-id_invoice = '71173f0f-5f2d-4b29-8a64-d002c3be8f23'
-id_ipn = 'f79ac9b9-46ee-4fb9-980c-f511c877d209'
+# find the latest created invoice, and its associated account
+i = BlackStack::I2P::Invoice.order(:create_time).last 
+a = i.account
 
-# Choose division to connect.
-# 
-BlackStack::Pampa::set_division_name(
-  'copernico' # central database, where Payment sends all the IPNs
-)
-
-# Connect to database.
-# 
-DB = BlackStack::Pampa::db_connection
-
-# Setup Sequel database classes.
-#
-BlackStack::Pampa::require_db_classes
-BlackStack::I2P::require_db_classes
-
-# Load client 
-#
-c = BlackStack::Client.where(:api_key=>BlackStack::Pampa::api_key).first
-
-# Notar que el numero de factura lleva anexionado el ID del cliente.
-# 
-invoice_number = "#{c.id.to_guid}.#{id_invoice.to_guid}"
+# el numero de factura lleva anexionado el ID del cliente.
+invoice_number = "#{a.id.to_guid}.#{i.id.to_guid}"
 subscr_id = 'I-U1VUKAX36LNE'
 
-# Creo la IPN de forma ficticia, que registra la creacion de una nueva suscripcion de PayPal
-#
+# fake IPN regarding a new subscription
 h = {
-  "id" => id_ipn, 
+  "id" => guid, 
   "create_time" => '20191224150000', 
   "txn_type"=>"subscr_signup", 
   "subscr_id"=>subscr_id, 
@@ -65,6 +50,9 @@ h = {
   "ipn_track_id"=>"ca8c4c88dc752"
 }
 
-# Proceso el IPN
-# 
-BlackStack::BufferPayPalNotification.process(h)
+# save the IPN
+ipn = BlackStack::I2P::BufferPayPalNotification.new(h)
+ipn.save
+
+# process the IPN
+ipn.process

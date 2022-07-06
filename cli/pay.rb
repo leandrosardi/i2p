@@ -67,8 +67,8 @@ class MyCLIProcess < BlackStack::MyLocalProcess
       raise 'Invoice not found' if i.nil?
 			self.logger.done
 			
-      self.logger.logs 'Get the client... '
-			c = i.client
+      self.logger.logs 'Get the account... '
+			c = i.account
 			self.logger.done			
 			
 			# marco la factura como pagada
@@ -90,7 +90,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 				# crea una factura para el periodo siguiente (dia, semana, mes, anio)
 				j = BlackStack::Invoice.new()
 				j.id = guid()
-				j.id_client = c.id
+				j.id_account = c.id
 				j.create_time = now()
 				j.disabled_trial = c.disabled_trial
 				j.save()

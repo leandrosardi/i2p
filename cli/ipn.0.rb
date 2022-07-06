@@ -7,20 +7,20 @@ module IPNReprocessing
     self.logger.logf("done (#{dname})")
 =begin
 # TODO: add this validation to prevent abuses  
-    # verify if this client paid with the same PayPal account than other client
-    self.logger.logs 'Check if the payer_email is not used by other client... '
+    # verify if this account paid with the same PayPal account than other account
+    self.logger.logs 'Check if the payer_email is not used by other account... '
     rows = DB[
       "select distinct x.id, x.name " +
       "from #{dname}..buffer_paypal_notification z " +
-      "join #{dname}..invoice y on ( z.id=y.id_buffer_paypal_notification and y.id_client<>'#{c.id}' ) " +
-      "join #{dname}..client x on x.id=y.id_client " +
+      "join #{dname}..invoice y on ( z.id=y.id_buffer_paypal_notification and y.id_account<>'#{c.id}' ) " +
+      "join #{dname}..account x on x.id=y.id_account " +
       "where z.payer_email COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
       "  select distinct payer_email " +
       "  from kepler..buffer_paypal_notification " + 
       "  where invoice COLLATE SQL_Latin1_General_CP1_CI_AS in ( " + 
       "    select cast(id as varchar(500)) COLLATE SQL_Latin1_General_CP1_CI_AS " + 
       "    from #{dname}..invoice " +
-      "    where id_client='#{c.id}' " + 
+      "    where id_account='#{c.id}' " + 
       "  ) " +
       ") "
     ].all
@@ -33,25 +33,25 @@ module IPNReprocessing
       s += "Please reprocess these other clients before this one:\r\n"
       rows.each { |row| 
         s += 
-        "ipn.reproc id_client=#{row[:id].to_guid}\r\n" + 
-        "ipn.recalc id_client=#{row[:id].to_guid}\r\n" + 
-        "ipn.expire id_client=#{row[:id].to_guid}\r\n"
+        "ipn.reproc id_account=#{row[:id].to_guid}\r\n" + 
+        "ipn.recalc id_account=#{row[:id].to_guid}\r\n" + 
+        "ipn.expire id_account=#{row[:id].to_guid}\r\n"
       }        
       raise s
     end
 =end
 
     # el cliente no puede estar habilitado para trial
-    self.logger.logs 'Set trial off for the client... '
-    DB.execute("update #{dname}..client set disabled_trial=1 where id='#{c.id}'")
+    self.logger.logs 'Set trial off for the account... '
+    DB.execute("update #{dname}..account set disabled_trial=1 where id='#{c.id}'")
     self.logger.done
   
     # delete movements that are not consumptions
     self.logger.logs 'Delete non-consumption movements... '
     DB[
       "select id " +
-      "from #{dname}..movement with (nolock index(IX_movment__id_client__type)) " +
-      "where id_client='#{c.id}' " +
+      "from #{dname}..movement with (nolock index(IX_movment__id_account__type)) " +
+      "where id_account='#{c.id}' " +
       "and COALESCE([type],0)<>#{BlackStack::Movement::MOVEMENT_TYPE_CANCELATION.to_s}"
     ].all { |row|
       DB.execute("delete #{dname}..movement where id='#{row[:id]}'")
@@ -64,7 +64,7 @@ module IPNReprocessing
     # actualizo los amounts a 0
     self.logger.logs 'Update consumption movements with 0 amount, and 0 profits... '
     a = []
-    q = "select id from #{dname}..movement with (nolock index(IX_movment__id_client__type)) where id_client='#{c.id}'"
+    q = "select id from #{dname}..movement with (nolock index(IX_movment__id_account__type)) where id_account='#{c.id}'"
     DB[q].all { |row|
       a << row[:id].to_guid
       if a.size % 100 == 0          
@@ -83,7 +83,7 @@ module IPNReprocessing
     DB[
       "  select i.id " +
       "  from #{dname}..invoice i " +
-      "  where i.id_client='#{c.id}' " +
+      "  where i.id_account='#{c.id}' " +
       "  and not exists ( " +
       "    select distinct b.invoice " +
       "    from kepler..buffer_paypal_notification b " +
@@ -103,7 +103,7 @@ module IPNReprocessing
     DB[
       "select i.id " +
       "from #{dname}..invoice i " + 
-      "where i.id_client='#{c.id}' " +
+      "where i.id_account='#{c.id}' " +
       "and not exists ( " +
       "  select distinct b.invoice " +
       "  from kepler..buffer_paypal_notification b " +
@@ -124,7 +124,7 @@ module IPNReprocessing
     DB[
       "select id " +
       "from #{dname}..invoice " + 
-      "where id_client='#{c.id}' " #+
+      "where id_account='#{c.id}' " #+
       #"and cast([id] as varchar(500)) in ( " +
       #"  select distinct invoice " +
       #"  from kepler..buffer_paypal_notification " +
@@ -146,7 +146,7 @@ module IPNReprocessing
   
     # delete subscriptions
     self.logger.logs 'Delete subscriptions... '
-    DB["select id from #{dname}..subscription where id_client='#{c.id}'"].all { |row|
+    DB["select id from #{dname}..subscription where id_account='#{c.id}'"].all { |row|
       DB.execute("delete #{dname}..subscription where id='#{row[:id]}'")          
       DB.disconnect
       GC.start
@@ -163,7 +163,7 @@ module IPNReprocessing
       "  where invoice COLLATE SQL_Latin1_General_CP1_CI_AS in ( " +
       "    select cast(id as varchar(500)) COLLATE SQL_Latin1_General_CP1_CI_AS " +
       "    from #{dname}..invoice " +
-      "    where id_client='#{c.id}' " +
+      "    where id_account='#{c.id}' " +
       "  ) " +
       ") "
     ].all { |row|
@@ -186,7 +186,7 @@ module IPNReprocessing
       "  where exists ( " +
       "    select cast(i.id as varchar(500)) " +
       "    from #{dname}..invoice i " +
-      "    where id_client='#{c.id}' " +
+      "    where id_account='#{c.id}' " +
       "    and lower(c.invoice) like '%'+lower(cast(i.id as varchar(500)))+'%' " +
       "  ) " +
       ") "
@@ -216,7 +216,7 @@ module IPNReprocessing
     self.logger.logf("done (#{dname})")
 
     # reprocess all the IPNs in the central     
-    DB["SELECT id FROM #{dname}..invoice where id_client='#{c.id}'"].all { |rowi|
+    DB["SELECT id FROM #{dname}..invoice where id_account='#{c.id}'"].all { |rowi|
       self.logger.logs "Process invoice #{rowi[:id]}... "
       BlackStack::BufferPayPalNotification.where("invoice like '%#{rowi[:id]}' and sync_end_time is null").order(:create_time).all { |p|
         self.logger.logs "IPN #{p.id.to_guid}... "
