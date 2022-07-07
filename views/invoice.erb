@@ -25,14 +25,13 @@ end
 	</div>
 </section>
 
-<section class="row-fluid">			
-	<div class="box invoice">
-		<div class="header clearfix row-fluid">
-			<div class='span6'>
-				<div class='span12'>
-					<h3>
+<section class="row-fluid">	
+	<div class='span12 box'>
+		<div class='span6'>
+			<div class='span12'>
+				<h3>
 					<div class='span2' style="align:right;text-align:center;vertical-align:middle;" align="center">
-						<img src='/core/images/logo/32x32-01.png' with='150px' width='32px' height='32px' style="align:center;text-align:center;vertical-align:middle;" align="center" />
+						<img src='/core/images/logo/32x32-01.png' with='32px' style="align:center;text-align:center;vertical-align:middle;" align="center" />
 					</div>
 					<div class='span10' style="align:right;text-align:left;" align="left">
 						<div>
@@ -41,65 +40,65 @@ end
 							INVOICE #: <small><%= invoice.number.to_s%></small>
 						</div>
 					</div>
-					</h3>
-				</div>
-				<div class='span12'>
-					<br>
-					<small><strong>Date</strong></small>
-					<br>
-					<%= invoice.dateDesc%>
-					<address>
-						<%=COMPANY_NAME%>
-						<br>
-						<%=COMPANY_ADDRESS%>
-					</address>
-				</div>
+				</h3>
 			</div>
-			<div class='span6'>
-				<div class="pull-right">
-					
-					<div class="row-fluid">							
-						<div class="span6" style="align:right;text-align:left;" align="left">					
-							<p style='color:<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>;font-size:32px;'>
-								<br>
-								<%=BlackStack::I2P::Invoice.statusDescription(invoice.status)%>
-							</p>
-						</div>
-
-						<div class="span6" style="align:right;text-align:right;" align="center">					
-							<p style='color:<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>;font-size:22px;'>
-								<br>
-								<%
-								if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::I2P::Invoice::STATUS_UNPAID || invoice.status == nil)
-								%>
-								<a style='border: none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='/images/paypal-button-big.png' width='265px' height='102px' /></a>
-								<%
-								elsif invoice.automatic_billing == true
-								%>
-								<button class='btn btn-gray btn-large' disabled><b>Auto Billing</b></button>
-								<%
-								elsif invoice.paypal_url.to_s.size == 0
-								%>
-								<button class='btn btn-gray btn-large' disabled><b>Link Not Found</b></button>
-								<%
-								end
-								%>
-							</p>
-						</div>
-					</div>
-
+			<div class='span12'>
+				<br>
+				<small><strong>Date</strong></small>
+				<br>
+				<%= invoice.dateDesc%>
+				<address>
+					<%=COMPANY_NAME%>
 					<br>
-					<div class="row-fluid" style="align:right;text-align:right;" align="right">
-						<small><strong>Due Date</strong></small>
-						<br>
-						<%= invoice.dueDateDesc%>
-						<br>
-						<small>Period: <%= invoice.billingPeriodFromDesc%> to <%= invoice.billingPeriodToDesc%></small>
-					</div>
-					<br>
-				</div>
-			</div>	
+					<%=COMPANY_ADDRESS%>
+				</address>
+			</div>
 		</div>
+		<div class='span6'>
+			<div class="pull-right">
+				
+				<div class="row-fluid">							
+					<div class="span6" style="align:right;text-align:left;" align="left">					
+						<p style='color:<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>;font-size:32px;'>
+							<br>
+							<%=BlackStack::I2P::Invoice.statusDescription(invoice.status)%>
+						</p>
+					</div>
+					<div class="span6" style="align:right;text-align:right;" align="center">					
+						<p style='color:<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>;font-size:22px;'>
+							<br>
+							<%
+							if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::I2P::Invoice::STATUS_UNPAID || invoice.status == nil)
+							%>
+							<a style='border: none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='/images/paypal-button-big.png' width='265px' height='102px' /></a>
+							<%
+							elsif invoice.automatic_billing == true
+							%>
+							<button class='btn btn-gray btn-large' disabled><b>Auto Billing</b></button>
+							<%
+							elsif invoice.paypal_url.to_s.size == 0
+							%>
+							<button class='btn btn-gray btn-large' disabled><b>Link Not Found</b></button>
+							<%
+							end
+							%>
+						</p>
+					</div>
+				</div>
+
+				<br>
+				<div class="row-fluid" style="align:right;text-align:right;" align="right">
+					<small><strong>Due Date</strong></small>
+					<br>
+					<%= invoice.dueDateDesc%>
+					<br>
+					<small>Period: <%= invoice.billingPeriodFromDesc%> to <%= invoice.billingPeriodToDesc%></small>
+				</div>
+				<br>
+			</div>
+		</div>	
+	</div>
+</section>
 
 		<div class="row-fluid">
 			<div class="span10">
