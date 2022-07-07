@@ -1,12 +1,12 @@
 <%
-login = BlackStack::Login.where(:id=>session['login.id']).first
+login = BlackStack::MySaaS::Login.where(:id=>session['login.id']).first
 user = login.user
 account = user.account
 division = account.division
 
 iid = params[:iid]
 
-invoice = BlackStack::Invoice.where(:id=>iid).first
+invoice = BlackStack::I2P::Invoice.where(:id=>iid).first
 
 add_item_number = params[:add_item_number]
 if add_item_number.to_s.size>0
@@ -71,17 +71,17 @@ end
 					
 					<div class="row-fluid">							
 						<div class="span6" style="align:right;text-align:left;" align="left">					
-							<p style='color:<%=BlackStack::Invoice.statusColor(invoice.status)%>;font-size:32px;'>
+							<p style='color:<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>;font-size:32px;'>
 								<br>
-								<%=BlackStack::Invoice.statusDescription(invoice.status)%>
+								<%=BlackStack::I2P::Invoice.statusDescription(invoice.status)%>
 							</p>
 						</div>
 
 						<div class="span6" style="align:right;text-align:right;" align="center">					
-							<p style='color:<%=BlackStack::Invoice.statusColor(invoice.status)%>;font-size:22px;'>
+							<p style='color:<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>;font-size:22px;'>
 								<br>
 								<%
-								if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::Invoice::STATUS_UNPAID || invoice.status == nil)
+								if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::I2P::Invoice::STATUS_UNPAID || invoice.status == nil)
 								%>
 								<a style='border: none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='../../apps/images/paypal-button-001.png' width='265px' height='102px' /></a>
 								<%
@@ -266,7 +266,7 @@ end
 				}
 				
 				compatible_upsell_plans = upsell_plans.select { |obj|
-					BlackStack::Invoice.compatibility?( invoice.items.first.plan_descriptor, obj ) &&
+					BlackStack::I2P::Invoice.compatibility?( invoice.items.first.plan_descriptor, obj ) &&
 					obj[:public] == true &&
 					!( obj[:one_time_offer] == true && account.has_item(obj[:item_number]) ) &&
 					invoice.items.select { |item0| item0.plan_descriptor[:item_number] == obj[:item_number] }.first.nil?

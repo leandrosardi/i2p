@@ -2,7 +2,7 @@
 <%
 iid = params[:iid]
 remove_item_id = params[:remove_item_id]
-invoice = BlackStack::Invoice.where(:id=>iid).first
+invoice = BlackStack::I2P::Invoice.where(:id=>iid).first
 if invoice.allowedToAddRemoveItems?
 	begin
 		invoice.remove_item(remove_item_id)

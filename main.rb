@@ -1,5 +1,17 @@
 module BlackStack
   module I2P
+
+    # load all the skeletons
+    def self.server_side
+        require 'extensions/i2p/lib/skeletons'
+    end
+
+    # load all the stubs
+    def self.client_side
+        # this extension has not stub
+        #require 'extensions/i2p/lib/stubs'
+    end
+
     # constants
     PAYPAL_ORDERS_URL = "https://www.paypal.com"
     

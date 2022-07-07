@@ -6,7 +6,13 @@ require 'version'
 DB = BlackStack::CRDB::connect
 require 'lib/skeletons'
 require 'extensions/i2p/lib/skeletons'
-require 'extensions/i2p/i2p'
+require 'extensions/i2p/main'
+
+# Setup configuration
+BlackStack::I2P::set({
+    'paypal_business_email' => 'sardi.leandro.daniel@gmail.com',
+    'paypal_ipn_listener' => "#{CS_HOME_WEBSITE}/api1.0/i2p/paypal/ipn.json",
+})
 
 BlackStack::I2P::set_products([
 { 

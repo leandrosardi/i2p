@@ -54,7 +54,7 @@ user = @login.user
 
 						<%
 						n = 0
-						BlackStack::Invoice.where(:id_account=>user.account.id, :delete_time=>nil).reverse(:billing_period_from).all { |invoice|
+						BlackStack::I2P::Invoice.where(:id_account=>user.account.id, :delete_time=>nil).reverse(:billing_period_from).all { |invoice|
 							n += 1
 						%>
 						<tr>
@@ -81,11 +81,11 @@ user = @login.user
 								$<%=invoice.totalDesc.encode_html%>
 							</td>
 							<td>
-								<span class='label label-<%=BlackStack::Invoice.statusColor(invoice.status)%>'><%=BlackStack::Invoice.statusDescription(invoice.status).to_s.downcase%></span>
+								<span class='label label-<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>'><%=BlackStack::I2P::Invoice.statusDescription(invoice.status).to_s.downcase%></span>
 							</td>
 							<td>
 								<%
-								if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::Invoice::STATUS_UNPAID || invoice.status == nil)
+								if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::I2P::Invoice::STATUS_UNPAID || invoice.status == nil)
 								%>
 								<a style='border:none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='../../apps/images/paypal-button-002.png' width='75px' /></a>
 								<%

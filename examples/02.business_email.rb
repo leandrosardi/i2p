@@ -6,7 +6,7 @@ require 'version'
 DB = BlackStack::CRDB::connect
 require 'lib/skeletons'
 require 'extensions/i2p/lib/skeletons'
-require 'extensions/i2p/i2p'
+require 'extensions/i2p/main'
 
 # Setup configuration
 BlackStack::I2P::set({

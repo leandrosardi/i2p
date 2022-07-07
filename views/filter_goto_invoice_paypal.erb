@@ -1,7 +1,7 @@
 <!-- HERE IS HOW TO CATCH POST/GET PARAMETERS -->
 <%
 iid = params[:iid]
-invoice = BlackStack::Invoice.where(:id=>iid).first
+invoice = BlackStack::I2P::Invoice.where(:id=>iid).first
 invoice.disabled_modification = true
 invoice.save
 redirect invoice.paypal_url

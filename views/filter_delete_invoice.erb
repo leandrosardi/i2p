@@ -6,7 +6,7 @@
 	 	redirect_adapted_to_nginx getDivisionURL + '/settings/invoices?errdesc=iid%20Parameter%20Missed.'
 	end
 
-	invoice = BlackStack::Invoice.where(:id=>params['iid']).first
+	invoice = BlackStack::I2P::Invoice.where(:id=>params['iid']).first
 	if ( invoice == nil )
 		DB.disconnect
 		GC.start
