@@ -203,7 +203,7 @@ module BlackStack
         self.save
         # 
         balance = BlackStack::Balance.new(self.account.id, self.product_code, registraton_time)
-        balance.calculate(false)
+        balance.calculate
         total_credits = 0.to_f - balance.credits.to_f
         total_amount = 0.to_f - balance.amount.to_f
         #

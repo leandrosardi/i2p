@@ -55,14 +55,14 @@ BlackStack::I2P::set_plans([
 }])
 
 # find the latest created invoice, and its associated account
-i = BlackStack::I2P::Invoice.order(:create_time).last 
+i = BlackStack::I2P::Invoice.order(:create_time).first 
 a = i.account
 
 # el numero de factura lleva anexionado el ID del cliente.
 invoice_number = "#{a.id.to_guid}.#{i.id.to_guid}"
 subscr_id = 'I-U1VUKAX36LNE'
 
-# fake IPN regarding the payment of the new subscrion in the previous example
+# fake IPN regarding the payment of the new subscription in the previous example
 h = {
   "create_time" => '20191224150000', 
   "transaction_subject"=>"Leads - Starter Plan", 

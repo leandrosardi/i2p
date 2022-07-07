@@ -300,8 +300,8 @@ module BlackStack
             row = DB["
               SELECT i.id 
               FROM buffer_paypal_notification b 
-              JOIN invoice i ON ( self.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::I2P::Invoice::STATUS_PAID.to_s} ) 
-              WHERE self.invoice='#{self.invoice}' 
+              JOIN invoice i ON ( b.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::I2P::Invoice::STATUS_PAID.to_s} ) 
+              WHERE b.invoice='#{self.invoice}' 
               ORDER BY i.create_time DESC 
               LIMIT 1
             "].first

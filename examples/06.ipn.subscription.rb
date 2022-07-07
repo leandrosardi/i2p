@@ -9,7 +9,7 @@ require 'extensions/i2p/lib/skeletons'
 require 'extensions/i2p/i2p'
 
 # find the latest created invoice, and its associated account
-i = BlackStack::I2P::Invoice.order(:create_time).last 
+i = BlackStack::I2P::Invoice.order(:create_time).first 
 a = i.account
 
 # el numero de factura lleva anexionado el ID del cliente.
