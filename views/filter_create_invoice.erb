@@ -31,7 +31,7 @@ i.disabled_trial = c.disabled_trial
 begin
 	i.check_create_item(item_number)
 rescue => e
-	redirect_adapted_to_nginx getDivisionURL + "/settings/credit?errdesc=#{CGI.escape(e.to_s)}"
+	redirect "/settings/credit?errdesc=#{CGI.escape(e.to_s)}"
 end
 
 # save the invoice
@@ -45,6 +45,6 @@ c.disabled_trial = true
 c.save
 
 # redireccionar al dashboard
-redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{i.id.to_guid}"
+redirect "/settings/invoice?iid=#{i.id.to_guid}"
 %>
 <!-- ---------------------------------------- -->

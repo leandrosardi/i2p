@@ -3,7 +3,7 @@
 		DB.disconnect
 		GC.start
 	 	# redireccionar al dashboard
-	 	redirect_adapted_to_nginx getDivisionURL + '/settings/invoices?errdesc=iid%20Parameter%20Missed.'
+	 	redirect '/settings/invoices?errdesc=iid%20Parameter%20Missed.'
 	end
 
 	invoice = BlackStack::I2P::Invoice.where(:id=>params['iid']).first
@@ -11,7 +11,7 @@
 		DB.disconnect
 		GC.start
 	 	# redireccionar al dashboard
-	 	redirect_adapted_to_nginx getDivisionURL + '/settings/invoices?errdesc=Invoice%20Not%20Found.'
+	 	redirect '/settings/invoices?errdesc=Invoice%20Not%20Found.'
 	end
 
 	# actualizo el registro
@@ -23,5 +23,5 @@
     GC.start
 
  	# redireccionar al dashboard
- 	redirect_adapted_to_nginx getDivisionURL + '/settings/invoices?msgdesc=Invoice%20Deleted.'
+ 	redirect '/settings/invoices?msgdesc=Invoice%20Deleted.'
 %>

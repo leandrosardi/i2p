@@ -1,49 +1,38 @@
 <%
 login = BlackStack::MySaaS::Login.where(:id=>session['login.id']).first
 user = login.user
-account = user.account
-division = account.division
-
+account = BlackStack::I2P::Account.where(:id=>user.id_account).first # NOTE: I work with the child class from the module BlackStack::I2P
 iid = params[:iid]
-
 invoice = BlackStack::I2P::Invoice.where(:id=>iid).first
 
 add_item_number = params[:add_item_number]
 if add_item_number.to_s.size>0
 	invoice.add_item(add_item_number)
-	redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}"
+	redirect "/settings/invoice?iid=#{iid}"
 end 
 
 remove_item_id = params[:remove_item_id]
 if remove_item_id.to_s.size>0
 	DB.execute("DELETE invoice_item WHERE [id]='#{remove_item_id}'")
 	invoice.setup
-	redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}"
+	redirect "/settings/invoice?iid=#{iid}"
 end
 %>
 
-<!-- Main navigation bar
+<section class="row-fluid">			
+	<div class='span12'>
+		<%=nav3("Settings", "/settings/dashboard", "Invoices", "/settings/invoices", invoice.number.to_s)%>
+	</div>
+</section>
 
-<!-- Page content
-================================================== -->
-<section class="container">
-
-	<section class="row-fluid">
-			
-		<section class='span12'>
-			<%=nav3("Settings", "#{getDivisionURL}/settings/dashboard", "Invoices", "#{getDivisionURL}/settings/invoices", invoice.number.to_s)%>
-		</section>
-	</section>
-
-	<br/>
-
+<section class="row-fluid">			
 	<div class="box invoice">
 		<div class="header clearfix row-fluid">
 			<div class='span6'>
 				<div class='span12'>
 					<h3>
 					<div class='span2' style="align:right;text-align:center;vertical-align:middle;" align="center">
-						<img src='../../apps/images/logo/32x32-01.png' with='150px' width='75px' height='75px' style="align:center;text-align:center;vertical-align:middle;" align="center" />
+						<img src='/core/images/logo/32x32-01.png' with='150px' width='32px' height='32px' style="align:center;text-align:center;vertical-align:middle;" align="center" />
 					</div>
 					<div class='span10' style="align:right;text-align:left;" align="left">
 						<div>
@@ -83,7 +72,7 @@ end
 								<%
 								if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::I2P::Invoice::STATUS_UNPAID || invoice.status == nil)
 								%>
-								<a style='border: none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='../../apps/images/paypal-button-001.png' width='265px' height='102px' /></a>
+								<a style='border: none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='/images/paypal-button-big.png' width='265px' height='102px' /></a>
 								<%
 								elsif invoice.automatic_billing == true
 								%>
@@ -115,6 +104,7 @@ end
 		<div class="row-fluid">
 			<div class="span10">
 				<strong><%=account.name%></strong>
+<!-- TODO: https://github.com/leandrosardi/i2p/issues/2
 				<br/>
 				<%
 				if account.hasBillingAddress?
@@ -129,6 +119,7 @@ end
 				%>
 				<br/>
 				<small><a href='/settings/clientinformation?redirect=<%=CGI.escape("settings/invoice?iid=#{invoice.id.to_guid}")%>'>Edit Billing Address</a></small>
+-->
 			</div>
 			<div class="span2">
 				<b>TOTAL:</b>
@@ -387,7 +378,7 @@ end
 									</table>
 								</div>
 								<div class='span12'>
-									<p align='right'><a href='./filter_add_invoice_item?iid=<%=iid%>&add_item_number=<%=item.item_number%>'><img src='../../apps/images/addtocart.png' border=0 /></a></p>									
+									<p align='right'><a href='/filter_add_invoice_item?iid=<%=iid%>&add_item_number=<%=item.item_number%>'><img src='/images/addtocart.png' border=0 /></a></p>									
 								</div>
 							</div>
 

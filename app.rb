@@ -21,6 +21,10 @@ get '/settings/filter_create_invoice', :auth => true, :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_create_invoice'
 end
   
+get '/settings/filter_delete_invoice', :agent => /(.*)/ do
+    erb :'/extensions/i2p/views/filter_delete_invoice'
+end
+
 get '/settings/filter_add_invoice_item', :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_add_invoice_item'
 end

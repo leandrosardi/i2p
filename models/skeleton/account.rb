@@ -1,39 +1,45 @@
 module BlackStack
   module I2P
-    # Inherit from BlackStack::MySaaS::Account.
-    # Add methods regarding the I2P extension.
-    class Account < BlackStack::MySaaS::Account
-      one_to_many :subscriptions, :class=>:'BlackStack::I2P::Subscription', :key=>:id_account
-      #one_to_many :customplans, :class=>:'BlackStack::I2P::CustomPlan', :key=>:id_account
+    	# Inherit from BlackStack::MySaaS::Account.
+    	# Add methods regarding the I2P extension.
+    	class Account < BlackStack::MySaaS::Account
+      		one_to_many :subscriptions, :class=>:'BlackStack::I2P::Subscription', :key=>:id_account
+      		#one_to_many :customplans, :class=>:'BlackStack::I2P::CustomPlan', :key=>:id_account
 
-      # Return an array of movements of this account.
-      # 
-      # This method replace the line:
-      # one_to_many :movements, :class=>:'BlackStack::I2P::Movement', :key=>:id_account
-      # 
-      # Because when you have a large number of records in the table movement, for a account, 
-      # then the call to this attribute account.movements can take too much time and generates
-      # a query timeout exception.
-      # 
-      # The call to this method may take too much time, but ti won't raise a query timeout.
-      # 
-      def movements
-        i = 0 
-        ret = []
-        BlackStack::I2P::Movement.where(:id_account=>self.id).each { |o| 
-          ret << o
-          i += 1
-          if i == 1000
-            i = 0
-            GC.start
-            DB.disconnect
-          end
-        }
-        ret
-      end
+	  		def hasBillingAddress?
+				false
+				# TODO: Code Me! 
+				# https://github.com/leandrosardi/i2p/issues/2
+			end
+	
+      		# Return an array of movements of this account.
+      		# 
+      		# This method replace the line:
+      		# one_to_many :movements, :class=>:'BlackStack::I2P::Movement', :key=>:id_account
+      		# 
+      		# Because when you have a large number of records in the table movement, for a account, 
+      		# then the call to this attribute account.movements can take too much time and generates
+      		# a query timeout exception.
+      		# 
+      		# The call to this method may take too much time, but ti won't raise a query timeout.
+      		# 
+      		def movements
+        		i = 0 
+        		ret = []
+        		BlackStack::I2P::Movement.where(:id_account=>self.id).each { |o| 
+          			ret << o
+          			i += 1
+          			if i == 1000
+            			i = 0
+            			GC.start
+            			DB.disconnect
+          			end
+        		}
+        		ret
+      		end
 
-      # crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el accounte, para el producto indicado en product_code. 
-      def consume(product_code, number_of_credits=1, description=nil, datetime=nil)
+      		# crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el accounte, para el producto indicado en product_code. 
+      		def consume(product_code, number_of_credits=1, description=nil, datetime=nil)
 				dt = datetime.nil? ? now() : datetime.to_time.to_sql
 				
 				# create the consumtion
@@ -67,10 +73,10 @@ module BlackStack
 				#self.recalculate(product_code) 
 				# return
 				cons
-      end
+      		end
 
-      # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
-      def bonus(product_code, expiration, number_of_credits=1, description=nil)				
+      		# crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
+      		def bonus(product_code, expiration, number_of_credits=1, description=nil)				
 				bonus_amount = 0 # Los bonos siempre son por un importa igual a 0.
 				
 				bonus = BlackStack::I2P::Movement.new
@@ -91,10 +97,10 @@ module BlackStack
 				#bonus.recalculate
 				# return
 				bonus
-      end
+      		end
 
-      # crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
-      def adjustment(product_code, adjustment_amount=0, adjustment_credits=0, description=nil, type=BlackStack::I2P::Movement::MOVEMENT_TYPE_ADJUSTMENT, registraton_time=nil)
+      		# crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
+      		def adjustment(product_code, adjustment_amount=0, adjustment_credits=0, description=nil, type=BlackStack::I2P::Movement::MOVEMENT_TYPE_ADJUSTMENT, registraton_time=nil)
 				adjust = BlackStack::I2P::Movement.new
 				adjust.id = guid()
 				adjust.id_account = self.id
@@ -110,7 +116,7 @@ module BlackStack
 				adjust.expiration_time = nil
 				adjust.save
 				adjust
-      end
+      		end
 
 			# recalculate the amount for all the consumptions, expirations, and adjustments
 			def recalculate(product_code)
@@ -146,58 +152,58 @@ module BlackStack
 				}
 			end 
 		    
-      # return true if the account is no longer allowed to take a trial
-      def disabled_trial?
-        !self.disabled_trial.nil? && self.disabled_trial == true
-      end
+      		# return true if the account is no longer allowed to take a trial
+      		def disabled_trial?
+        		!self.disabled_trial.nil? && self.disabled_trial == true
+      		end
 
-      # 
-      def get_balance()
-        n = 0
-        BlackStack::I2P::products_descriptor.each { |code| 
-          n += BlackStack::I2P::Balance.new(self.id, code).amount 
-        }
-        n
-      end
+			# 
+			def get_balance()
+				n = 0
+				BlackStack::I2P::products_descriptor.each { |code| 
+				n += BlackStack::I2P::Balance.new(self.id, code).amount 
+				}
+				n
+			end
 
-      # retorna true si existe algun item de factura relacionado al 'plan' ('item_number').
-      # si el atributo 'amount' ademas es distinto a nil, se filtran items por ese monto.
-      def has_item(item_number, amount=nil)
-        h = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number].to_s == item_number.to_s }.first
-        raise "Plan not found" if h.nil?
-            
-        q = 
-        "SELECT i.id " + 
-        "FROM invoice i "
+			# retorna true si existe algun item de factura relacionado al 'plan' ('item_number').
+			# si el atributo 'amount' ademas es distinto a nil, se filtran items por ese monto.
+			def has_item(item_number, amount=nil)
+				h = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number].to_s == item_number.to_s }.first
+				raise "Plan not found" if h.nil?
+					
+				q = 
+				"SELECT i.id " + 
+				"FROM invoice i "
+			
+				# si el plan tiene un trial, entnces se pregunta si ya existe un item de factura por el importe del trial.
+				# si el plan no tiene un trial, entnces se pregunta si ya existe un item de factura por el importe del plan.
+				if amount.nil? 
+				q +=
+				"JOIN invoice_item t ON ( i.id=t.id_invoice AND t.item_number='#{item_number}' ) "
+				else
+				q +=
+				"JOIN invoice_item t ON ( i.id=t.id_invoice AND t.item_number='#{item_number}' AND t.amount=#{amount.to_s} ) "
+				end
+				
+				q +=
+				"WHERE i.id_account='#{self.id}' " +
+				"AND i.delete_time IS NULL "
+				
+				return !DB[q].first.nil?
+			end
     
-        # si el plan tiene un trial, entnces se pregunta si ya existe un item de factura por el importe del trial.
-        # si el plan no tiene un trial, entnces se pregunta si ya existe un item de factura por el importe del plan.
-        if amount.nil? 
-          q +=
-          "JOIN invoice_item t ON ( i.id=t.id_invoice AND t.item_number='#{item_number}' ) "
-        else
-          q +=
-          "JOIN invoice_item t ON ( i.id=t.id_invoice AND t.item_number='#{item_number}' AND t.amount=#{amount.to_s} ) "
-        end
-        
-        q +=
-        "WHERE i.id_account='#{self.id}' " +
-        "AND i.delete_time IS NULL "
-        
-        return !DB[q].first.nil?
-      end
-    
-      # retorna los planes estandar definidos en el array BlackStack::I2P::plans_descriptor, y le concatena los arrays customizados de este accounte definidos en la tabla custom_plan
-      # TODO: someday, add custom plans here
-      def plans
-        a = BlackStack::I2P::plans_descriptor 
+			# retorna los planes estandar definidos en el array BlackStack::I2P::plans_descriptor, y le concatena los arrays customizados de este accounte definidos en la tabla custom_plan
+			# TODO: someday, add custom plans here
+			def plans
+				a = BlackStack::I2P::plans_descriptor 
 =begin
-        self.customplans.each { |p|
-          a << p.to_hash
-        }
+				self.customplans.each { |p|
+				a << p.to_hash
+				}
 =end
-        a
-      end
-    end # class Account
-  end # module I2P
+				a
+			end
+    	end # class Account
+	end # module I2P
 end # module BlackStack

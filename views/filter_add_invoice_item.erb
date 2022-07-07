@@ -7,11 +7,11 @@ if invoice.allowedToAddRemoveItems?
 	begin
 		invoice.add_item(add_item_number)
 	rescue => e
-		redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}&errdesc=#{CGI.escape(e.to_s)}"
+		redirect "/settings/invoice?iid=#{iid}&errdesc=#{CGI.escape(e.to_s)}"
 	end
-	redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}"
+	redirect "/settings/invoice?iid=#{iid}"
 else
-	redirect_adapted_to_nginx getDivisionURL + "/settings/invoice?iid=#{iid}&errdesc=#{CGI.escape("Can't add or remove items from this invoice")}"
+	redirect "/settings/invoice?iid=#{iid}&errdesc=#{CGI.escape("Can't add or remove items from this invoice")}"
 end
 %>
 <!-- ---------------------------------------- -->

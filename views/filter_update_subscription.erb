@@ -5,7 +5,7 @@
 		# libero recursos
 		DB.disconnect
 		GC.start
-		redirect_adapted_to_nginx CS_LOGIN_PAGE
+		redirect CS_LOGIN_PAGE
 	end
 	user = BlackStack::MySaaS::User.where(:id=>login.id_user).first
 
@@ -34,6 +34,6 @@
 	GC.start
   
 	# redireccionar al dashboard
-	redirect_adapted_to_nginx getDivisionURL + '/settings/subscriptions?msg=Subscription%20Updated.'
+	redirect '/settings/subscriptions?msg=Subscription%20Updated.'
 %>
 <!-- ---------------------------------------- -->
