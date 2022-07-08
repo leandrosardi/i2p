@@ -100,6 +100,9 @@ end
 	</div>
 </section>
 
+<section class="row-fluid">	
+	<div class='span12 box'>
+
 		<div class="row-fluid">
 			<div class="span10">
 				<strong><%=account.name%></strong>
@@ -218,18 +221,21 @@ end
 				</table>
 			</div>
 		</div>
-	</div> <!-- <div class="box invoice"> -->
+	</div>
+</section>	
 
-	<section class="row-fluid pull-left">
-			<%
-			if !invoice.allowedToAddRemoveItems?
-			%>
+
+<section class="row-fluid">
+	<div class='span12 box'>
+		<%
+		if !invoice.allowedToAddRemoveItems?
+		%>
 			<table width='100%'>
 				<tr><td colspan='10' style='height:5px;'> </td></tr>
 				</tr>
 			</table>
 	
-			<div class='pull-left span11 box'>
+			<div class='pull-left span11'>
 				<h4>Why I Can't Edit This Invoice?</h4>
 				<p>
 					You can't add or remove items from the invoice after you clicked in the PayPal check out button.<br/>
@@ -398,5 +404,5 @@ end
 		<%
 		end # if invoice.allowedToAddRemoveItems?
 		%>
-	</section>	
+	</div>	
 </section>

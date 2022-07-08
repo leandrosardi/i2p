@@ -468,7 +468,7 @@ module BlackStack
         ret = ""
         ret += "$#{h[:trial_fee]} trial. " if self.disabled_trial? && !h[:trial_fee].nil?
         ret += "$#{h[:trial2_fee]} one-time price. " if self.disabled_trial? && !h[:trial2_fee].nil?
-        ret += "$#{h[:fee]}/#{h[:units]}. " if h[:units].to_i <= 1 
+        ret += "$#{h[:fee]}/#{h[:period]}. " if h[:units].to_i <= 1 
         ret += "$#{h[:fee]}/#{h[:units]}#{h[:period]}. " if h[:units].to_i > 1 
         ret += "#{h[:credits]} credits. " if h[:credits].to_i > 1
         ret
