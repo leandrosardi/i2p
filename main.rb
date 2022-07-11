@@ -99,13 +99,13 @@ module BlackStack
 
     def self.plan_descriptor(item_number)
       plan = BlackStack::I2P::plans_descriptor.select { |h| h[:item_number].to_s == item_number.to_s }.first
-      raise "Plan not found (#{item_number.to_s})" if plan.nil?
+      #raise "Plan not found (#{item_number.to_s})" if plan.nil?
       plan
     end
   
     def self.service_descriptor(service_code)
       ret = BlackStack::I2P::services_descriptor.select { |h| h[:code] == service_code }.first
-      raise "Product not found" if ret.nil?
+      #raise "Product not found" if ret.nil?
       ret 
     end
   end # module I2P

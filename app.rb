@@ -41,5 +41,10 @@ get '/settings/filter_update_subscription', :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_update_subscription'
 end
 
+# AJAX
+post '/ajax/ip2/get_credits.json', :auth => true, :agent => /(.*)/ do
+    erb :'/extensions/i2p/views/ajax/get_credits'
+end
+
 # API (pending)
 # TODO: code API access points

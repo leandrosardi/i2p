@@ -224,7 +224,34 @@ end
 	</div>
 </section>	
 
+<%
+upsell_plans = []
 
+invoice.items.sort_by { |obj| obj.create_time }.reverse.each { |item0|
+	upsells = item0.plan_descriptor[:upsells]
+	#.select { |obj| obj[:item_number] == item0.item_number }.first[:upsells]
+	if !upsells.nil?
+		upsells.each { |upsell_item_number|
+			add_plan = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == upsell_item_number }.first
+			if !add_plan.nil?
+				if upsell_plans.select { |obj| obj[:item_number] == add_plan[:item_number] }.first.nil?
+					upsell_plans << add_plan
+				end
+			end
+			
+		}
+	end
+}
+
+compatible_upsell_plans = upsell_plans.select { |obj|
+	BlackStack::I2P::Invoice.compatibility?( invoice.items.first.plan_descriptor, obj ) &&
+	obj[:public] == true &&
+	!( obj[:one_time_offer] == true && account.has_item(obj[:item_number]) ) &&
+	invoice.items.select { |item0| item0.plan_descriptor[:item_number] == obj[:item_number] }.first.nil?
+}.uniq
+
+if !invoice.allowedToAddRemoveItems? || compatible_upsell_plans.size > 0
+%>
 <section class="row-fluid">
 	<div class='span12 box'>
 		<%
@@ -242,78 +269,53 @@ end
 					After the PayPal order has been generated, is not possible to modifiy the invoice.
 				</p>
 			</div>			
-			<%
-			else
-				upsell_plans = []
-				invoice.items.sort_by { |obj| obj.create_time }.reverse.each { |item0|
-					upsells = item0.plan_descriptor[:upsells]
-					#.select { |obj| obj[:item_number] == item0.item_number }.first[:upsells]
-					if !upsells.nil?
-						upsells.each { |upsell_item_number|
-							add_plan = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == upsell_item_number }.first
-							if !add_plan.nil?
-								if upsell_plans.select { |obj| obj[:item_number] == add_plan[:item_number] }.first.nil?
-									upsell_plans << add_plan
-								end
-							end
+		<%
+		else				
+			if compatible_upsell_plans.size > 0 # TODO: Remove the add-ons from the $1 invoice
+			%>
+				<table width='100%'>
+					<tr><td colspan='10' style='height:5px;'> </td></tr>
+					</tr>
+					<tr>
+						<td colspan='10' style='height:35px;'>
+							<h4>Other Resources That You May Need:</h4>
+						</td>
+					</tr>
+				</table>	
+				<%
+					n = 0
+					compatible_upsell_plans.each { |upsell_plan|
+						upsell_product = BlackStack::I2P::services_descriptor.select { |j| j[:code] == upsell_plan[:service_code] }.first
+						raise 'Product not found.' if upsell_product.nil?
 							
-						}
-					end
-				}
-				
-				compatible_upsell_plans = upsell_plans.select { |obj|
-					BlackStack::I2P::Invoice.compatibility?( invoice.items.first.plan_descriptor, obj ) &&
-					obj[:public] == true &&
-					!( obj[:one_time_offer] == true && account.has_item(obj[:item_number]) ) &&
-					invoice.items.select { |item0| item0.plan_descriptor[:item_number] == obj[:item_number] }.first.nil?
-				}.uniq
-				
-				if compatible_upsell_plans.size > 0 && false # #136: Remove the add-ons from the $1 invoice
-				%>
-					<table width='100%'>
-						<tr><td colspan='10' style='height:5px;'> </td></tr>
-						</tr>
-						<tr>
-							<td colspan='10' style='height:35px;'>
-								<h4>Other Resources That You May Need:</h4>
-							</td>
-						</tr>
-					</table>
-	
-					<%
-						n = 0
-						compatible_upsell_plans.each { |upsell_plan|
-							upsell_product = BlackStack::I2P::services_descriptor.select { |j| j[:code] == upsell_plan[:service_code] }.first
-							raise 'Product not found.' if upsell_product.nil?
+						item = invoice.create_item(upsell_plan[:item_number])
+						%>
 							
-							item = invoice.create_item(upsell_plan[:item_number])
-							%>
+						<%
+						if n % 3 == 0
+						%>
+						<div class="pull-left span12">
+						<%
+						end
+						%>
 							
-							<%
-							if n % 3 == 0
-							%>
-							<div class="pull-left span12">
-							<%
-							end
-							%>
-							
-							<div class='span4 box pull-left'>
-								<div class='span12'>
-									<h4 align="right"><%=item.plan_descriptor[:name]%></h4>						
+						<div class='span4 box pull-left'>
+							<div class='span12'>
+								<h4 align="right"><%=item.plan_descriptor[:name]%></h4>						
+							</div>
+							<div class='span12'>
+								<div class='span4'>
+									<img width='150px' src='<%=upsell_product[:thumbnail]%>'>
 								</div>
-								<div class='span12'>
-									<div class='span4'>
-										<img width='150px' src='<%=upsell_product[:thumbnail]%>'>
-									</div>
-									<div class='span8'>
-										<%
-										if !item.plan_descriptor[:normal_fee].nil?
-											fee = item.plan_descriptor[:fee].to_f
-											normal = item.plan_descriptor[:normal_fee].to_f
-											saving = (normal.to_f - fee.to_f).to_f
-											ratio = (saving.to_f / normal.to_f) * 100.to_f
-										%>
-										<div class='span12'>
+								<div class='span8'>
+									<%
+									if !item.plan_descriptor[:normal_fee].nil?
+										fee = item.plan_descriptor[:fee].to_f
+										normal = item.plan_descriptor[:normal_fee].to_f
+										saving = (normal.to_f - fee.to_f).to_f
+										ratio = (saving.to_f / normal.to_f) * 100.to_f
+									%>
+									<div class='span12'>
 										<table align='right'>
 											<tr>
 												<td align='right'>
@@ -324,7 +326,6 @@ end
 													<span style='color:gray;font-size:14px;text-decoration:line-through;'>$<%=('%.2f' % normal).to_s%></span><br/>													
 												</td>
 											</tr>
-
 											<tr>
 												<td align='right'>
 													<span style='color:gray;font-size:12px;'>Offer:</span><br/>
@@ -334,7 +335,6 @@ end
 													<span style='color:red;font-size:18px;'>$<%=('%.2f' % fee).to_s%></span><br/>
 												</td>
 											</tr>
-
 											<tr>
 												<td align='right'>
 													<span style='color:gray;font-size:12px;'>Saving:</span><br/>
@@ -347,62 +347,62 @@ end
 											
 											<tr><td height='15px'></td></tr>
 										</table>
-										</div>
-										<%
-										end
-										%>
-
-										<div class='span12'>
-										<%
-										if item.plan_descriptor[:type].to_s == 'S'
-										%>
-										<p align='right'>
-											<span style='color:black;'><b>Plan Details:</b></span><br/>
-											<span style='color:gray;'><%=invoice.plan_payment_description(item.plan_descriptor)%></span>
-										</p>
-										<%
-										end
-										%>
-
-										<p align='right'>
-											<span style='color:black;'><b>Description:</b></span><br/>
-											<span style='color:gray;'><%=upsell_product[:description]%></span>
-										</p>
-
-										<p align='right'>
-											<span style='color:black;'><b>Summary:</b></span><br/>
-											<span style='color:gray;font-size:11px;'><%=upsell_product[:summary]%></span>
-										</p>
-
-										</div>
 									</div>
-								</div>
-								<div class='span12'>
-									<table width='100%'>
-										<tr><td colspan='10' style='height:5px;'> </td></tr></tr>
-									</table>
-								</div>
-								<div class='span12'>
-									<p align='right'><a href='/filter_add_invoice_item?iid=<%=iid%>&add_item_number=<%=item.item_number%>'><img src='/images/addtocart.png' border=0 /></a></p>									
+									<%
+									end
+									%>
+
+									<div class='span12'>
+									<%
+									if item.plan_descriptor[:type].to_s == 'S'
+									%>
+									<p align='right'>
+										<span style='color:black;'><b>Plan Details:</b></span><br/>
+										<span style='color:gray;'><%=invoice.plan_payment_description(item.plan_descriptor)%></span>
+									</p>
+									<%
+									end
+									%>
+									<p align='right'>
+										<span style='color:black;'><b>Description:</b></span><br/>
+										<span style='color:gray;'><%=upsell_product[:description]%></span>
+									</p>
+									<p align='right'>
+										<span style='color:black;'><b>Summary:</b></span><br/>
+										<span style='color:gray;font-size:11px;'><%=upsell_product[:summary]%></span>
+									</p>
 								</div>
 							</div>
+						</div>
+						<div class='span12'>
+							<table width='100%'>
+								<tr><td colspan='10' style='height:5px;'> </td></tr></tr>
+							</table>
+						</div>
+						<div class='span12'>
+							<p align='right'><a href='/filter_add_invoice_item?iid=<%=iid%>&add_item_number=<%=item.item_number%>'><img src='/images/addtocart.png' border=0 /></a></p>									
+						</div>
+					</div>
 
-							<%
-							n += 1
+					<%
+					n += 1
 
-							if n % 3 == 0
-							%>
-							</div>
-							<%
-							end
-						}
+					if n % 3 == 0
 					%>
-				</div>
-				<%
-				end # if a.size > 0
-				%>
+					</div>
+					<%
+					end
+				}
+			%>
+		</div>
+		<%
+		end # if a.size > 0
+		%>
 		<%
 		end # if invoice.allowedToAddRemoveItems?
 		%>
 	</div>	
 </section>
+<%
+end # if !invoice.allowedToAddRemoveItems? || compatible_upsell_plans.size > 0
+%>
