@@ -70,7 +70,7 @@ PRODUCT_EF = 'ef' # email address
 #
 # Descriptor of list of products
 #
-BlackStack::I2P::set_products([
+BlackStack::I2P::set_services([
   { 
     :code=>PRODUCT_SUP, 
     :public=>true,
@@ -361,7 +361,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO,
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_EDU, 
+    :service_code=>PRODUCT_EDU, 
     :item_number=>"EDU.B2B-Selling-Mastery", 
     :name=>"B2B Selling Mastery", 
     :credits=>1, 
@@ -378,7 +378,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_EDU, 
+    :service_code=>PRODUCT_EDU, 
     :item_number=>"EDU.B2B-Selling-Fraternity", 
     :name=>"B2B Selling Fraternity", 
     :credits=>1, 
@@ -402,7 +402,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SUP, 
+    :service_code=>PRODUCT_SUP, 
     :item_number=>"SUP.Dedicated-Support", 
     :name=>"Dedicated Support", 
     :credits=>1, 
@@ -434,7 +434,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_DRX, 
+    :service_code=>PRODUCT_DRX, 
     :item_number=>"SSM.1.SaaS", 
     :name=>"SaaS", 
     :credits=>2500, 
@@ -465,7 +465,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true, # used in the landing page
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.2.Semi-Dedicated-Monthly", 
     :name=>"Semi-Dedicated", 
     :credits=>25, 
@@ -498,7 +498,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true, # used in the landing page
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.3.Full-Dedicated-Monthly", 
     :name=>"Agency", 
     :credits=>25, 
@@ -537,7 +537,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.Robin-Monthly", 
     :name=>"SSM Robin Plan", 
     :credits=>25, 
@@ -568,7 +568,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.Batman-Monthly", 
     :name=>"SSM Batman Plan", 
     :credits=>65, 
@@ -601,7 +601,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.Hulk-Monthly", 
     :name=>"SSM Hulk Plan", 
     :credits=>140, 
@@ -636,7 +636,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.Small-Pay-As-You-Go", 
     :name=>"SSM Small Pay-As-You-Go", 
     :credits=>10, 
@@ -663,7 +663,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.Robin-Pay-As-You-Go", 
     :name=>"SSM Robin Pay-As-You-Go", 
     :credits=>20, 
@@ -690,7 +690,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.Batman-Pay-As-You-Go", 
     :name=>"SSM Batman Pay-As-You-Go", 
     :credits=>55, 
@@ -718,7 +718,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM, 
+    :service_code=>PRODUCT_SSM, 
     :item_number=>"SSM.Hulk-Pay-As-You-Go", 
     :name=>"SSM Hulk Pay-As-You-Go", 
     :credits=>120, 
@@ -748,7 +748,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,
     :public=>false,
     :one_time_offer=>true, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SSM,
+    :service_code=>PRODUCT_SSM,
     :item_number=>"SSM.Robin-Montly-50%-Off-First-Month", 
     :name=>"SSM Robin 50% Off", 
     :credits=>25, :fee=>99, 
@@ -778,7 +778,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_THR, 
+    :service_code=>PRODUCT_THR, 
     :item_number=>"THR.Unique-Plan", 
     :name=>"Hosted Processing Threads", 
     :credits=>1, 
@@ -807,7 +807,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SRV, 
+    :service_code=>PRODUCT_SRV, 
     :item_number=>"SRV.Unique-Plan", 
     :name=>"Dedicated Servers", 
     :credits=>1, 
@@ -824,7 +824,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SBR, 
+    :service_code=>PRODUCT_SBR, 
     :item_number=>"SBR.Unique-Plan", 
     :name=>"Stealth Browser Profiles", 
     :credits=>10, 
@@ -841,7 +841,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_STO, 
+    :service_code=>PRODUCT_STO, 
     :item_number=>"STO.Small-Plan", 
     :name=>"Storage MBs", 
     :credits=>512, 
@@ -863,7 +863,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_STO, 
+    :service_code=>PRODUCT_STO, 
     :item_number=>"STO.Medium-Plan", 
     :name=>"Storage MBs", 
     :credits=>1024, 
@@ -885,7 +885,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_STO, 
+    :service_code=>PRODUCT_STO, 
     :item_number=>"STO.Large-Plan", 
     :name=>"Storage MBs", 
     :credits=>2048, 
@@ -909,7 +909,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SHM, 
+    :service_code=>PRODUCT_SHM, 
     :item_number=>"SHM.Small-Plan", 
     :name=>"Small Plan", 
     :credits=>1, 
@@ -933,7 +933,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SHM, 
+    :service_code=>PRODUCT_SHM, 
     :item_number=>"SHM.Medium-Plan", 
     :name=>"Medium Plan", 
     :credits=>10, 
@@ -957,7 +957,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_SHM, 
+    :service_code=>PRODUCT_SHM, 
     :item_number=>"SHM.Large-Plan", 
     :name=>"Large Plan", 
     :credits=>100, 
@@ -981,7 +981,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_DRX, 
+    :service_code=>PRODUCT_DRX, 
     :item_number=>"DRX.Plan-4000", 
     :name=>"Linked Prospector 4K", 
     :credits=>4000, 
@@ -1010,7 +1010,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_DRX, 
+    :service_code=>PRODUCT_DRX, 
     :item_number=>"DRX.Plan-8000", 
     :name=>"Linked Prospector 8K", 
     :credits=>8000, 
@@ -1039,7 +1039,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_DRX, 
+    :service_code=>PRODUCT_DRX, 
     :item_number=>"DRX.Plan-16000", 
     :name=>"Linked Prospector 16K", 
     :credits=>15000, 
@@ -1070,7 +1070,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_EDB, 
+    :service_code=>PRODUCT_EDB, 
     :item_number=>"EDB.Plan-5", 
     :name=>"5 Searches", 
     :credits=>5, 
@@ -1098,7 +1098,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_EDB, 
+    :service_code=>PRODUCT_EDB, 
     :item_number=>"EDB.Plan-15", 
     :name=>"15 Searches", 
     :credits=>15, 
@@ -1126,7 +1126,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_EDB, 
+    :service_code=>PRODUCT_EDB, 
     :item_number=>"EDB.Plan-50", 
     :name=>"50 Searches", 
     :credits=>50, 
@@ -1154,7 +1154,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_MAC, 
+    :service_code=>PRODUCT_MAC, 
     :item_number=>"MAC.Plan-20", 
     :name=>"Farming", 
     :credits=>20, 
@@ -1180,7 +1180,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_MAC, 
+    :service_code=>PRODUCT_MAC, 
     :item_number=>"MAC.Plan-45", 
     :name=>"Farming", 
     :credits=>45, 
@@ -1206,7 +1206,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_MAC, 
+    :service_code=>PRODUCT_MAC, 
     :item_number=>"MAC.Plan-100", 
     :name=>"Farming", 
     :credits=>100, 
@@ -1235,7 +1235,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,   
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_PVA, 
+    :service_code=>PRODUCT_PVA, 
     :item_number=>"PVA.Plan-10", 
     :name=>"Social Accounts", 
     :credits=>10, 
@@ -1263,7 +1263,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_PVA, 
+    :service_code=>PRODUCT_PVA, 
     :item_number=>"PVA.Plan-20", 
     :name=>"Social Accounts", 
     :credits=>20, 
@@ -1291,7 +1291,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_PVA, 
+    :service_code=>PRODUCT_PVA, 
     :item_number=>"PVA.Plan-50", 
     :name=>"Social Accounts", 
     :credits=>50, 
@@ -1319,7 +1319,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_PAY_AS_YOU_GO, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_PVA, 
+    :service_code=>PRODUCT_PVA, 
     :item_number=>"PVA.Plan-100", 
     :name=>"Social Accounts", 
     :credits=>125, 
@@ -1347,7 +1347,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>false,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_IP6, 
+    :service_code=>PRODUCT_IP6, 
     :item_number=>"IP6.Plan-20", 
     :name=>"IPv6 Social Proxies", 
     :credits=>20, 
@@ -1371,7 +1371,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_ACC, 
+    :service_code=>PRODUCT_ACC, 
     :item_number=>"ACC.Plan-20", 
     :name=>"Social Accounts Rental", 
     :credits=>20, 
@@ -1400,7 +1400,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_FLD, 
+    :service_code=>PRODUCT_FLD, 
     :item_number=>"FLD.Unique-Plan", 
     :name=>"Leads", 
     :credits=>300, 
@@ -1425,7 +1425,7 @@ BlackStack::I2P::set_plans([
     :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION, 
     :public=>true,
     :one_time_offer=>false, # true: solo puede generarse un invoice-item con este plan 
-    :product_code=>PRODUCT_IPJ, 
+    :service_code=>PRODUCT_IPJ, 
     :item_number=>"IPJ.Unique-Plan", 
     :name=>"LinkedIn Community", 
     :credits=>100, 

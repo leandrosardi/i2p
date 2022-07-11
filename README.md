@@ -59,7 +59,7 @@ puts BlackStack::I2P::paypal_business_email
 ```ruby
 require 'i2p'
 
-BlackStack::I2P::set_products([
+BlackStack::I2P::set_services([
 { 
 	:code=>'dedicated-support', 
 	:name=>'Dedicated Support', 
@@ -83,7 +83,7 @@ BlackStack::I2P::set_products([
 	:return_path=>'https://yourwebsite.com/event2020/step1',
 }])
 
-puts BlackStack::I2P::products_descriptor
+puts BlackStack::I2P::services_descriptor
 # => [{...}, {...}]	
 ```
 
@@ -105,7 +105,7 @@ BlackStack::I2P::set_plans([
 	:one_time_offer=>false,  
 	
 	# which product is this plan belong
-	:product_code=>'dedicated-support', 
+	:service_code=>'dedicated-support', 
 	
 	# plan description
 	:item_number=>"deducated-support.starter-plan", 
@@ -129,7 +129,7 @@ BlackStack::I2P::set_plans([
 	:one_time_offer=>false,  
 	
 	# which product is this plan belong
-	:product_code=>'dedicated-support', 
+	:service_code=>'dedicated-support', 
 	
 	# plan description
 	:item_number=>"deducated-support.enterprise-plan", 

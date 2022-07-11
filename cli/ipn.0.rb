@@ -265,7 +265,7 @@ api_url = "http://74.208.28.38:81"
   end # def reproc
 
   def recalc(c)
-    BlackStack::I2P::products_descriptor.each { |h|
+    BlackStack::I2P::services_descriptor.each { |h|
       self.logger.logs "Product:#{h[:code]}... "
       c.recalculate(h[:code])
       self.logger.done
@@ -280,7 +280,7 @@ api_url = "http://74.208.28.38:81"
       !m.expiration_time.nil? &&
       m.expiration_lead_time < Time.now
     }.each { |m|
-      self.logger.logs "#{m.id.to_guid}:#{m.product_code}:#{m.expiration_lead_time.to_s}:."       
+      self.logger.logs "#{m.id.to_guid}:#{m.service_code}:#{m.expiration_lead_time.to_s}:."       
       m.expire(m.expiration_lead_time, "Expiration of <a href='/settings/record?rid=#{m.id.to_guid}'>record:#{m.id.to_guid}</a> because the lead-time has been reached.") 
       self.logger.done
     }     

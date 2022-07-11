@@ -67,7 +67,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
         # starting account
         self.logger.logs "Client #{c.name} (#{c.id})... "
         # iterate the list of products
-        BlackStack::I2P::products_descriptor.clone.each { |hprod|
+        BlackStack::I2P::services_descriptor.clone.each { |hprod|
           # starting product
           self.logger.logs "Product #{hprod[:code]}... "
           #

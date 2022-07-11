@@ -19,7 +19,7 @@ module BlackStack
     @@paypal_business_email = nil # "sardi.leandro.daniel@gmail.com"
     @@paypal_orders_url = BlackStack::I2P::PAYPAL_ORDERS_URL
     @@paypal_ipn_listener = nil # "#{CS_HOME_WEBSITE}/api1.0/i2p/paypal/ipn.json"
-    @@products_descriptor = []
+    @@services_descriptor = []
     @@plans_descriptor = []
     
     # constant values for different type of plans (pay as you go, subscription)
@@ -27,8 +27,8 @@ module BlackStack
     PAYMENT_SUBSCRIPTION = 1
 
     # constant values for different type of consumtion (consume by unit, or consume by period of time)
-    CONSUMPTION_BY_UNIT = 0 # el producto se conume credito por credito. Ejemplo: lead records.
-    CONSUMPTION_BY_TIME = 1 # el producto exira al final del periodo de la factura. Ejemplos: Publicidad. Membresía.  
+    CONSUMPTION_BY_UNIT = 0 # el servicio se conume credito por credito. Ejemplo: lead records.
+    CONSUMPTION_BY_TIME = 1 # el servicio exira al final del periodo de la factura. Ejemplos: Publicidad. Membresía.  
 
     #
     def self.payment_types()
@@ -73,13 +73,13 @@ module BlackStack
       @@paypal_ipn_listener
     end
 
-    def self.set_products(h)
-      @@products_descriptor = h
-    end # def self.set_products
+    def self.set_services(h)
+      @@services_descriptor = h
+    end # def self.set_services
 
-    def self.products_descriptor()
-      @@products_descriptor
-    end # def self.products_descriptor
+    def self.services_descriptor()
+      @@services_descriptor
+    end # def self.services_descriptor
     
     def self.set_plans(h)
       @@plans_descriptor = h
@@ -95,8 +95,8 @@ module BlackStack
       plan
     end
   
-    def self.product_descriptor(product_code)
-      ret = BlackStack::I2P::products_descriptor.select { |h| h[:code] == product_code }.first
+    def self.service_descriptor(service_code)
+      ret = BlackStack::I2P::services_descriptor.select { |h| h[:code] == service_code }.first
       raise "Product not found" if ret.nil?
       ret 
     end

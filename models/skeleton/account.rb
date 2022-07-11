@@ -38,13 +38,13 @@ module BlackStack
         		ret
       		end
 
-      		# crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el accounte, para el producto indicado en product_code. 
-      		def consume(product_code, number_of_credits=1, description=nil, datetime=nil)
+      		# crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el accounte, para el producto indicado en service_code. 
+      		def consume(service_code, number_of_credits=1, description=nil, datetime=nil)
 				dt = datetime.nil? ? now() : datetime.to_time.to_sql
 				
 				# create the consumtion
-				total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, product_code).credits.to_f
-				total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, product_code).amount.to_f
+				total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).credits.to_f
+				total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).amount.to_f
 				ratio = total_credits == 0 ? 0.to_f : total_amount.to_f / total_credits.to_f
 				amount = number_of_credits.to_f * ratio
 				cons = BlackStack::I2P::Movement.new
@@ -58,25 +58,25 @@ module BlackStack
 				cons.amount = amount
 				cons.credits = number_of_credits
 				cons.profits_amount = -amount
-				cons.product_code = product_code
+				cons.service_code = service_code
 				cons.expiration_time = nil
 				cons.save
 				# if there is negative credits
-				prod = BlackStack::I2P.product_descriptor(product_code)
-				total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, product_code).credits.to_f
-				total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, product_code).amount.to_f
+				prod = BlackStack::I2P.product_descriptor(service_code)
+				total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).credits.to_f
+				total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).amount.to_f
 				sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
 				if total_credits < 0
-					self.adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded (1).')
+					self.adjustment(service_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded (1).')
 				end
 				# recaculate amounts in both consumptions and expirations - CANCELADO - Se debe hacer offline
-				#self.recalculate(product_code) 
+				#self.recalculate(service_code) 
 				# return
 				cons
       		end
 
-      		# crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
-      		def bonus(product_code, expiration, number_of_credits=1, description=nil)				
+      		# crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en service_code. 
+      		def bonus(service_code, expiration, number_of_credits=1, description=nil)				
 				bonus_amount = 0 # Los bonos siempre son por un importa igual a 0.
 				
 				bonus = BlackStack::I2P::Movement.new
@@ -90,7 +90,7 @@ module BlackStack
 				bonus.amount = -bonus_amount
 				bonus.credits = -number_of_credits
 				bonus.profits_amount = 0
-				bonus.product_code = product_code
+				bonus.service_code = service_code
 				bonus.expiration_time = expiration
 				bonus.save
 				# recalculate - CANCELADO
@@ -99,8 +99,8 @@ module BlackStack
 				bonus
       		end
 
-      		# crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en product_code. 
-      		def adjustment(product_code, adjustment_amount=0, adjustment_credits=0, description=nil, type=BlackStack::I2P::Movement::MOVEMENT_TYPE_ADJUSTMENT, registraton_time=nil)
+      		# crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en service_code. 
+      		def adjustment(service_code, adjustment_amount=0, adjustment_credits=0, description=nil, type=BlackStack::I2P::Movement::MOVEMENT_TYPE_ADJUSTMENT, registraton_time=nil)
 				adjust = BlackStack::I2P::Movement.new
 				adjust.id = guid()
 				adjust.id_account = self.id
@@ -112,20 +112,20 @@ module BlackStack
 				adjust.amount = adjustment_amount
 				adjust.credits = adjustment_credits
 				adjust.profits_amount = -adjustment_amount
-				adjust.product_code = product_code
+				adjust.service_code = service_code
 				adjust.expiration_time = nil
 				adjust.save
 				adjust
       		end
 
 			# recalculate the amount for all the consumptions, expirations, and adjustments
-			def recalculate(product_code)
+			def recalculate(service_code)
 				# 
 				amount_paid = 0.to_f
 				credits_paid = 0
 
 				self.movements.select { |o| 
-					o.product_code.upcase == product_code.upcase
+					o.service_code.upcase == service_code.upcase
 				}.sort_by { |o| [o.create_time, o.type] }.each { |o| # se ordena por o.create_time, pero tmabien por o.type para procesar primero los pagos y bonos
 					# consumption or expiration or bonus
 					if ( 
@@ -145,7 +145,7 @@ module BlackStack
 					total_credits = credits_paid
 					total_amount = amount_paid
 					if total_credits < 0
-						self. adjustment(product_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded (2).', BlackStack::I2P::Movement::MOVEMENT_TYPE_ADJUSTMENT, o.create_time)
+						self. adjustment(service_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded (2).', BlackStack::I2P::Movement::MOVEMENT_TYPE_ADJUSTMENT, o.create_time)
 						amount_paid = 0.to_f
 						credits_paid = 0.to_i
 					end
@@ -158,12 +158,22 @@ module BlackStack
       		end
 
 			# 
-			def get_balance()
+			def balance
 				n = 0
-				BlackStack::I2P::products_descriptor.each { |code| 
-				n += BlackStack::I2P::Balance.new(self.id, code).amount 
+				BlackStack::I2P::services_descriptor.each { |code| 
+					n += BlackStack::I2P::Balance.new(self.id, code).amount 
 				}
 				n
+			end
+
+			# 
+			def balance(code)
+				BlackStack::I2P::Balance.new(self.id, code).amount 
+			end
+
+			# 
+			def credits(code)
+				BlackStack::I2P::Balance.new(self.id, code).credits 
 			end
 
 			# retorna true si existe algun item de factura relacionado al 'plan' ('item_number').

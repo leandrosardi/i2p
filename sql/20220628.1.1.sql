@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS invoice (
 CREATE TABLE IF NOT EXISTS invoice_item (
 	id uuid NOT NULL PRIMARY KEY,
 	id_invoice uuid NOT NULL REFERENCES invoice(id),
-	product_code varchar(5) NOT NULL,
+	service_code varchar(5) NOT NULL,
 	unit_price numeric(18, 4) NOT NULL,
 	units numeric(18, 4) NOT NULL,
 	amount numeric(18, 4) NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS movement (
 	credits bigint NOT NULL,
 	profits_amount numeric(22, 8) NOT NULL,
 	id_invoice_item uuid NULL REFERENCES invoice_item(id),
-	product_code varchar(500) NOT NULL,
+	service_code varchar(500) NOT NULL,
 	expiration_time timestamp NULL,
 	expiration_start_time timestamp NULL,
 	expiration_end_time timestamp NULL,

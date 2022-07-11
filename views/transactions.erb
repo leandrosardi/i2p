@@ -68,7 +68,7 @@ c = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
 						n = 0
 						BlackStack::I2P::Movement.where(:id_account=>login.user.account.id).order(:create_time).all { |m|
 							n += 1
-							prod = BlackStack::I2P::products_descriptor.select { |p| p[:code] == m.product_code }.first
+							prod = BlackStack::I2P::services_descriptor.select { |p| p[:code] == m.service_code }.first
 						%>
 						<tr>
 							<td>

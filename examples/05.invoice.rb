@@ -15,7 +15,7 @@ BlackStack::I2P::set({
 })
 
 # define your product
-BlackStack::I2P::set_products([
+BlackStack::I2P::set_services([
   { 
     :code=>'leads', 
     :name=>'B2B Contacts', 
@@ -36,7 +36,7 @@ BlackStack::I2P::set_plans([
 # Dedicated Support - 
 {
   # which product is this plan belonging
-  :product_code=>'leads', 
+  :service_code=>'leads', 
   # recurrent billing plan or one-time payments
   :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,  
   # show this plan in the UI

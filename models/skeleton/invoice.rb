@@ -137,7 +137,7 @@ module BlackStack
           raise "Plan not found"      
         end
     
-        product_descriptor = BlackStack::I2P::products_descriptor.select { |j| j[:code].to_s == plan_descriptor[:product_code].to_s }.first
+        product_descriptor = BlackStack::I2P::services_descriptor.select { |j| j[:code].to_s == plan_descriptor[:service_code].to_s }.first
         if product_descriptor.nil?
           raise "Product not found"      
         end
@@ -324,7 +324,7 @@ module BlackStack
           # obtengo descriptor del plan
           plan = BlackStack::I2P.plan_descriptor(item.item_number)
           # obtengo descriptor del producto
-          prod = BlackStack::I2P.product_descriptor(plan[:product_code])
+          prod = BlackStack::I2P.product_descriptor(plan[:service_code])
           # registro el pago
           BlackStack::I2P::Movement.new().parse(item, BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_PAYMENT, "Payment of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.", payment_time, item.id).save()
           # agrego los bonos de este plan
@@ -335,7 +335,7 @@ module BlackStack
               bonus = BlackStack::I2P::InvoiceItem.new
               bonus.id = guid()
               bonus.id_invoice = self.id
-              bonus.product_code = plan_bonus[:product_code]
+              bonus.service_code = plan_bonus[:service_code]
               bonus.unit_price = 0
               bonus.units = plan_bonus[:credits] * item.number_of_packages # agrego los creditos del bono, multiplicado por la cantiad de paquetes 
               bonus.amount = 0
@@ -452,7 +452,7 @@ module BlackStack
         item1 = BlackStack::I2P::InvoiceItem.new()
         item1.id = guid()
         item1.id_invoice = self.id
-        item1.product_code = h[:product_code]
+        item1.service_code = h[:service_code]
         item1.unit_price = unit_price.to_f
         item1.units = units.to_i
         item1.amount = amount.to_f
@@ -579,7 +579,7 @@ module BlackStack
             item1.unit_price = u.unit_price.to_f
             item1.units = -u.units
             item1.amount = -u.amount.to_f
-            item1.product_code = u.product_code.to_s
+            item1.service_code = u.service_code.to_s
             item1.item_number = u.item_number.to_s
             item1.detail = u.detail.to_s
             item1.description = u.description.to_s
@@ -587,10 +587,10 @@ module BlackStack
             # hago el reembolso de este item
             # si el balance quedo en negativo, entonces aplico otro ajuste
             BlackStack::I2P::Movement.new().parse(item1, BlackStack::I2P::Movement::MOVEMENT_TYPE_REFUND_BALANCE, "Full Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.").save()        
-            net_amount = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, u.product_code.to_s).amount.to_f
-            net_credits = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, u.product_code.to_s).credits.to_f
+            net_amount = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, u.service_code.to_s).amount.to_f
+            net_credits = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, u.service_code.to_s).credits.to_f
             if net_amount <= 0 && net_credits < 0
-              adjust = self.account.adjustment(u.product_code.to_s, net_amount, net_credits, "Adjustment for Negative Balance After Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
+              adjust = self.account.adjustment(u.service_code.to_s, net_amount, net_credits, "Adjustment for Negative Balance After Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
               adjust.id_invoice_item = item1.id
               adjust.save			
             end # if net_amount < 0
@@ -599,23 +599,23 @@ module BlackStack
             if !h[:bonus_plans].nil?
               h[:bonus_plans].each { |bonus|
                 i = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == bonus[:item_number] }.first
-                j = BlackStack::I2P::products_descriptor.select { |obj| obj[:code] == i[:product_code] }.first
+                j = BlackStack::I2P::services_descriptor.select { |obj| obj[:code] == i[:service_code] }.first
                 item2 = BlackStack::I2P::InvoiceItem.new()
                 item2.id = guid()
                 item2.id_invoice = self.id
                 item2.unit_price = 0
                 item2.units = -i[:credits]
                 item2.amount = 0
-                item2.product_code = i[:product_code].to_s
+                item2.service_code = i[:service_code].to_s
                 item2.item_number = i[:item_number].to_s
                 item2.detail = 'Bonus Refund'
                 item2.description = j[:description].to_s
                 item2.save()
                 BlackStack::I2P::Movement.new().parse(item2, BlackStack::I2P::Movement::MOVEMENT_TYPE_REFUND_BALANCE, "Bonus Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.").save()        
-                net_amount = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, i[:product_code].to_s).amount.to_f
-                net_credits = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, i[:product_code].to_s).credits.to_f
+                net_amount = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, i[:service_code].to_s).amount.to_f
+                net_credits = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, i[:service_code].to_s).credits.to_f
                 if net_amount <= 0 && net_credits < 0
-                  adjust = self.account.adjustment(i[:product_code].to_s, net_amount, net_credits, "Adjustment for Negative Balance After Bonus Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
+                  adjust = self.account.adjustment(i[:service_code].to_s, net_amount, net_credits, "Adjustment for Negative Balance After Bonus Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
                   adjust.id_invoice_item = item1.id
                   adjust.save     
                 end # if net_amount < 0            
@@ -642,7 +642,7 @@ module BlackStack
           item1.unit_price = unit_price.to_f
           item1.units = -units
           item1.amount = -amount.to_f
-          item1.product_code = t.product_code.to_s
+          item1.service_code = t.service_code.to_s
           item1.item_number = t.item_number.to_s
           item1.detail = t.detail.to_s
           item1.description = t.description.to_s
@@ -651,21 +651,21 @@ module BlackStack
           # agrego un ajuste por el redondeo a una cantidad entera de creditos
           if float_units.to_f != units.to_f
             adjustment_amount = unit_price.to_f * (units.to_f - float_units.to_f)
-            adjust = self.account.adjustment(t.product_code.to_s, adjustment_amount, 0, "Adjustment for Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.", BlackStack::I2P::Movement::MOVEMENT_TYPE_REFUND_ADJUSTMENT)
+            adjust = self.account.adjustment(t.service_code.to_s, adjustment_amount, 0, "Adjustment for Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.", BlackStack::I2P::Movement::MOVEMENT_TYPE_REFUND_ADJUSTMENT)
             adjust.id_invoice_item = item1.id
             adjust.save
           end
           # si el balance quedo en negativo, entonces aplico otro ajuste
-          net_amount = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, t.product_code.to_s).amount.to_f
-          net_credits = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, t.product_code.to_s).credits.to_f
+          net_amount = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, t.service_code.to_s).amount.to_f
+          net_credits = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, t.service_code.to_s).credits.to_f
           if net_amount < 0 && net_credits < 0
-            adjust = self.account.adjustment(t.product_code.to_s, net_amount, net_credits, "Adjustment for Negative Balance After Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
+            adjust = self.account.adjustment(t.service_code.to_s, net_amount, net_credits, "Adjustment for Negative Balance After Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
             adjust.id_invoice_item = item1.id
             adjust.save			
           end # if net_amount < 0
           
           # recalculo todos los consumos y expiraciones - CANCELADO - Debe hacerse offline
-          # => self.account.recalculate(t.product_code.to_s)
+          # => self.account.recalculate(t.service_code.to_s)
           
           # si el cliente se quedo sin saldo luego del reembolso parcial 
           if net_amount <= 0
@@ -673,23 +673,23 @@ module BlackStack
             # si el balance quedo en negativo, entonces aplico otro ajuste
             h[:bonus_plans].each { |bonus|
               i = BlackStack::I2P::plans_descriptor.select { |obj| obj[:item_number] == bonus[:item_number] }.first
-              j = BlackStack::I2P::products_descriptor.select { |obj| obj[:code] == i[:product_code] }.first
+              j = BlackStack::I2P::services_descriptor.select { |obj| obj[:code] == i[:service_code] }.first
               item2 = BlackStack::I2P::InvoiceItem.new()
               item2.id = guid()
               item2.id_invoice = self.id
               item2.unit_price = 0
               item2.units = -i[:credits]
               item2.amount = 0
-              item2.product_code = i[:product_code].to_s
+              item2.service_code = i[:service_code].to_s
               item2.item_number = i[:item_number].to_s
               item2.detail = 'Bonus Refund'
               item2.description = j[:description].to_s
               item2.save()
               BlackStack::I2P::Movement.new().parse(item2, BlackStack::I2P::Movement::MOVEMENT_TYPE_REFUND_BALANCE, "Bonus Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.").save()        
-              net_amount = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, i[:product_code].to_s).amount.to_f
-              net_credits = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, i[:product_code].to_s).credits.to_f
+              net_amount = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, i[:service_code].to_s).amount.to_f
+              net_credits = 0.to_f - BlackStack::I2P::Balance.new(self.account.id, i[:service_code].to_s).credits.to_f
               if net_amount <= 0 && net_credits < 0
-                adjust = self.account.adjustment(i[:product_code].to_s, net_amount, net_credits, "Adjustment for Negative Balance After Bonus Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
+                adjust = self.account.adjustment(i[:service_code].to_s, net_amount, net_credits, "Adjustment for Negative Balance After Bonus Refund of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.")
                 adjust.id_invoice_item = item1.id
                 adjust.save     
               end # if net_amount < 0            

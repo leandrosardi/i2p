@@ -18,7 +18,7 @@ BlackStack::I2P::set_plans([
 # Dedicated Support - 
 {
   # which product is this plan belonging
-  :product_code=>'dedicated-support', 
+  :service_code=>'dedicated-support', 
   # recurrent billing plan or one-time payments
   :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,  
   # show this plan in the UI
@@ -38,7 +38,7 @@ BlackStack::I2P::set_plans([
   :units=>1, # billed monthy
 }, {
   # which product is this plan belonging
-  :product_code=>'dedicated-support', 
+  :service_code=>'dedicated-support', 
   # recurrent billing plan or one-time payments
   :type=>BlackStack::I2P::PAYMENT_SUBSCRIPTION,  
   # show this plan in the UI
