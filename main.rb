@@ -77,12 +77,20 @@ module BlackStack
       @@services_descriptor = h
     end # def self.set_services
 
+    def self.add_services(h)
+      @@services_descriptor += h
+    end # def self.set_services
+
     def self.services_descriptor()
       @@services_descriptor
     end # def self.services_descriptor
     
     def self.set_plans(h)
       @@plans_descriptor = h
+    end # def self.set_plans
+
+    def self.add_plans(h)
+      @@plans_descriptor += h
     end # def self.set_plans
 
     def self.plans_descriptor()

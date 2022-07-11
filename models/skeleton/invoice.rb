@@ -137,8 +137,8 @@ module BlackStack
           raise "Plan not found"      
         end
     
-        product_descriptor = BlackStack::I2P::services_descriptor.select { |j| j[:code].to_s == plan_descriptor[:service_code].to_s }.first
-        if product_descriptor.nil?
+        service_descriptor = BlackStack::I2P::services_descriptor.select { |j| j[:code].to_s == plan_descriptor[:service_code].to_s }.first
+        if service_descriptor.nil?
           raise "Product not found"      
         end
     
@@ -155,7 +155,7 @@ module BlackStack
           n+=1
         }
     
-        return_path = product_descriptor[:return_path]
+        return_path = service_descriptor[:return_path]
         id_invoice = self.id
         id_account = self.account.id
         allow_trials = self.disabled_trial?
@@ -324,7 +324,7 @@ module BlackStack
           # obtengo descriptor del plan
           plan = BlackStack::I2P.plan_descriptor(item.item_number)
           # obtengo descriptor del producto
-          prod = BlackStack::I2P.product_descriptor(plan[:service_code])
+          prod = BlackStack::I2P.service_descriptor(plan[:service_code])
           # registro el pago
           BlackStack::I2P::Movement.new().parse(item, BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_PAYMENT, "Payment of <a href='/settings/invoice?iid=#{self.id.to_guid}'>invoice:#{self.id.to_guid}</a>.", payment_time, item.id).save()
           # agrego los bonos de este plan

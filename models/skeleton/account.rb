@@ -62,7 +62,7 @@ module BlackStack
 				cons.expiration_time = nil
 				cons.save
 				# if there is negative credits
-				prod = BlackStack::I2P.product_descriptor(service_code)
+				prod = BlackStack::I2P.service_descriptor(service_code)
 				total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).credits.to_f
 				total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).amount.to_f
 				sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
@@ -163,17 +163,17 @@ module BlackStack
 				BlackStack::I2P::services_descriptor.each { |code| 
 					n += BlackStack::I2P::Balance.new(self.id, code).amount 
 				}
-				n
+				-n
 			end
 
 			# 
 			def balance(code)
-				BlackStack::I2P::Balance.new(self.id, code).amount 
+				-BlackStack::I2P::Balance.new(self.id, code).amount 
 			end
 
 			# 
 			def credits(code)
-				BlackStack::I2P::Balance.new(self.id, code).credits 
+				-BlackStack::I2P::Balance.new(self.id, code).credits 
 			end
 
 			# retorna true si existe algun item de factura relacionado al 'plan' ('item_number').

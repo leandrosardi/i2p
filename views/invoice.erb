@@ -148,7 +148,7 @@ end
 						bonuses = []
 						invoice.items.sort_by {|obj| obj.create_time}.each { |item|
 							plan = BlackStack::I2P.plan_descriptor(item.item_number)
-							prod = BlackStack::I2P.product_descriptor(plan[:service_code])
+							prod = BlackStack::I2P.service_descriptor(plan[:service_code])
 							bonus_plans = plan[:bonus_plans]
 							bonuses += bonus_plans if !bonus_plans.nil?
 						%>

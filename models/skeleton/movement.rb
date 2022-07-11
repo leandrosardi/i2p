@@ -83,7 +83,7 @@ module BlackStack
         # 
         payment_time = Time.now() if payment_time.nil?
         plan = BlackStack::I2P.plan_descriptor(item.item_number)
-        prod = BlackStack::I2P.product_descriptor(plan[:service_code])
+        prod = BlackStack::I2P.service_descriptor(plan[:service_code])
         if (self.id==nil)
           self.id=guid()
         end
