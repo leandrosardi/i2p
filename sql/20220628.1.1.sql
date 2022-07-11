@@ -137,5 +137,5 @@ CREATE TABLE IF NOT EXISTS subscription (
 	stat_creation_notification_time timestamp NULL
 );
 
-ALTER TABLE invoice RENAME disabled_trial TO disabled_trial;
-ALTER TABLE invoice RENAME disabled_modification TO disabled_modification;
+--ALTER TABLE invoice RENAME disabled_trial TO disabled_trial;
+--ALTER TABLE invoice RENAME disabled_modification TO disabled_modification;
