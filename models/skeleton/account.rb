@@ -43,8 +43,9 @@ module BlackStack
 				dt = datetime.nil? ? now() : datetime.to_time.to_sql
 				
 				# create the consumtion
-				total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).credits.to_f
-				total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).amount.to_f
+				balance = BlackStack::I2P::Balance.new(self.id, service_code)
+				total_credits = 0.to_f - balance.credits.to_f
+				total_amount = 0.to_f - balance.amount.to_f
 				ratio = total_credits == 0 ? 0.to_f : total_amount.to_f / total_credits.to_f
 				amount = number_of_credits.to_f * ratio
 				cons = BlackStack::I2P::Movement.new
@@ -61,16 +62,21 @@ module BlackStack
 				cons.service_code = service_code
 				cons.expiration_time = nil
 				cons.save
+# TODO: deprecated
+=begin 
 				# if there is negative credits
 				prod = BlackStack::I2P.service_descriptor(service_code)
-				total_credits = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).credits.to_f
-				total_amount = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).amount.to_f
-				sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
+				balance = BlackStack::I2P::Balance.new(self.id, service_code)
+				total_credits = 0.to_f - balance.credits.to_f
+				total_amount = 0.to_f - balance.amount.to_f
+				#sleep(2) # delay to ensure the time of the bonus movement will be later than the time of the consumption movement
 				if total_credits < 0
 					self.adjustment(service_code, total_amount, total_credits, 'Adjustment Because Quota Has Been Exceeded (1).')
 				end
+				
 				# recaculate amounts in both consumptions and expirations - CANCELADO - Se debe hacer offline
 				#self.recalculate(service_code) 
+=end				
 				# return
 				cons
       		end
