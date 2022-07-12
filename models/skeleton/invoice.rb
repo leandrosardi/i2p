@@ -397,12 +397,12 @@ module BlackStack
         # encuentro el descriptor del plan
         # el descriptor del plan tambien es necesario para la llamada a paypal_link 
         h = self.account.plans.select { |j| j[:item_number].to_s == item_number.to_s }.first
-    
+        
         # mapeo variables
         amount = 0.to_f
         unit_price = 0.to_f
         units = 0.to_i
-      
+        
         # le seteo la fecha de hoy
         self.billing_period_from = now()
 
@@ -413,7 +413,7 @@ module BlackStack
           units = h[:trial_credits].to_i
           unit_price = h[:trial_fee].to_f / h[:trial_credits].to_f
           billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:trial_units].to_s} #{h[:trial_period].to_s}' AS now"].map(:now)[0].to_s
-
+        
         # si el plan tiene un segundo trial, y
         # es la segunda factura, entonces:
         # => se trata del segundo pago por segundo trial
@@ -466,7 +466,7 @@ module BlackStack
     
       def plan_payment_description(h)
         ret = ""
-        ret += "$#{h[:trial_fee]} trial. " if self.disabled_trial? && !h[:trial_fee].nil?
+        ret += "$#{h[:trial_fee]} trial. Then " if self.disabled_trial? && !h[:trial_fee].nil?
         ret += "$#{h[:trial2_fee]} one-time price. " if self.disabled_trial? && !h[:trial2_fee].nil?
         ret += "$#{h[:fee]}/#{h[:period]}. " if h[:units].to_i <= 1 
         ret += "$#{h[:fee]}/#{h[:units]}#{h[:period]}. " if h[:units].to_i > 1 

@@ -28,7 +28,7 @@ i.disabled_trial = c.disabled_trial
 begin
 	i.check_create_item(item_number)
 rescue => e
-	redirect "/settings/credit?errdesc=#{CGI.escape(e.to_s)}"
+	redirect "/dashboard?errdesc=#{CGI.escape(e.to_s)}"
 end
 
 # save the invoice
