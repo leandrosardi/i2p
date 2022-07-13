@@ -26,8 +26,8 @@ BlackStack::Extensions::add ({
     :setting_screens => [
         # add a link in section `Billing & Finances` of the `/settings` screen, with a caption `Invoices`, and linking to the screen `/settings/invoices`. The source code of the screen `/settings/invoices` is copied from the file `/vews/invoices.erb` in the extension's folder. 
         { :section => 'Billing & Finances', :label => 'Invoices', :screen => :invoices },
-        { :section => 'Billing & Finances', :label => 'PayPal Subscriptions', :screen => :subscriptions },
-        { :section => 'Billing & Finances', :label => 'Transactions', :screen => :transactions },
+#        { :section => 'Billing & Finances', :label => 'PayPal Subscriptions', :screen => :subscriptions },
+#        { :section => 'Billing & Finances', :label => 'Transactions', :screen => :transactions },
     ],
 
 =begin
