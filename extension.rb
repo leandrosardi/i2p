@@ -30,18 +30,19 @@ BlackStack::Extensions::add ({
 #        { :section => 'Billing & Finances', :label => 'Transactions', :screen => :transactions },
     ],
 
-=begin
-    # what are the screens to add in the leftbar
-    :leftbar_icons => [
-        # add an icon with the label "dashboard`, with the icon `icon-dashboard`, and poiting to the scren `helpdesk/dashboard`. 
-        { :label => 'search', :icon => :'icon-search', :screen => :search, },
-        # add an icon with the label "tickets`, with the icon `icon-envelope`, and poiting to the scren `helpdesk/tickets`. 
-        { :label => 'exports', :icon => :'icon-download-cloud', :screen => :exports, },
-    ],
- 
-    # add a folder to the storage from where user can download the exports.
-    :storage_folders => [
-        { :name => 'exports.leads', },
-    ],
-=end
+    # deployment routines
+    :deployment_routines => [{
+        :name => 'start-ipn-process',
+        :commands => [{ 
+            # back up old configuration file
+            # setup new configuration file
+            :command => "
+                source /home/%ssh_username%/.rvm/scripts/rvm; rvm install 3.1.2; rvm --default use 3.1.2 > /dev/null 2>&1;
+                cd /home/%ssh_username%/code/mysaas/extensions/i2p/p > /dev/null 2>&1; 
+                export RUBYLIB=/home/%ssh_username%/code/mysaas > /dev/null 2>&1;
+                nohup ruby ipn.rb > /dev/null 2>&1 &
+            ",
+            :sudo => false,
+        }],
+    }],
 })
