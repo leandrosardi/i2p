@@ -42,9 +42,14 @@ get '/settings/filter_update_subscription', :agent => /(.*)/ do
 end
 
 # AJAX
-post '/ajax/ip2/get_credits.json', :auth => true, :agent => /(.*)/ do
+post '/ajax/i2p/get_credits.json', :auth => true, :agent => /(.*)/ do
     erb :'/extensions/i2p/views/ajax/get_credits'
 end
 
-# API (pending)
-# TODO: code API access points
+# API
+get '/api1.0/i2p/ipn.json', :agent => /(.*)/ do
+    erb :'/extensions/i2p/views/api1.0/ipn'
+end
+post '/api1.0/i2p/ipn.json', :agent => /(.*)/ do
+    erb :'/extensions/i2p/views/api1.0/ipn'
+end

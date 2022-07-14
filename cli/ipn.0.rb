@@ -218,7 +218,7 @@ module IPNReprocessing
     # reprocess all the IPNs in the central     
     DB["SELECT id FROM #{dname}..invoice where id_account='#{c.id}'"].all { |rowi|
       self.logger.logs "Process invoice #{rowi[:id]}... "
-      BlackStack::BufferPayPalNotification.where("invoice like '%#{rowi[:id]}' and sync_end_time is null").order(:create_time).all { |p|
+      BlackStack::I2P::BufferPayPalNotification.where("invoice like '%#{rowi[:id]}' and sync_end_time is null").order(:create_time).all { |p|
         self.logger.logs "IPN #{p.id.to_guid}... "
             
         # inicio la sincronizacion.

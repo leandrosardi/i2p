@@ -7,6 +7,9 @@ DB = BlackStack::CRDB::connect
 require 'lib/skeletons'
 require 'extensions/i2p/lib/skeletons'
 
+puts '.'+BlackStack::I2P::plans_descriptor.to_s
+exit(0)
+
 # add required extensions
 BlackStack::Extensions.append :i2p
 
@@ -14,7 +17,7 @@ l = BlackStack::LocalLogger.new('./ipn.log')
 
 while true
   # iterate all exports with no start time, and a search.
-  BlackStack::BufferPayPalNotification.where(:sync_start_time=>nil).all.each do |ipn|
+  BlackStack::I2P::BufferPayPalNotification.where(:sync_start_time=>nil).all.each do |ipn|
     l.logs "Processing IPN #{ipn.id}"
     begin
         l.logs 'Flag start_time... '
