@@ -7,9 +7,6 @@ DB = BlackStack::CRDB::connect
 require 'lib/skeletons'
 require 'extensions/i2p/lib/skeletons'
 
-puts '.'+BlackStack::I2P::plans_descriptor.to_s
-exit(0)
-
 # add required extensions
 BlackStack::Extensions.append :i2p
 

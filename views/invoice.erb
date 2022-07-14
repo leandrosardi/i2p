@@ -354,7 +354,7 @@ if !invoice.allowedToAddRemoveItems? || compatible_upsell_plans.size > 0
 
 									<div class='span12'>
 									<%
-									if item.plan_descriptor[:type].to_s == 'S'
+									if item.plan_descriptor[:type].to_s == BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s
 									%>
 									<p align='right'>
 										<span style='color:black;'><b>Plan Details:</b></span><br/>

@@ -20,17 +20,17 @@ module BlackStack
       # compara 2 planes, y retorna TRUE si ambos pueden coexistir en una misma facutra, con un mismo enlace de PayPal
       def self.compatibility?(h, i)
         return false if h[:type]!=i[:type]
-        return false if h[:type]=='S' && h[:type]==i[:type] && h[:period]!=i[:period] 
-        return false if h[:type]=='S' && h[:type]==i[:type] && h[:units]!=i[:units] 
-        return false if h[:type]=='S' && h[:type]==i[:type] && h[:trial_period]!=i[:trial_period] 
-        return false if h[:type]=='S' && h[:type]==i[:type] && h[:trial_units]!=i[:trial_units] 
-        return false if h[:type]=='S' && h[:type]==i[:type] && h[:trial2_period]!=i[:trial2_period] 
-        return false if h[:type]=='S' && h[:type]==i[:type] && h[:trial2_units]!=i[:trial2_units] 
+        return false if h[:type].to_s==BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s && h[:type]==i[:type] && h[:period]!=i[:period] 
+        return false if h[:type].to_s==BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s && h[:type]==i[:type] && h[:units]!=i[:units] 
+        return false if h[:type].to_s==BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s && h[:type]==i[:type] && h[:trial_period]!=i[:trial_period] 
+        return false if h[:type].to_s==BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s && h[:type]==i[:type] && h[:trial_units]!=i[:trial_units] 
+        return false if h[:type].to_s==BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s && h[:type]==i[:type] && h[:trial2_period]!=i[:trial2_period] 
+        return false if h[:type].to_s==BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s && h[:type]==i[:type] && h[:trial2_units]!=i[:trial2_units] 
         true
       end
     
       # retorna un array con la lista de estados posibles de una factura
-      def self.statuses()
+      def self.statuses
         [STATUS_UNPAID, STATUS_PAID, STATUS_REFUNDED]
       end
     
@@ -84,32 +84,32 @@ module BlackStack
       end
       
       # 
-      def number()
+      def number
         self.id.to_guid
       end
     
       # 
-      def dateDesc()
+      def dateDesc
         self.create_time.strftime('%b %d, %Y')
       end
     
       # 
-      def dueDateDesc()
+      def dueDateDesc
         Date.strptime(self.billing_period_from.to_s, '%Y-%m-%d').strftime('%b %d, %Y')
       end
     
       # 
-      def billingPeriodFromDesc()
+      def billingPeriodFromDesc
         Date.strptime(self.billing_period_from.to_s, '%Y-%m-%d').strftime('%b %d, %Y')
       end
     
       # 
-      def billingPeriodToDesc()
+      def billingPeriodToDesc
         Date.strptime(self.billing_period_to.to_s, '%Y-%m-%d').strftime('%b %d, %Y')
       end
     
       # 
-      def total()
+      def total
         ret = 0
         self.items.each { |item|
           ret += item.amount.to_f
@@ -121,12 +121,12 @@ module BlackStack
       end
     
       #
-      def totalDesc()
+      def totalDesc
         ("%.2f" % self.total.to_s)
       end
     
       # TODO: refactor me
-      def paypal_link()
+      def paypal_link
         item = self.items.first
         if item.nil?
           raise "Invoice has no items"      
@@ -161,7 +161,7 @@ module BlackStack
         allow_trials = self.disabled_trial?
         
         bIsSubscription = false
-        bIsSubscription = true if plan_descriptor[:type]=="S"
+        bIsSubscription = true if plan_descriptor[:type].to_s==BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s
         
         # generating the invoice number
         invoice_id = "#{id_account.to_guid}.#{id_invoice.to_guid}"
@@ -207,21 +207,21 @@ module BlackStack
             end 
           }
           values[:p3] = plan_descriptor[:units] # every 1
-          values[:t3] = plan_descriptor[:period] # per month
+          values[:t3] = plan_descriptor[:period][0,1].upcase # month->M, week->W, day->D, etc.
       
           # si tiene un primer periodo de prueba
           if trial1
             values[:a1] = 0 # $1 fee
             self.items.each { |i| values[:a1] += i.plan_descriptor[:trial_fee].to_i }
             values[:p1] = plan_descriptor[:trial_units] # 15
-            values[:t1] = plan_descriptor[:trial_period] # days
+            values[:t1] = plan_descriptor[:trial_period][0,1].upcase # month->M, week->W, day->D, etc.
       
             # si tiene un segundo periodo de prueba
             if trial2
               values[:a2] = 0 # $50 fee
               self.items.each { |i| values[:a2] += i.plan_descriptor[:trial2_fee].to_i }
               values[:p2] = plan_descriptor[:trial2_units] # first 1
-              values[:t2] = plan_descriptor[:trial2_period] # month
+              values[:t2] = plan_descriptor[:trial2_period][0,1].upcase # month->M, week->W, day->D, etc.
             end
           end
       
@@ -252,7 +252,7 @@ module BlackStack
       # actualiza el registro en la tabla invoice segun los parametros. 
       # en este caso la factura se genera antes del pago.
       # genera el enlace de paypal.
-      def setup()
+      def setup
         # busco el primer item de esta factura
         item = self.items.sort_by {|obj| obj.create_time}.first
         if item == nil
@@ -423,7 +423,7 @@ module BlackStack
           billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:trial2_units].to_s} #{h[:trial2_period].to_s}' AS now"].map(:now)[0].to_s
 
         # si el plan tiene un fee, y
-        elsif h[:fee].to_f != nil && h[:type] == BlackStack::I2P::PAYMENT_SUBSCRIPTION
+        elsif h[:fee].to_f != nil && h[:type].to_s == BlackStack::I2P::PAYMENT_SUBSCRIPTION.to_s
           units = n.to_i * h[:credits].to_i
           unit_price = h[:fee].to_f / h[:credits].to_f
           billing_period_to = DB["SELECT TIMESTAMP '#{self.billing_period_from.to_s}' + INTERVAL '#{h[:units].to_s} #{h[:period].to_s}' AS now"].map(:now)[0].to_s
