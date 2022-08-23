@@ -52,7 +52,7 @@ module IPNReprocessing
       "select id " +
       "from #{dname}..movement with (nolock index(IX_movment__id_account__type)) " +
       "where id_account='#{c.id}' " +
-      "and COALESCE([type],0)<>#{BlackStack::Movement::MOVEMENT_TYPE_CANCELATION.to_s}"
+      "and COALESCE([type],0)<>#{BlackStack::I2P::Movement::MOVEMENT_TYPE_CANCELATION.to_s}"
     ].all { |row|
       DB.execute("delete #{dname}..movement where id='#{row[:id]}'")
       DB.disconnect
@@ -134,7 +134,7 @@ module IPNReprocessing
         "update #{dname}..invoice " + 
         "set " +
         "  subscr_id=null, " +
-        "  status=#{BlackStack::Invoice::STATUS_UNPAID.to_s}, " +
+        "  status=#{BlackStack::I2P::Invoice::STATUS_UNPAID.to_s}, " +
         "  id_buffer_paypal_notification=null " +
         "where id='#{row[:id]}' "
       )
@@ -274,7 +274,7 @@ api_url = "http://74.208.28.38:81"
 
   def expire(c)
     c.movements.select { |m|
-      (m.type == BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT || m.type == BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS) &&
+      (m.type == BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_PAYMENT || m.type == BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_BONUS) &&
       m.expiration_end_time.nil? &&
       m.expiration_tries.to_i < 3 &&
       !m.expiration_time.nil? &&
