@@ -48,7 +48,7 @@ module BlackStack
       end
 
       def typeName()
-        BlackStack::Movement::typeName(self.type)
+        BlackStack::I2P::Movement::typeName(self.type)
       end
     
       def self.typeColorName(t)
@@ -72,7 +72,7 @@ module BlackStack
       end
 
       def typeName()
-        BlackStack::Movement::typeColorName(self.type)
+        BlackStack::I2P::Movement::typeColorName(self.type)
       end
 
       # actualiza el registro con los valores del item de una factura
@@ -140,7 +140,7 @@ module BlackStack
         q = "
           select COALESCE(SUM(COALESCE(m.credits,0)),0) AS n 
           from movement m  
-          where COALESCE(m.type, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}) in (#{BlackStack::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}, #{BlackStack::Movement::MOVEMENT_TYPE_ADD_BONUS.to_s}) 
+          where COALESCE(m.type, #{BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}) in (#{BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_PAYMENT.to_s}, #{BlackStack::I2P::Movement::MOVEMENT_TYPE_ADD_BONUS.to_s}) 
           and m.id_account='#{self.account.id.to_guid}' 
           and COALESCE(m.credits,0) < 0 
           and UPPER(COALESCE(m.service_code, '')) = '#{self.service_code.upcase}' 
@@ -212,11 +212,11 @@ module BlackStack
         credits_to_expire = credits - credits_consumed.to_i #- (0.to_f - self.credits.to_f)).to_i
         amount_to_expire = total_credits.to_f == 0 ? 0 : credits_to_expire.to_f * ( total_amount.to_f / total_credits.to_f )
         #
-        exp = BlackStack::Movement.new
+        exp = BlackStack::I2P::Movement.new
         exp.id = guid()
         exp.id_account = self.account.id
         exp.create_time = registraton_time.nil? ? now() : registraton_time
-        exp.type = BlackStack::Movement::MOVEMENT_TYPE_EXPIRATION
+        exp.type = BlackStack::I2P::Movement::MOVEMENT_TYPE_EXPIRATION
         exp.id_user_creator = self.id_user_creator
         exp.description = desc
         exp.paypal1_amount = 0

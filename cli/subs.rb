@@ -54,7 +54,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     begin		
 			# get the invoice
       self.logger.logs 'Get the invoice... '
-			i = BlackStack::Invoice.where(:id=>PARSER.value('id_invoice')).first
+			i = BlackStack::I2P::Invoice.where(:id=>PARSER.value('id_invoice')).first
       raise 'Invoice not found' if i.nil?
       #raise 'Invoice is beling another account' if i.id_account.to_guid != c.id.to_guid
 			#raise 'Invoice already linked to another subscription' if !i.subscr_id.nil?

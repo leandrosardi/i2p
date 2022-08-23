@@ -62,7 +62,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     begin		
 			# get the invoice
       self.logger.logs 'Get the invoice... '
-			i = BlackStack::Invoice.where(:id=>PARSER.value('id_invoice')).first
+			i = BlackStack::I2P::Invoice.where(:id=>PARSER.value('id_invoice')).first
       raise 'Invoice not found' if i.nil?
 			self.logger.done
 			

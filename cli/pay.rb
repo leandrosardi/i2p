@@ -63,7 +63,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
     begin		
 			# get the invoice
       self.logger.logs 'Get the invoice... '
-			i = BlackStack::Invoice.where(:id=>PARSER.value('id_invoice')).first
+			i = BlackStack::I2P::Invoice.where(:id=>PARSER.value('id_invoice')).first
       raise 'Invoice not found' if i.nil?
 			self.logger.done
 			
@@ -88,7 +88,7 @@ class MyCLIProcess < BlackStack::MyLocalProcess
 				# i.recalculate
 		
 				# crea una factura para el periodo siguiente (dia, semana, mes, anio)
-				j = BlackStack::Invoice.new()
+				j = BlackStack::I2P::Invoice.new()
 				j.id = guid()
 				j.id_account = c.id
 				j.create_time = now()
