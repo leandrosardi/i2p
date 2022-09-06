@@ -202,7 +202,7 @@ module BlackStack
         self.expiration_tries = self.expiration_tries.to_i + 1
         self.save
         # 
-        balance = BlackStack::Balance.new(self.account.id, self.service_code, registraton_time)
+        balance = BlackStack::I2P::Balance.new(self.account.id, self.service_code, registraton_time)
         balance.calculate
         total_credits = 0.to_f - balance.credits.to_f
         total_amount = 0.to_f - balance.amount.to_f
