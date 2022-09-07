@@ -42,7 +42,7 @@ BlackStack::Extensions::add ({
                 export RUBYLIB=/home/%ssh_username%/code/mysaas;
                 nohup ruby ipn.rb;
             ",
-            :sudo => true,
+            :sudo => false,
             :background => true,
         }],
     }],
