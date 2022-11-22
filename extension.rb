@@ -31,7 +31,9 @@ BlackStack::Extensions::add ({
     ],
 
     # deployment routines
-    :deployment_routines => [{
+    :deployment_routines => [
+=begin
+    {
         :name => 'start-ipn-process',
         :commands => [{ 
             # back up old configuration file
@@ -45,5 +47,7 @@ BlackStack::Extensions::add ({
             :sudo => true,
             :background => true,
         }],
-    }],
+    }
+=end
+    ],
 })
