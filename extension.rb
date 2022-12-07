@@ -1,6 +1,6 @@
 BlackStack::Extensions::add ({
     # descriptive name and descriptor
-    :name => 'I2P',
+    :name => 'i2p',
     :description => 'Simple Invoicing & Payments Processing.',
 
     # setup the url of the repository for installation and updates
