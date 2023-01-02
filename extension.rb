@@ -29,25 +29,4 @@ BlackStack::Extensions::add ({
 #        { :section => 'Billing & Finances', :label => 'PayPal Subscriptions', :screen => :subscriptions },
 #        { :section => 'Billing & Finances', :label => 'Transactions', :screen => :transactions },
     ],
-
-    # deployment routines
-    :deployment_routines => [
-=begin
-    {
-        :name => 'start-ipn-process',
-        :commands => [{ 
-            # back up old configuration file
-            # setup new configuration file
-            :command => "
-                source /home/%ssh_username%/.rvm/scripts/rvm; rvm install 3.1.2; rvm --default use 3.1.2;
-                cd /home/%ssh_username%/code/mysaas/extensions/i2p/p; 
-                export RUBYLIB=/home/%ssh_username%/code/mysaas;
-                nohup ruby ipn.rb;
-            ",
-            :sudo => true,
-            :background => true,
-        }],
-    }
-=end
-    ],
 })
