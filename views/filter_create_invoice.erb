@@ -28,7 +28,8 @@ i.disabled_trial = c.disabled_trial
 begin
 	i.check_create_item(item_number)
 rescue => e
-	redirect "/dashboard?errdesc=#{CGI.escape(e.to_s)}"
+	# TODO: This URL should be parametrized
+	redirect "/plans?err=#{CGI.escape(e.to_s)}"
 end
 
 # save the invoice
