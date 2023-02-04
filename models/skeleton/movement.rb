@@ -13,6 +13,22 @@ module BlackStack
       MOVEMENT_TYPE_ADJUSTMENT = 6 # it can be recalculated
       MOVEMENT_TYPE_REFUND_ADJUSTMENT = 7 # it cannot be recalculated
     
+      def after_create
+        super
+        # if it is payment or bonus, update the account as premium
+        if (self.type == MOVEMENT_TYPE_ADD_PAYMENT || self.type == MOVEMENT_TYPE_ADD_BONUS)
+          DB.execute("UPDATE \"account\" SET premium=TRUE WHERE id='#{self.id_accout}'")
+        end
+      end # after_create
+
+      def after_update
+        super
+        # if it is payment or bonus, update the account as premium
+        if (self.type == MOVEMENT_TYPE_ADD_PAYMENT || self.type == MOVEMENT_TYPE_ADD_BONUS)
+          DB.execute("UPDATE \"account\" SET premium=TRUE WHERE id='#{self.id_accout}'")
+        end
+      end # after_update
+
       def self.types()
         [
           MOVEMENT_TYPE_ADD_PAYMENT,
