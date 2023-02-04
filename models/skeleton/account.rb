@@ -7,7 +7,7 @@ module BlackStack
       		#one_to_many :customplans, :class=>:'BlackStack::I2P::CustomPlan', :key=>:id_account
 
 			def premium?
-				self.subscriptions.size > 0
+				self.premium
 			end
 
 	  		def hasBillingAddress?
