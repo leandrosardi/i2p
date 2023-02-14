@@ -17,7 +17,7 @@ module BlackStack
         super
         # if it is payment and is not premium, update the account as premium
         if self.type == MOVEMENT_TYPE_ADD_PAYMENT && !self.account.premium 
-          DB.execute("UPDATE \"account\" SET premium=TRUE WHERE id='#{self.id_accout}'")
+          DB.execute("UPDATE \"account\" SET premium=TRUE WHERE id='#{self.id_account}'")
         end
       end # after_create
 
@@ -25,7 +25,7 @@ module BlackStack
         super
         # if it is payment and is not premium, update the account as premium
         if self.type == MOVEMENT_TYPE_ADD_PAYMENT && !self.account.premium 
-          DB.execute("UPDATE \"account\" SET premium=TRUE WHERE id='#{self.id_accout}'")
+          DB.execute("UPDATE \"account\" SET premium=TRUE WHERE id='#{self.id_account}'")
         end
       end # after_update
 
