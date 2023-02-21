@@ -18,8 +18,8 @@ module BlackStack
             WHERE id_account='#{self.account.id}' 
             AND service_code='#{self.service_code}'
           "].first
-          self.credits = row[:credits].to_i
-          self.amount = row[:amount].to_f
+          self.credits = row.nil? ? 0 : row[:credits].to_i
+          self.amount = row.nil? ? 0 : row[:amount].to_f
         else
           q1 = nil
           q2 = nil
