@@ -6,6 +6,33 @@ module BlackStack
       		one_to_many :subscriptions, :class=>:'BlackStack::I2P::Subscription', :key=>:id_account
       		#one_to_many :customplans, :class=>:'BlackStack::I2P::CustomPlan', :key=>:id_account
 
+			# update `balance` snapshot for the given accounts.
+			# update `balance` snapshot for all accounts if `aids` is nil.
+			def self.update_balance_snapshot(aids=nil)
+				q = "
+					insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+					select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), sum(m.credits) as credits_update, sum(m.amount) as amount_update
+					from movement m
+					#{aids.nil? ? '' : "where m.id_account in ('#{aids.join("','")}')" }
+					group by m.id_account, m.service_code 
+					on conflict (id_Account, service_code)
+					do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount;
+				"
+				DB.execute(q)
+			end
+
+			# update `balance` snapshot for all accounts
+			def self.update_balance_snapshot_all
+				BlackStack::I2P::Account.update_balance_snapshot(nil)
+			end
+
+			# update `balance` snapshot for this account
+			def update_balance_snapshot
+				BlackStack::I2P::Account.update_balance_snapshot([self.id])
+			end
+
+			# return true if this account is premium
+			# return false otherwise
 			def premium?
 				self.premium
 			end
