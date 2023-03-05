@@ -20,6 +20,7 @@ while true
       l.logs "#{a.name}... "
       begin
         a.update_movements(l)
+        a.update_balance
         l.done
       rescue => e
         l.logf "ERROR: #{e.message}"
