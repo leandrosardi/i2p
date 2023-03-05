@@ -69,6 +69,128 @@ module BlackStack
         		ret
       		end
 
+			# update the snapshot `balance`
+			# reference: https://github.com/leandrosardi/i2p/issues/22
+			def self.update_balance()
+				q = "
+				insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+				select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), sum(m.credits) as credits_update, sum(m.amount) as amount_update
+				from movement m
+				group by m.id_account, m.service_code 
+				on conflict (id_Account, service_code)
+				do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount
+				"
+				DB.execute(q)
+			end
+
+			# update the snapshot `balance`
+			# reference: https://github.com/leandrosardi/i2p/issues/22
+			def update_balance()
+				q = "
+				insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+				select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), sum(m.credits) as credits_update, sum(m.amount) as amount_update
+				from movement m
+				where m.id_account='#{self.id}'
+				group by m.id_account, m.service_code 
+				on conflict (id_Account, service_code)
+				do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount
+				"
+				DB.execute(q)
+			end
+
+			# update the table `movement`
+			# reference: https://github.com/leandrosardi/i2p/issues/24
+			def update_movements(l=nil)
+                l = BlackStack::DummyLogger.new(nil) if l.nil?
+                # Get latetest date-hour in the `eml_timeline` for this address, and store it in the variable `last`.
+                # If there is no `eml_timeline` for this address, set `2023-01-01` as default value.
+                l.logs 'Get the latest date-hour... '
+                last = self.movement_last_date_processed
+                last = self.create_time if last.nil?
+                last = Time.new(2023,1,1) if last.nil?
+                l.logf "done (#{last})"
+                # Iterate all date-hours from `last` to now, using the table `daily` joined with `hourly`.
+                # Each iteration store such a date-hour in the variable `dt`.
+                l.logs 'Iterate all date-hours from `last` to now...'
+                rightnow = now
+                lastday = Time.new(last.year, last.month, last.day, 0, 0)
+                today = Time.new(rightnow.year, rightnow.month, rightnow.day, 0, 0, 0)
+				# move `lastday` 1 day before, in case that new activity happned in the last secod of the previ
+                
+				# iterate days
+				BlackStack::MySaaS::Daily.where(:date=>lastday.to_time..today).order(:date).all do |daily|
+                    l.logs "#{daily.date}... "
+                    # update `movement_last_date_processed`
+                    self.movement_last_date_processed = daily.date
+                    self.save
+					# iterate the services
+					BlackStack::I2P::services_descriptor.each { |h|
+						service_code = h[:code]
+						l.logs "Service #{service_code}... "
+						if h[:consumed_function].nil?
+							l.logf "skipped"
+						else
+							# get total credits of this account and service
+							# note: such a value must be the same after get the number of consumption, 
+							# in order to calculate the credit rate with no incongruences (atomicity).
+							self.update_balance
+							credits0 = 0.to_f - BlackStack::I2P::Balance.new(self.id, service_code).credits.to_f
+							# load the consumption for this id_account, dt, type, service_code
+							l.logs "Loading consumption... "
+							n = h[:consumed_function].call(self.id, daily.date)				
+							l.logf "done (#{n})"
+							if n > 0
+								# get credit rate
+								self.update_balance
+								balance = BlackStack::I2P::Balance.new(self.id, service_code)
+								total_credits = 0.to_f - balance.credits.to_f
+								total_amount = 0.to_f - balance.amount.to_f
+								ratio = total_credits == 0 ? 0.to_f : total_amount.to_f / total_credits.to_f
+								amount = n.to_f * ratio
+								# validate atomicity
+								raise "Atomicity error: credits0=#{credits0}, total_credits=#{total_credits}" if credits0 != total_credits
+								# load the movments for this id_account, dt, type, service_code
+								q = "
+									SELECT m.id
+									FROM movement m
+									WHERE m.id_account = '#{self.id}'
+									AND m.service_code = '#{h[:code]}'
+									AND m.type = #{BlackStack::I2P::Movement::MOVEMENT_TYPE_CANCELATION}
+									AND date_part('year', m.create_time) = '#{daily.date.year}'
+									AND date_part('month', m.create_time) = '#{daily.date.month}'
+									AND date_part('day', m.create_time) = '#{daily.date.day}'
+								"
+								row = DB[q].first
+								# if there is a movement for this id_account, dt, service_code, then update it
+								if row.nil?
+									# create a new movement
+									m = BlackStack::I2P::Movement.new
+									m.id = guid
+									m.create_time = daily.date
+									m.id_account = self.id
+									m.service_code = h[:code]
+									m.type = BlackStack::I2P::Movement::MOVEMENT_TYPE_CANCELATION
+									m.description = "Cancelation for #{h[:code]} on #{daily.date}"
+									m.paypal1_amount = 0
+									m.bonus_amount = 0
+								else
+									m = BlackStack::I2P::Movement.where(:id=>row[:id]).first
+								end
+								m.amount = amount
+								m.profits_amount = -amount
+								m.credits = n
+								m.save
+							end
+							# 
+							l.done
+						end
+					}
+					l.done
+                end # each daily
+                l.done
+            end # def update_timeline
+
+			# TODO: deprecated
       		# crea/actualiza un registro en la tabla movment, reduciendo la cantidad de creditos y saldo que tiene el accounte, para el producto indicado en service_code. 
       		def consume(service_code, number_of_credits=1, description=nil, datetime=nil)
 				dt = datetime.nil? ? now() : datetime.to_time.to_sql
