@@ -16,7 +16,7 @@ while true
   i = 0
 
   begin
-    BlackStack::I2P::Account.where(:premium=>true).all { |a|
+    BlackStack::I2P::Account.all { |a|
       l.logs "#{a.name}... "
       begin
         a.update_movements(l)
