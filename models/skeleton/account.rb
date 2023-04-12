@@ -120,9 +120,9 @@ module BlackStack
 				# iterate days
 				BlackStack::MySaaS::Daily.where(:date=>lastday.to_time..today).order(:date).all do |daily|
                     l.logs "#{daily.date}... "
-                    # update `movement_last_date_processed`
-                    self.movement_last_date_processed = daily.date
-                    self.save
+                    # update `movement_last_date_processed` for this account
+					query_update = "UPDATE account SET movement_last_date_processed='#{daily.date}' WHERE id='#{self.id}'"
+					DB.execute(query_update)
 					# iterate the services
 					BlackStack::I2P::services_descriptor.each { |h|
 						service_code = h[:code]
