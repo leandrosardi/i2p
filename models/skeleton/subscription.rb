@@ -10,6 +10,15 @@ module BlackStack
       # ----------------------------------------------------------------------------------------- 
       #
     
+      # receive an IPN hash privided by PayPal. 
+      # search an IPN by the keys that I conside are primary: verify_sign, txn_type, ipn_track_id.
+      # if it founds the record in the table then it returns it, otherwise it returns nil. 
+      def self.find(params)
+        BlackStack::I2P::Subscription.where(
+          :subscr_id=>params['subscr_id']
+        ).first
+      end
+
       # retorna true si existe un registro en :subscription con el mismo valor subscr_id.
       # sin retorna false.
       def self.load(params)

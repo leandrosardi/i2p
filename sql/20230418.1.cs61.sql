@@ -1,0 +1,1 @@
+ALTER TABLE invoice_item ALTER COLUMN service_code TYPE varchar(500);

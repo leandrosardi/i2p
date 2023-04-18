@@ -67,7 +67,7 @@ module BlackStack
           :verify_sign=>params['verify_sign'], 
           :txn_type=>params['txn_type'], 
           :ipn_track_id=>params['ipn_track_id']
-        ).first.nil?
+        ).first
       end
     
       # receive an IPN hash privided by PayPal. 
