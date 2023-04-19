@@ -211,11 +211,27 @@ module BlackStack
             if row != nil
               i = BlackStack::I2P::Invoice.where(:id=>row[:iid]).first
             end
+
+            # si la factura no existe, entonces la creo
+            if i.nil?
+              # busco la ultima factura de este cliente, con el mismo subscription id
+              # reference: https://github.com/leandrosardi/cs/issues/61
+              i = BlackStack::I2P::Invoice.where(:id_account=>cid, :subscr_id=>self.subscr_id).order(:billing_period_from).last
+              if i.nil?
+                raise "Invoice not found"
+              end
+              # creo una nueva factura para el periodo siguiente
+              j = BlackStack::I2P::Invoice.new()
+              j.id = guid()
+              j.id_account = a.id
+              j.create_time = now()
+              j.disabled_trial = a.disabled_trial
+              j.save()
+              j.next(i)
+              i = j
+            end
           end
-    
-          # 
-          raise "Invoice not found" if i.nil?
-    
+        
           # valido que el importe de la factura sea igual al importe del IPN
           raise "Invoice amount is not the equal to the amount of the IPN (#{i.total.to_s}!=#{self.payment_gross.to_s})" if i.total.to_f != self.payment_gross.to_f
     
