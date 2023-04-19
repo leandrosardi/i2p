@@ -20,6 +20,7 @@ from buffer_paypal_notification b
 where b.sync_start_time is not null 
 and b.sync_end_time is null
 and coalesce(b.sync_reservation_times, 0) < 3
+order by b.create_time
 "
 i = 0
 DB[q].all { |row|
@@ -32,7 +33,7 @@ DB[q].all { |row|
   DB.disconnect
   GC.start
   # break
-  #break if i > 10
+  break if i > 100
 }
 l.done
 
@@ -40,7 +41,7 @@ l.done
 while true
   begin
     # iterate all exports with no start time, and a search.
-    BlackStack::I2P::BufferPayPalNotification.where(:sync_start_time=>nil).all.each do |ipn|
+    BlackStack::I2P::BufferPayPalNotification.where(:sync_start_time=>nil).order(:create_time).all.each do |ipn|
 #BlackStack::I2P::BufferPayPalNotification.where(:id=>['3ab7b12c-ebe4-449d-8b86-08c7ab554eef', 'a8e09089-41a1-4f10-9bde-a14eba5c5623']).all.each do |ipn|
       l.logs "Processing IPN #{ipn.id}"
       begin
