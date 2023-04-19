@@ -32,7 +32,7 @@ DB[q].all { |row|
   DB.disconnect
   GC.start
   # break
-  break if i > 10
+  #break if i > 10
 }
 l.done
 
