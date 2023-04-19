@@ -172,166 +172,165 @@ module BlackStack
       # si se trata de una suscripcion, entonces genera nuevas facturas para pagos futuros
       def process 
         # validation: if this IPN is already linked to an invoice, then ignore it.
-        if !BlackStack::I2P::Invoice.where(:id_buffer_paypal_notification=>self.id).first.nil?
-          raise "IPN already linked to an invoice."
-        end      
-        # validation: the IPN must be linked to an account
-        a = self.account
-        if a.nil?
-          raise "Client not found (payer_email=#{self.payer_email.to_s})."
-        end
-        
-        # parseo en numero de factura formado por id_account.id_invoice
-        cid = a.id.to_guid
-        iid = self.first_invoice_id
-    
-        # si es un pago por un primer trial, sengundo trial o pago recurrente de suscripcion,
-        # entonces registro la factura, activo el rol de este cliente (deprecated), se agrega el cliente a la lista de emails (deprecated)
-        if  ( ( self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_WEB_ACCEPT || self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_PAYMENT || self.txn_type == BufferPayPalNotification::TXN_STATUS_COMPLETED ) && self.payment_status == 'Completed' )        
-          # reviso si la factura ya estaba creada.
-          # la primer factura se por adelantado cuando el cliente hace signup, y antes de que se suscriba a paypal, y se le pone un ID igual a primer GUID del campo invoice del IPN
-          i = BlackStack::I2P::Invoice.where(:id=>iid, :status=>BlackStack::I2P::Invoice::STATUS_UNPAID).order(:billing_period_from).first
-          if i.nil?
-            i = BlackStack::I2P::Invoice.where(:id=>iid, :status=>nil).order(:billing_period_from).first
+        if BlackStack::I2P::Invoice.where(:id_buffer_paypal_notification=>self.id).first.nil?
+          # validation: the IPN must be linked to an account
+          a = self.account
+          if a.nil?
+            raise "Client not found (payer_email=#{self.payer_email.to_s})."
           end
           
-          # de la segunda factura en adelante, se generan con un ID diferente, pero se le guarda a subscr_id para identificar cuado llegue el pago de esa factura
-          if i.nil?
-            # busco una factura en estado UNPAID que este vinculada a esta suscripcion
-            q = "
-              SELECT i.id AS iid 
-              FROM invoice i 
-              WHERE i.id_account='#{cid}' 
-              AND COALESCE(i.status,#{BlackStack::I2P::Invoice::STATUS_UNPAID})=#{Invoice::STATUS_UNPAID} 
-              AND i.subscr_id = '#{self.subscr_id}'
-              ORDER BY i.billing_period_from ASC
-              LIMIT 1
-            "
-            row = DB[q].first
-            if row != nil
-              i = BlackStack::I2P::Invoice.where(:id=>row[:iid]).first
-            end
-
-            # si la factura no existe, entonces la creo
+          # parseo en numero de factura formado por id_account.id_invoice
+          cid = a.id.to_guid
+          iid = self.first_invoice_id
+      
+          # si es un pago por un primer trial, sengundo trial o pago recurrente de suscripcion,
+          # entonces registro la factura, activo el rol de este cliente (deprecated), se agrega el cliente a la lista de emails (deprecated)
+          if  ( ( self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_WEB_ACCEPT || self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_PAYMENT || self.txn_type == BufferPayPalNotification::TXN_STATUS_COMPLETED ) && self.payment_status == 'Completed' )        
+            # reviso si la factura ya estaba creada.
+            # la primer factura se por adelantado cuando el cliente hace signup, y antes de que se suscriba a paypal, y se le pone un ID igual a primer GUID del campo invoice del IPN
+            i = BlackStack::I2P::Invoice.where(:id=>iid, :status=>BlackStack::I2P::Invoice::STATUS_UNPAID).order(:billing_period_from).first
             if i.nil?
-              # busco la ultima factura de este cliente, con el mismo subscription id
-              # reference: https://github.com/leandrosardi/cs/issues/61
-              i = BlackStack::I2P::Invoice.where(:id_account=>cid, :subscr_id=>self.subscr_id).order(:billing_period_from).last
-              if i.nil?
-                raise "Invoice not found"
-              end
-              # creo una nueva factura para el periodo siguiente
-              j = BlackStack::I2P::Invoice.new()
-              j.id = guid()
-              j.id_account = a.id
-              j.create_time = now()
-              j.disabled_trial = a.disabled_trial
-              j.save()
-              j.next(i)
-              i = j
+              i = BlackStack::I2P::Invoice.where(:id=>iid, :status=>nil).order(:billing_period_from).first
             end
-          end
-        
-          # valido que el importe de la factura sea igual al importe del IPN
-          raise "Invoice amount is not the equal to the amount of the IPN (#{i.total.to_s}!=#{self.payment_gross.to_s})" if i.total.to_f != self.payment_gross.to_f
-    
-          # le asigno el id_buffer_paypal_notification
-          i.id_buffer_paypal_notification = self.id
-          i.subscr_id = self.subscr_id
-          i.save
-      
-          # marco la factura como pagada
-          # registro contable - bookkeeping
-          i.getPaid(self.create_time) if i.canBePaid?
-      
-          # crea una factura para el periodo siguiente (dia, semana, mes, anio)
-          j = BlackStack::I2P::Invoice.new()
-          j.id = guid()
-          j.id_account = a.id
-          j.create_time = now()
-          j.disabled_trial = a.disabled_trial
-          j.save()
-      
-          # genero los datos de esta factura, como la siguiente factura a la que estoy pagando en este momento
-          j.next(i)
-
-        elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_SIGNUP)
-          # crear un registro en la tabla subscriptions
-          if BlackStack::I2P::Subscription.find(self.to_hash) != nil
-            # mensaje de error
-            raise 'Subscription Already Exists.'
-          else
-            # registro la suscripcion en la base de datos
-            s = BlackStack::I2P::Subscription.create(self.to_hash)
-            s.id = guid
-            s.id_buffer_paypal_notification = self.id
-            s.create_time = now       
-            s.id_account = a.id
-            s.active = true
-            s.save              
-            # obtengo la factura que se creo con esta suscripcion
-            i = BlackStack::I2P::Invoice.where(:id=>iid).first
-            # vinculo esta suscripcion a la factura que la genero, y a todas las facturas siguientes
-            i.set_subscription(s)
-          end
             
-        elsif (
-          self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_CANCEL #||
-          #self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_SUSPEND ||           # estos IPN traen el campo subscr_id en blanco
-          #self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_SUSPEND_DUE_MAX_FAILURES   # estos IPN traen el campo subscr_id en blanco
-        )
-            s = BlackStack::I2P::Subscription.find(self.to_hash)
-            if s.nil?
-              # validate: subscription exists
-              raise "Subscription (#{self.subscr_id}) Not Found."
+            # de la segunda factura en adelante, se generan con un ID diferente, pero se le guarda a subscr_id para identificar cuado llegue el pago de esa factura
+            if i.nil?
+              # busco una factura en estado UNPAID que este vinculada a esta suscripcion
+              q = "
+                SELECT i.id AS iid 
+                FROM invoice i 
+                WHERE i.id_account='#{cid}' 
+                AND COALESCE(i.status,#{BlackStack::I2P::Invoice::STATUS_UNPAID})=#{Invoice::STATUS_UNPAID} 
+                AND i.subscr_id = '#{self.subscr_id}'
+                ORDER BY i.billing_period_from ASC
+                LIMIT 1
+              "
+              row = DB[q].first
+              if row != nil
+                i = BlackStack::I2P::Invoice.where(:id=>row[:iid]).first
+              end
+
+              # si la factura no existe, entonces la creo
+              if i.nil?
+                # busco la ultima factura de este cliente, con el mismo subscription id
+                # reference: https://github.com/leandrosardi/cs/issues/61
+                i = BlackStack::I2P::Invoice.where(:id_account=>cid, :subscr_id=>self.subscr_id).order(:billing_period_from).last
+                if i.nil?
+                  raise "Invoice not found"
+                end
+                # creo una nueva factura para el periodo siguiente
+                j = BlackStack::I2P::Invoice.new()
+                j.id = guid()
+                j.id_account = a.id
+                j.create_time = now()
+                j.disabled_trial = a.disabled_trial
+                j.save()
+                j.next(i)
+                i = j
+              end
+            end
+          
+            # valido que el importe de la factura sea igual al importe del IPN
+            raise "Invoice amount is not the equal to the amount of the IPN (#{i.total.to_s}!=#{self.payment_gross.to_s})" if i.total.to_f != self.payment_gross.to_f
+      
+            # le asigno el id_buffer_paypal_notification
+            i.id_buffer_paypal_notification = self.id
+            i.subscr_id = self.subscr_id
+            i.save
+        
+            # marco la factura como pagada
+            # registro contable - bookkeeping
+            i.getPaid(self.create_time) if i.canBePaid?
+        
+            # crea una factura para el periodo siguiente (dia, semana, mes, anio)
+            j = BlackStack::I2P::Invoice.new()
+            j.id = guid()
+            j.id_account = a.id
+            j.create_time = now()
+            j.disabled_trial = a.disabled_trial
+            j.save()
+        
+            # genero los datos de esta factura, como la siguiente factura a la que estoy pagando en este momento
+            j.next(i)
+
+          elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_SIGNUP)
+            # crear un registro en la tabla subscriptions
+            if BlackStack::I2P::Subscription.find(self.to_hash) != nil
+              # mensaje de error
+              raise 'Subscription Already Exists.'
             else
               # registro la suscripcion en la base de datos
-              s.active = false
-              s.save
-            end
-      
-        elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_FAILED)
-          # TODO: actualizar registro en la tabla subscriptions. notificar al usuario
-      
-        elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_MODIFY)
-          # TODO: ?
-      
-        elsif (self.txn_type.to_s == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_REFUND)
-          # PROBLEMA: Los IPN no dicen de a quÃ© pago corresponde el reembolso
-            
-          payment_gross = 0
-          if self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_CENCELED_REVERSAL
-            payment_gross = 0 - self.payment_gross.to_f - self.payment_fee.to_f 
-          elsif self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_REFUNDED || self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_REVERSED
-            payment_gross = self.payment_gross.to_f # en negativo 
-          end
-          if payment_gross < 0
-            # validation: verifico que la factura por este IPN no exista
-            j = BlackStack::I2P::Invoice.where(:id_buffer_paypal_notification=>self.id).first
-            if !j.nil?
-              raise 'Invoice already exists.'
+              s = BlackStack::I2P::Subscription.create(self.to_hash)
+              s.id = guid
+              s.id_buffer_paypal_notification = self.id
+              s.create_time = now       
+              s.id_account = a.id
+              s.active = true
+              s.save              
+              # obtengo la factura que se creo con esta suscripcion
+              i = BlackStack::I2P::Invoice.where(:id=>iid).first
+              # vinculo esta suscripcion a la factura que la genero, y a todas las facturas siguientes
+              i.set_subscription(s)
             end
               
-            # obtengo la ultima factura pagada, vinculada a un IPN con el mismo codigo invoice
-            row = DB["
-              SELECT i.id 
-              FROM buffer_paypal_notification b 
-              JOIN invoice i ON ( b.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::I2P::Invoice::STATUS_PAID.to_s} ) 
-              WHERE b.invoice='#{self.invoice}' 
-              ORDER BY i.create_time DESC 
-              LIMIT 1
-            "].first
-            if row.nil?
-              raise 'Previous Paid Invoice not found.'
-            end
-            k = BlackStack::I2P::Invoice.where(:id=>row[:id]).first
+          elsif (
+            self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_CANCEL #||
+            #self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_SUSPEND ||           # estos IPN traen el campo subscr_id en blanco
+            #self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_SUSPEND_DUE_MAX_FAILURES   # estos IPN traen el campo subscr_id en blanco
+          )
+              s = BlackStack::I2P::Subscription.find(self.to_hash)
+              if s.nil?
+                # validate: subscription exists
+                raise "Subscription (#{self.subscr_id}) Not Found."
+              else
+                # registro la suscripcion en la base de datos
+                s.active = false
+                s.save
+              end
+        
+          elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_FAILED)
+            # TODO: actualizar registro en la tabla subscriptions. notificar al usuario
+        
+          elsif (self.txn_type == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_MODIFY)
+            # TODO: ?
+        
+          elsif (self.txn_type.to_s == BlackStack::I2P::BufferPayPalNotification::TXN_TYPE_SUBSCRIPTION_REFUND)
+            # PROBLEMA: Los IPN no dicen de a quÃ© pago corresponde el reembolso
               
-            # creo la factura por el reembolso
-            k.refund(payment_gross)  
+            payment_gross = 0
+            if self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_CENCELED_REVERSAL
+              payment_gross = 0 - self.payment_gross.to_f - self.payment_fee.to_f 
+            elsif self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_REFUNDED || self.payment_status == BlackStack::I2P::BufferPayPalNotification::TXN_STATUS_REVERSED
+              payment_gross = self.payment_gross.to_f # en negativo 
+            end
+            if payment_gross < 0
+              # validation: verifico que la factura por este IPN no exista
+              j = BlackStack::I2P::Invoice.where(:id_buffer_paypal_notification=>self.id).first
+              if !j.nil?
+                raise 'Invoice already exists.'
+              end
+                
+              # obtengo la ultima factura pagada, vinculada a un IPN con el mismo codigo invoice
+              row = DB["
+                SELECT i.id 
+                FROM buffer_paypal_notification b 
+                JOIN invoice i ON ( b.id=i.id_buffer_paypal_notification AND i.status=#{BlackStack::I2P::Invoice::STATUS_PAID.to_s} ) 
+                WHERE b.invoice='#{self.invoice}' 
+                ORDER BY i.create_time DESC 
+                LIMIT 1
+              "].first
+              if row.nil?
+                raise 'Previous Paid Invoice not found.'
+              end
+              k = BlackStack::I2P::Invoice.where(:id=>row[:id]).first
+                
+              # creo la factura por el reembolso
+              k.refund(payment_gross)  
+            end
+          else
+            # unknown
           end
-        else
-          # unknown
-        end
+        end # if self.txn_type != nil
       end # def process
     end # class
   end # module I2P
