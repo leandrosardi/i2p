@@ -171,8 +171,9 @@ module BlackStack
       # salda facturas
       # si se trata de una suscripcion, entonces genera nuevas facturas para pagos futuros
       def process 
-        # validation: if this IPN is already linked to an invoice, then ignore it.
+          # validation: if this IPN is already linked to an invoice, then ignore it.
         if BlackStack::I2P::Invoice.where(:id_buffer_paypal_notification=>self.id).first.nil?
+
           # validation: the IPN must be linked to an account
           a = self.account
           if a.nil?
@@ -330,7 +331,7 @@ module BlackStack
           else
             # unknown
           end
-        end # if self.txn_type != nil
+        end # if i.nil?
       end # def process
     end # class
   end # module I2P

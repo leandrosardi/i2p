@@ -198,9 +198,10 @@ module BlackStack
           
           values[:a3] = 0
           self.items.each { |i|
-            if trial1 && i.units.to_i!=i.plan_descriptor[:trial_credits].to_i
-              raise 'Cannot order more than 1 package and trial in the same invoice'
-            elsif trial1
+            #if trial1 && i.units.to_i!=i.plan_descriptor[:trial_credits].to_i
+            #  raise 'Cannot order more than 1 package and trial in the same invoice'
+            #els
+            if trial1
               values[:a3] += i.plan_descriptor[:fee].to_f
             else # !trial1
               values[:a3] += ( i.units.to_f * ( i.plan_descriptor[:fee].to_f / i.plan_descriptor[:credits].to_f ).to_f )
