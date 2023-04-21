@@ -1,19 +1,17 @@
-<!--#include virtual = "./lgi/commons.asp"-->
-
 <%
 login = @login
 user = BlackStack::MySaaS::User.where(:id=>login.id_user).first
 c = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
+service_code = @login.user.preference('settings.transactions.service_code', '', params[:service_code])
+all_prods = BlackStack::I2P::services_descriptor
+prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] == service_code } 
 %>
 
-
-	<!-- Page content
-		================================================== -->
 	<section class="container">
 
 		<section class="row-fluid">	
 			<section class='span6'>
-				<%=nav2("Settings", "#{getDivisionURL}/settings/dashboard", "Transactions")%>
+				<%=nav2("Settings", "/settings/dashboard", "Transactions")%>
 			</section>
 			<section class='span6'>
 			</section>
@@ -25,38 +23,68 @@ c = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
 
 			<div class="span12 box" style="margin-bottom: 20px">
 
-				<input type='hidden' name='uid' id='uid' value='<%=user.id.gsub("{", "").gsub("}", "")%>'>
+				<div>
+					<b>Services: </b> 
+					<%
+					all_prods.each { |o|
+					%>
+					<span style='margin:5px;'>
+						<%
+						if !service_code.empty? && o[:code] == service_code
+						%>
+							<span class='badge badge-blue'><%=o[:code]%></span>
+						<%
+						else
+						%>
+							<a href="/settings/transactions?service_code=<%=o[:code]%>"><%=o[:code]%></a>
+						<%
+						end
+						%>
+					</span>
+					<%
+					}				
+					%>
+
+					<span style='margin:5px;'>
+						<%
+						if service_code.empty?
+						%>
+							<span class='badge badge-blue'>all</span>
+						<%
+						else
+						%>
+							<a href="/settings/transactions?service_code=">all</a>
+						<%
+						end
+						%>
+					</span>
+				</div>
+
 				<table class="table table-condensed">
 					<thead>
 						<tr>
-							<th width='auto'>
+							<th width='95px'>
 								date
 							</th>
-							<th width='auto'>
+							<th width='95px'>
 								service
 							</th>
-							<th width='auto'>
+							<th width='95px'>
 								type
 							</th>
-							<th width='350px'>
+							<th width='auto'>
 								description
 							</th>
-							<th align='right'>
-								paypal
+							<th style='text-align:right;' width='65px'>
+								amount
 							</th>
-							<th width='auto'>
-								bonus
-							</th>
-							<th width='auto'>
-								balance
-							</th>
-							<th width='auto'>
+							<th style='text-align:right;' width='65px'>
 								credits
 							</th>
-							<th width='auto'>
-								invoice								
-							</th>
-							<th width='auto'>
+							<th style='text-align:right;' width='65px'>
+								balance
+							</th>							
+							<th style='text-align:right;' width='95px'>
 								expiration								
 							</th>
 						</tr>
@@ -66,18 +94,49 @@ c = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
 
 						<%
 						n = 0
-						BlackStack::I2P::Movement.where(:id_account=>login.user.account.id).order(:create_time).all { |m|
+						balance = 0.to_f
+						BlackStack::I2P::Movement.where(:id_account=>login.user.account.id, :service_code=>prods.map { |o| o[:code] }).order(:create_time).all { |m|
 							n += 1
-							prod = BlackStack::I2P::services_descriptor.select { |p| p[:code] == m.service_code }.first
+							balance += m.amount.to_f
 						%>
 						<tr>
 							<td>
 								<%=m.create_time.strftime('%b %d, %Y')%>
 							</td>
 							<td>
-								<%=prod[:name].to_s%>
+								<%=m.service_code.to_s%>
 							</td>
 
+							<td>
+								<span class='badge badge-<%=BlackStack::I2P::Movement::typeColorName(m.type)%>'>
+									<%=BlackStack::I2P::Movement::typeName(m.type)%>
+								</span>
+							</td>
+							<td>
+								<%=m.description.to_s%>
+							</td>
+							<td style='text-align:right;color:<%=-m.amount<0 ? 'red' : 'blue';%>'>
+								$<%=('%.2f' % -m.amount.to_f)%>
+							</td>
+							<td style='text-align:right;color:<%=-m.credits<0 ? 'red' : 'blue';%>'>
+								<%=-m.credits.to_i.to_label%>
+							</td>
+							<td style='text-align:right;color:<%=-balance<0 ? 'red' : 'blue';%>'>
+								$<%=('%.2f' % -balance.to_f)%>
+							</td>
+							<td style='text-align:right;'>
+								<%
+								if m.id_invoice_item.nil?
+								%>
+								<span>-</span>
+								<%
+								else
+								%>
+								<span><%=m.expiration_time.strftime('%b %d, %Y')%></span>
+								<%
+								end
+								%>
+							</td>
 						</tr>
 						<%
 						}
@@ -98,8 +157,6 @@ c = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
 				<%
 				end
 				%>						
-			</div>				
-
-
+			</div>
 		</section>
 	</section>

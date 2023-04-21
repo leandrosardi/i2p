@@ -1,19 +1,14 @@
-<!--#include virtual = "./lgi/commons.asp"-->
-
 <%
 login = @login
 user = BlackStack::MySaaS::User.where(:id=>login.id_user).first
-account = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
+account = BlackStack::I2P::Account.where(:id=>user.id_account).first
 %>
 
-
-	<!-- Page content
-		================================================== -->
 	<section class="container">
 
 		<section class="row-fluid">	
 			<section class='span6'>
-				<%=nav2("Settings", "#{getDivisionURL}/settings/dashboard", "Subscriptions")%>
+				<%=nav2("Settings", "/settings/dashboard", "Invoices")%>
 			</section>
 			<section class='span6'>
 			</section>
@@ -141,7 +136,7 @@ account = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
 							<p style='font-size:18px'>
 								If you didn't subscribe yet... <br/>
 								<br/>
-								<button class='btn btn-large btn-green' onclick='window.location="/settings/credit#ssm"'>subscribe here</button>
+								<a class='btn btn-large btn-green' href='/plans'>subscribe here</a>
 							</p>
 						</center>
 						<%
