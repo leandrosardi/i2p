@@ -34,6 +34,9 @@
 					<th>
 						<!-- paypal link -->								
 					</th>
+					<th>
+						<!-- manually payment -->								
+					</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -66,7 +69,7 @@
 						$<%=invoice.totalDesc.encode_html%>
 					</td>
 					<td>
-						<span class='label label-<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>'><%=BlackStack::I2P::Invoice.statusDescription(invoice.status).to_s.downcase%></span>
+						<span class='badge badge-<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>'><%=BlackStack::I2P::Invoice.statusDescription(invoice.status).to_s.downcase%></span>
 					</td>
 					<td>
 						<%
@@ -81,6 +84,22 @@
 						elsif invoice.paypal_url.to_s.size == 0
 						%>
 						<small>paypal link not found!</small>
+						<%
+						end
+						%>
+					</td>
+					<td>
+						<%
+						# if an agent is accessing a client's account, or if the user is the sysowner
+						if @login.whois.account.sysowner?
+						%>
+						<%
+						if invoice.subscr_id.nil? && invoice.status.to_i == BlackStack::I2P::Invoice::STATUS_UNPAID
+						%>
+						<a class='btn btn-pink' href='./filter_set_invoice_paid?iid=<%=invoice.id.to_guid%>'>paid</a>
+						<%
+						end
+						%>
 						<%
 						end
 						%>

@@ -36,7 +36,11 @@ end
 get '/settings/filter_goto_invoice_paypal', :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_goto_invoice_paypal'
 end
-  
+
+get '/settings/filter_set_invoice_paid', :agent => /(.*)/ do
+    erb :'/extensions/i2p/views/filter_set_invoice_paid'
+end
+
 get '/settings/filter_update_subscription', :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_update_subscription'
 end

@@ -1,0 +1,18 @@
+<%
+iid = params[:iid]
+dt = now()
+# load invoice
+i = BlackStack::I2P::Invoice.where(:id=>iid).first
+# pay invoice
+i.getPaid(dt)
+# create next invoice
+j = BlackStack::I2P::Invoice.new()
+j.id = guid()
+j.id_account = i.id_account
+j.create_time = dt
+j.disabled_trial = i.account.disabled_trial
+j.save()
+j.next(i)
+# redireccionar al dashboard
+redirect '/settings/invoices?msg=Marked%20as%20Paid.'
+%>
