@@ -46,6 +46,11 @@ module BlackStack
         DB.disconnect
         GC.start
       end
+
+      def save
+        DB.execute("UPDATE balance SET amount=#{self.amount}, credits=#{self.credits} WHERE id_account='#{self.account.id}' AND service_code='#{self.service_code}'")
+      end
+
     end	# class Balance
   end # module I2P
 end # module BlackStack
