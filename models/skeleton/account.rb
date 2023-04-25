@@ -5,6 +5,17 @@ module BlackStack
     	class Account < BlackStack::MySaaS::Account
       		one_to_many :subscriptions, :class=>:'BlackStack::I2P::Subscription', :key=>:id_account
       		#one_to_many :customplans, :class=>:'BlackStack::I2P::CustomPlan', :key=>:id_account
+			
+			# deadline is the overdue date of the last paid invoice
+			def deadline
+				q = "
+				select max(i.billing_period_to) as account_deadline 
+				from invoice i 
+				where i.id_account = '#{self.id}' 
+				and coalesce(i.status,0)=1
+				"
+				DB[q].first[:account_deadline]
+			end
 
 			# update `balance` snapshot for the given accounts.
 			# update `balance` snapshot for all accounts if `aids` is nil.
