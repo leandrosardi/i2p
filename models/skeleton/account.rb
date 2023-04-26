@@ -248,7 +248,6 @@ module BlackStack
       		# crea un registro en la tabla movment, reduciendo la cantidad de creditos con saldo importe 0, para el producto indicado en service_code. 
       		def bonus(service_code, expiration, number_of_credits=1, description=nil)				
 				bonus_amount = 0 # Los bonos siempre son por un importa igual a 0.
-				
 				bonus = BlackStack::I2P::Movement.new
 				bonus.id = guid()
 				bonus.id_account = self.id

@@ -37,9 +37,7 @@ while true
             m = BlackStack::I2P::Movement.where(:id=>row[:id_movement]).first
             b = BlackStack::I2P::Account.where(:id=>m.id_account).first
             # update balance
-            balance = BlackStack::I2P::Balance.new(b.id, m.service_code)
-            balance.calculate
-            balance.save
+            BlackStack::I2P::Account.update_balance_snapshot([b.id])
             # expire this movement
             m.expire
             l.done

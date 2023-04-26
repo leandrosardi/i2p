@@ -10,6 +10,11 @@ module BlackStack
         self.calculate
       end
       
+      # value of each credit
+      def rate
+        self.amount.to_f / self.credits.to_f
+      end
+
       def calculate()
         if self.up_time.nil?
           row = DB["
@@ -45,10 +50,6 @@ module BlackStack
         # libero recursos
         DB.disconnect
         GC.start
-      end
-
-      def save
-        DB.execute("UPDATE balance SET amount=#{self.amount}, credits=#{self.credits} WHERE id_account='#{self.account.id}' AND service_code='#{self.service_code}'")
       end
 
     end	# class Balance
