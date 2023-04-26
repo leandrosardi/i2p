@@ -116,13 +116,51 @@ prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] =
 								<%=m.description.to_s%>
 							</td>
 							<td style='text-align:right;color:<%=-m.amount<0 ? 'red' : 'blue';%>'>
-								$<%=('%.2f' % -m.amount.to_f)%>
+								<%
+								if m.amount.to_f == 0
+								%>
+									<span>-</span>
+								<%
+								elsif -m.amount.to_f < 0
+								%>
+									-$<%=('%.2f' % m.amount.to_f)%>
+								<%
+								else
+								%>
+									$<%=('%.2f' % -m.amount.to_f)%>
+								<%
+								end
+								%>
 							</td>
 							<td style='text-align:right;color:<%=-m.credits<0 ? 'red' : 'blue';%>'>
-								<%=-m.credits.to_i.to_label%>
+								<%
+								if m.credits.to_i == 0
+								%>
+									<span>-</span>
+								<%
+								else
+								%>
+									<span><%=(-m.credits).to_i.to_label%></span>
+								<%
+								end
+								%>
 							</td>
 							<td style='text-align:right;color:<%=-balance<0 ? 'red' : 'blue';%>'>
-								$<%=('%.2f' % -balance.to_f)%>
+								<%
+								if balance.to_f == 0.0 
+								%>
+									<span>-</span>
+								<%
+								elsif -balance.to_f < 0
+								%>
+									-$<%=('%.2f' % balance.to_f)%>
+								<%
+								else
+								%>
+									$<%=('%.2f' % -balance.to_f)%>
+								<%
+								end
+								%>
 							</td>
 							<td style='text-align:right;'>
 								<%
