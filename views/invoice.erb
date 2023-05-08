@@ -116,10 +116,12 @@ end
 				<br/>
 				<%=account.billing_country.to_s%>.
 				<%
+				else
+				%>
+				<small><a href='/settings/clientinformation?redirect=<%=CGI.escape("settings/invoice?iid=#{invoice.id.to_guid}")%>'>Edit Billing Address</a></small>
+				<%
 				end
 				%>
-				<br/>
-				<small><a href='/settings/clientinformation?redirect=<%=CGI.escape("settings/invoice?iid=#{invoice.id.to_guid}")%>'>Edit Billing Address</a></small>
 			</div>
 			<div class="span2">
 				<b>TOTAL:</b>

@@ -49,9 +49,7 @@ module BlackStack
 			end
 
 	  		def hasBillingAddress?
-				false
-				# TODO: Code Me! 
-				# https://github.com/leandrosardi/i2p/issues/2
+				!billing_address.nil? && !billing_city.nil? && !billing_state.nil? && !billing_zipcode.nil? && !billing_country.nil?
 			end
 	
       		# Return an array of movements of this account.
