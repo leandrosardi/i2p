@@ -106,7 +106,6 @@ end
 		<div class="row-fluid">
 			<div class="span10">
 				<strong><%=account.name%></strong>
-<!-- TODO: https://github.com/leandrosardi/i2p/issues/2
 				<br/>
 				<%
 				if account.hasBillingAddress?
@@ -115,13 +114,12 @@ end
 				<br/>
 				<%=account.billing_city.to_s%>, <%=account.billing_state.to_s%>, <%=account.billing_zipcode.to_s%>.
 				<br/>
-				<%=account.billingCountry.name.to_s%>.
+				<%=account.billing_country.to_s%>.
 				<%
 				end
 				%>
 				<br/>
 				<small><a href='/settings/clientinformation?redirect=<%=CGI.escape("settings/invoice?iid=#{invoice.id.to_guid}")%>'>Edit Billing Address</a></small>
--->
 			</div>
 			<div class="span2">
 				<b>TOTAL:</b>
