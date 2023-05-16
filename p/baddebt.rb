@@ -24,6 +24,7 @@ while true
         join \"subscription\" s on (s.subscr_id=b.subscr_id and coalesce(s.active,false)=true) 
         where b.txn_type='subscr_failed' 
         group by b.subscr_id
+        having max(b.create_time) < current_timestamp - interval '6 days'
         order by max(b.create_time)
         "
         DB[q].all { |row|

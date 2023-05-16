@@ -19,11 +19,23 @@ while true
     BlackStack::I2P::Account.all { |a|
       l.logs "#{a.name}... "
       begin
+        a.update_balance_start_time = now
+        a.save
+
         a.update_movements(l)
         a.update_balance
         l.done
+
+        a.update_balance_success = true
+        a.update_balance_end_time = now
+        a.save
+
       rescue => e
         l.logf "ERROR: #{e.message}"
+
+        a.update_balance_success = false
+        a.update_balance_error_description = e.to_s
+        a.save
       end
     }
   rescue => e
