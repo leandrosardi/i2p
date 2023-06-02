@@ -118,7 +118,7 @@ end
 				<%
 				else
 				%>
-				<small><a href='/settings/clientinformation?redirect=<%=CGI.escape("settings/invoice?iid=#{invoice.id.to_guid}")%>'>Edit Billing Address</a></small>
+				<small><a href='/settings/account?redirect=<%=CGI.escape("settings/invoice?iid=#{invoice.id.to_guid}")%>'>Edit Billing Address</a></small>
 				<%
 				end
 				%>
