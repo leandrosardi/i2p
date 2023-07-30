@@ -107,6 +107,58 @@ module BlackStack
 				DB.execute(q)
 			end
 
+			# update the table `movement`, with the credits consumed today
+			def update_consumption_of_the_day(service_code, rightnow=nil, l=nil)
+                rightnow = now if rightnow.nil?
+                today = Time.new(rightnow.year, rightnow.month, rightnow.day, 0, 0, 0)
+				h = BlackStack::I2P::services_descriptor.select { |i| service_code == i[:code] }.first
+				n = h[:consumed_function].call(self.id, today)
+
+				# get payments/credit rate, from the while history of movements of this account
+				self.update_balance
+				balance = BlackStack::I2P::Balance.new(self.id, service_code)
+				total_credits = 0.to_f - balance.credits.to_f
+				total_amount = 0.to_f - balance.amount.to_f
+				ratio = total_credits == 0 ? 0.to_f : total_amount.to_f / total_credits.to_f
+				amount = n.to_f * ratio
+
+				# validate atomicity
+				#raise "Atomicity error: credits0=#{credits0}, total_credits=#{total_credits}" if credits0 != total_credits
+
+				# update credits
+				# load the movments for this id_account, dt, type, service_code
+				q = "
+					SELECT m.id
+					FROM movement m
+					WHERE m.id_account = '#{self.id}'
+					AND m.service_code = '#{service_code}'
+					AND m.type = #{BlackStack::I2P::Movement::MOVEMENT_TYPE_CANCELATION}
+					AND date_part('year', m.create_time) = '#{today.year}'
+					AND date_part('month', m.create_time) = '#{today.month}'
+					AND date_part('day', m.create_time) = '#{today.day}'
+				"
+				row = DB[q].first
+				# if there is a movement for this id_account, dt, service_code, then update it
+				if row.nil?
+					# create a new movement
+					m = BlackStack::I2P::Movement.new
+					m.id = guid
+					m.create_time = today
+					m.id_account = self.id
+					m.service_code = service_code
+					m.type = BlackStack::I2P::Movement::MOVEMENT_TYPE_CANCELATION
+					m.description = "Cancelation for #{service_code} on #{today}"
+					m.paypal1_amount = 0
+					m.bonus_amount = 0
+				else
+					m = BlackStack::I2P::Movement.where(:id=>row[:id]).first
+				end
+				m.amount = amount
+				m.profits_amount = -amount
+				m.credits = n
+				m.save				
+			end
+
 			# update the table `movement`
 			# reference: https://github.com/leandrosardi/i2p/issues/24
 			def update_movements(l=nil)

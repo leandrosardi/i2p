@@ -44,7 +44,7 @@ while true
 
   l.logs 'Sleeping... '
   if i == 0
-    sleep(600)
+    sleep(10)
     l.done
   else
     l.no
