@@ -2,8 +2,8 @@
 login = @login
 user = BlackStack::MySaaS::User.where(:id=>login.id_user).first
 c = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
-service_code = @login.user.preference('settings.transactions.service_code', '', params[:service_code])
-all_prods = BlackStack::I2P::services_descriptor
+all_prods = BlackStack::I2P::services_descriptor.select { |h| h[:public] }
+service_code = all_prods.size == 1 ? all_prods[0][:code] : @login.user.preference('settings.transactions.service_code', '', params[:service_code])
 prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] == service_code } 
 %>
 
@@ -23,6 +23,9 @@ prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] =
 
 			<div class="span12 box" style="margin-bottom: 20px">
 
+				<%
+				if all_prods.size > 1
+				%>
 				<div>
 					<b>Services: </b> 
 					<%
@@ -59,6 +62,9 @@ prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] =
 						%>
 					</span>
 				</div>
+				<%
+				end # if all_prods.size > 0
+				%>
 
 				<table class="table table-condensed">
 					<thead>
