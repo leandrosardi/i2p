@@ -30,6 +30,12 @@ module BlackStack
     CONSUMPTION_BY_UNIT = 0 # el servicio se conume credito por credito. Ejemplo: lead records.
     CONSUMPTION_BY_TIME = 1 # el servicio exira al final del periodo de la factura. Ejemplos: Publicidad. Membresía.  
 
+    # :mode may be :credits or :amount
+    # if you choose :credits, the number of credits is shown in the header and in the transactions screen too.
+    # if you choose :amount, the balance is shown in the header, and credits are hidden in the transactions screen.
+    MODE_CREDITS = 0
+    MODE_AMOUNT = 1
+
     #
     def self.payment_types()
       [PAYMENT_PAY_AS_YOU_GO, PAYMENT_SUBSCRIPTION]

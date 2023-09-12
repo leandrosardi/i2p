@@ -4,7 +4,8 @@ user = BlackStack::MySaaS::User.where(:id=>login.id_user).first
 c = BlackStack::MySaaS::Account.where(:id=>user.id_account).first
 all_prods = BlackStack::I2P::services_descriptor.select { |h| h[:public] }
 service_code = all_prods.size == 1 ? all_prods[0][:code] : @login.user.preference('settings.transactions.service_code', '', params[:service_code])
-prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] == service_code } 
+prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] == service_code }
+show_credits = prods.select { |o| o[:mode] == BlackStack::I2P::MODE_CREDITS }.size > 0
 %>
 
 	<section class="container">
@@ -84,9 +85,15 @@ prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] =
 							<th style='text-align:right;' width='65px'>
 								amount
 							</th>
+							<%
+							if show_credits
+							%>
 							<th style='text-align:right;' width='65px'>
 								credits
 							</th>
+							<%
+							end # if show_credits
+							%>
 							<th style='text-align:right;' width='65px'>
 								balance
 							</th>							
@@ -138,6 +145,9 @@ prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] =
 								end
 								%>
 							</td>
+							<%
+							if show_credits
+							%>
 							<td style='text-align:right;color:<%=-m.credits<0 ? 'red' : 'blue';%>'>
 								<%
 								if m.credits.to_i == 0
@@ -151,6 +161,9 @@ prods = service_code.to_s.empty? ? all_prods : all_prods.select { |o| o[:code] =
 								end
 								%>
 							</td>
+							<%
+							end # if show_credits
+							%>
 							<td style='text-align:right;color:<%=-balance<0 ? 'red' : 'blue';%>'>
 								<%
 								if balance.to_f == 0.0 
