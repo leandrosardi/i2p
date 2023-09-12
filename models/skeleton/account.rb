@@ -97,7 +97,7 @@ module BlackStack
 			def update_balance()
 				q = "
 				insert into balance (id, id_account, service_code, last_update_time, credits, amount)
-				select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), sum(m.credits) as credits_update, sum(m.amount) as amount_update
+				select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), cast(sum(m.credits) as int) as credits_update, sum(m.amount) as amount_update
 				from movement m
 				where m.id_account='#{self.id}'
 				group by m.id_account, m.service_code 
