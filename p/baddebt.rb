@@ -1,13 +1,13 @@
 # Reference: https://github.com/leandrosardi/cs/issues/69
 
 # load gem and connect database
-require 'mysaas'
-require 'lib/stubs'
-require 'config'
-require 'version'
+require 'app/mysaas'
+require 'app/lib/stubs'
+require 'app/config'
+require 'app/version'
 DB = BlackStack::CRDB::connect
-require 'lib/skeletons'
-require 'extensions/i2p/lib/skeletons'
+require 'app/lib/skeletons'
+require 'app/extensions/i2p/lib/skeletons'
 
 # add required extensions
 BlackStack::Extensions.append :i2p
