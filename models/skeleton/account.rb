@@ -22,7 +22,7 @@ module BlackStack
 			def self.update_balance_snapshot(aids=nil)
 				q = "
 					insert into balance (id, id_account, service_code, last_update_time, credits, amount)
-					select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), sum(m.credits) as credits_update, sum(m.amount) as amount_update
+					select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), cast(sum(m.credits) as int) as credits_update, sum(m.amount) as amount_update
 					from movement m
 					#{aids.nil? ? '' : "where m.id_account in ('#{aids.join("','")}')" }
 					group by m.id_account, m.service_code 
