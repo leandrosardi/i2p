@@ -10,13 +10,14 @@ show_credits = prods.select { |o| o[:mode] == BlackStack::I2P::MODE_CREDITS }.si
 
 	<section class="container">
 
-		<section class="row-fluid">	
-			<section class='span6'>
-				<%=nav2("Settings", "/settings/dashboard", "Transactions")%>
+		<!-- NavBar -->
+		<div class="mynavbar mysticky">
+			<section class="row-fluid">	
+				<div class="span6">
+					<%=nav2("Settings", "/settings/dashboard", "Transactions")%>
+				</div>
 			</section>
-			<section class='span6'>
-			</section>
-		</section>
+		</div>	
 
 		<br/>
 

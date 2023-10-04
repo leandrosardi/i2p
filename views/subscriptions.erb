@@ -6,13 +6,14 @@ account = BlackStack::I2P::Account.where(:id=>user.id_account).first
 
 	<section class="container">
 
-		<section class="row-fluid">	
-			<section class='span6'>
-				<%=nav2("Settings", "/settings/dashboard", "Invoices")%>
+		<!-- NavBar -->
+		<div class="mynavbar mysticky">
+			<section class="row-fluid">	
+				<div class="span6">
+					<%=nav2("Settings", "/settings/dashboard", "Subscriptions")%>
+				</div>
 			</section>
-			<section class='span6'>
-			</section>
-		</section>
+		</div>		
 
 		<section class="row-fluid">						
 			<div class="span12 box" style="margin-bottom: 20px">
