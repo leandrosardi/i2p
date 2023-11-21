@@ -43,6 +43,7 @@ c.disabled_trial = true
 c.save
 
 # redireccionar al dashboard
-redirect "/settings/invoice?iid=#{i.id.to_guid}"
+#redirect "/settings/invoice?iid=#{i.id.to_guid}"
+redirect "/settings/filter_goto_invoice_paypal?iid=#{i.id.to_s.to_guid}"
 %>
 <!-- ---------------------------------------- -->
