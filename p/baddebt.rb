@@ -43,7 +43,8 @@ while true
         }
 
     rescue => e
-        l.logf "Error: #{e.message}"
+        l.reset
+        l.error(e)
     end 
 
     l.logs 'Sleeping... '

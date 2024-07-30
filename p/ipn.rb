@@ -61,7 +61,8 @@ while true
           ipn.save
           l.done
       rescue => e
-        l.logf "Error: #{e.message}"
+        l.reset
+        l.error(e)
 
         l.logs 'Flag error... '
         ipn.sync_result = e.message
@@ -71,7 +72,8 @@ while true
       l.done
     end # exports.each 
   rescue => e
-    l.logf "Error: #{e.message}"
+    l.reset
+    l.error(e)
   end 
 
   l.logs 'Sleeping... '

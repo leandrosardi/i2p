@@ -31,7 +31,8 @@ while true
         a.save
 
       rescue => e
-        l.logf "ERROR: #{e.message}"
+        l.reset
+        l.error(e)
 
         a.update_balance_success = false
         a.update_balance_error_description = e.to_s
@@ -39,7 +40,8 @@ while true
       end
     }
   rescue => e
-    l.logf "Error: #{e.message}"
+    l.reset
+    l.error(e)
   end 
 
   l.logs 'Sleeping... '
