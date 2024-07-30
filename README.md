@@ -1,3 +1,5 @@
+![Gem version](https://img.shields.io/gem/v/i2p) ![Gem downloads](https://img.shields.io/gem/dt/i2p)
+
 # Invoicing Payments Processing
 
 **Invoicing and Payments Processing** gem (a.k.a. **I+2P**) is a Ruby gem to setup amazing offers in your website, track them, and also process payments automatically using PayPal.
