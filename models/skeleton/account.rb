@@ -20,15 +20,30 @@ module BlackStack
 			# update `balance` snapshot for the given accounts.
 			# update `balance` snapshot for all accounts if `aids` is nil.
 			def self.update_balance_snapshot(aids=nil)
-				q = "
-					insert into balance (id, id_account, service_code, last_update_time, credits, amount)
-					select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), cast(sum(m.credits) as int8) as credits_update, sum(m.amount) as amount_update
-					from movement m
-					#{aids.nil? ? '' : "where m.id_account in ('#{aids.join("','")}')" }
-					group by m.id_account, m.service_code 
-					on conflict (id_Account, service_code)
-					do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount;
-				"
+				if BlackStack.db_type == BlackStack::TYPE_CRDB
+					q = "
+						insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+						select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), cast(sum(m.credits) as int8) as credits_update, sum(m.amount) as amount_update
+						from movement m
+						#{aids.nil? ? '' : "where m.id_account in ('#{aids.join("','")}')" }
+						group by m.id_account, m.service_code 
+						on conflict (id_Account, service_code)
+						do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount;
+					"
+				elsif BlackStack.db_type == BlackStack::TYPE_POSTGRESQL
+					q = "
+						insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+						select uuid_generate_v4(), m.id_account, m.service_code, current_timestamp, cast(sum(m.credits) as int8) as credits_update, sum(m.amount) as amount_update
+						from movement m
+						#{aids.nil? ? '' : "where m.id_account in ('#{aids.join("','")}')" }
+						group by m.id_account, m.service_code 
+						on conflict (id_Account, service_code)
+						do update set last_update_time=current_timestamp, credits=excluded.credits, amount=excluded.amount;
+					"
+				else
+					raise "Unknown database type"
+				end
+				# execute
 				DB.execute(q)
 			end
 
@@ -81,29 +96,57 @@ module BlackStack
 			# update the snapshot `balance`
 			# reference: https://github.com/leandrosardi/i2p/issues/22
 			def self.update_balance()
-				q = "
-				insert into balance (id, id_account, service_code, last_update_time, credits, amount)
-				select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), sum(m.credits) as credits_update, sum(m.amount) as amount_update
-				from movement m
-				group by m.id_account, m.service_code 
-				on conflict (id_Account, service_code)
-				do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount
-				"
+				if BlackStack.db_type == BlackStack::TYPE_CRDB
+					q = "
+					insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+					select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), sum(m.credits) as credits_update, sum(m.amount) as amount_update
+					from movement m
+					group by m.id_account, m.service_code 
+					on conflict (id_Account, service_code)
+					do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount
+					"	
+				elsif BlackStack.db_type == BlackStack::TYPE_POSTGRESQL
+					q = "
+					insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+					select uuid_generate_v4(), m.id_account, m.service_code, current_timestamp, sum(m.credits) as credits_update, sum(m.amount) as amount_update
+					from movement m
+					group by m.id_account, m.service_code 
+					on conflict (id_Account, service_code)
+					do update set last_update_time=current_timestamp, credits=excluded.credits, amount=excluded.amount
+					"	
+				else
+					raise "Unknown database type"
+				end
+
 				DB.execute(q)
 			end
 
 			# update the snapshot `balance`
 			# reference: https://github.com/leandrosardi/i2p/issues/22
 			def update_balance()
-				q = "
-				insert into balance (id, id_account, service_code, last_update_time, credits, amount)
-				select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), cast(sum(m.credits) as int) as credits_update, sum(m.amount) as amount_update
-				from movement m
-				where m.id_account='#{self.id}'
-				group by m.id_account, m.service_code 
-				on conflict (id_Account, service_code)
-				do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount
-				"
+				if BlackStack.db_type == BlackStack::TYPE_CRDB
+					q = "
+					insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+					select gen_random_uuid(), m.id_account, m.service_code, current_timestamp(), cast(sum(m.credits) as int) as credits_update, sum(m.amount) as amount_update
+					from movement m
+					where m.id_account='#{self.id}'
+					group by m.id_account, m.service_code 
+					on conflict (id_Account, service_code)
+					do update set last_update_time=current_timestamp(), credits=excluded.credits, amount=excluded.amount
+					"	
+				elsif BlackStack.db_type == BlackStack::TYPE_POSTGRESQL
+					q = "
+					insert into balance (id, id_account, service_code, last_update_time, credits, amount)
+					select uuid_generate_v4(), m.id_account, m.service_code, current_timestamp, cast(sum(m.credits) as int) as credits_update, sum(m.amount) as amount_update
+					from movement m
+					where m.id_account='#{self.id}'
+					group by m.id_account, m.service_code 
+					on conflict (id_Account, service_code)
+					do update set last_update_time=current_timestamp, credits=excluded.credits, amount=excluded.amount
+					"	
+				else
+					raise "Unknown database type"
+				end
 				DB.execute(q)
 			end
 

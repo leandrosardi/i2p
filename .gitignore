@@ -1,3 +1,6 @@
+# sandbox flags
+.sandbox
+
 # ignore lock files
 *.lock
 
