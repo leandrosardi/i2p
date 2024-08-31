@@ -42,7 +42,7 @@
 			<tbody>
 				<%
 				n = 0
-				BlackStack::I2P::Invoice.where(:id_account=>@login.user.account.id, :delete_time=>nil).reverse(:billing_period_from).all { |invoice|
+				BlackStack::I2P::Invoice.where(:id_account=>@login.user.account.id, :delete_time=>nil).order(:create_time, :billing_period_from).reverse.all { |invoice|
 					n += 1
 				%>
 				<tr>
