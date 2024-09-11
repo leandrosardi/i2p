@@ -1,0 +1,16 @@
+<%
+user = @login.user
+sid = params[:sid]
+s = BlackStack::I2P::Subscription.where(:id=>sid).first
+
+redirect '/settings/subscriptions?err=Subscription%20Not%20Found.' if s.nil?
+redirect '/settings/subscriptions?err=Cancelation%20Denied.' if s.id_account.to_guid != user.id_account.to_guid
+
+s.cancellation_requested = false
+s.cancellation_request_time = nil
+s.cancellation_request_id_user = nil
+s.save
+
+# redireccionar al dashboard
+redirect '/settings/subscriptions?msg=Cancelation%20Request%20Removed.'
+%>

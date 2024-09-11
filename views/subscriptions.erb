@@ -21,7 +21,7 @@ account = BlackStack::I2P::Account.where(:id=>user.id_account).first
 					<table>
 					<%
 					n = 0
-					account.subscriptions.each { |subs|
+					account.subscriptions.sort_by { |s| s.create_time }.reverse.each { |subs|
 						%>
 						<tr>
 							<td colspan=10>
@@ -39,6 +39,29 @@ account = BlackStack::I2P::Account.where(:id=>user.id_account).first
 									<%
 									end
 									%>
+
+									<span class="label label-<%=subs.class.colors[subs.type]%> label-mini"><%=subs.class.types[subs.type].to_s.encode_html%></span>
+	
+									<%
+									if subs.active
+									%>
+										<span> | </span>
+										<%
+										if subs.cancellation_requested
+										%>
+										<a class='btn btn-small btn-gray' disabled>Cancelation Requested</a>
+										<a href="./filter_unrequest_cancelation?sid=<%=subs.id%>" class='btn btn-small btn-link'>UnDo Cancelation</a>
+										<%
+										else # if subs.cancellation_requested
+										%>
+										<a href="./filter_request_cancelation?sid=<%=subs.id%>" class='btn btn-small btn-red'>Request Cancelation</a>
+										<%
+										end # if subs.cancellation_requested
+										%>	
+									<%
+									end # if subs.active
+									%>
+
 								</span>
 								</label>
 							</td>

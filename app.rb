@@ -21,15 +21,15 @@ get '/settings/filter_create_invoice', :auth => true, :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_create_invoice'
 end
   
-get '/settings/filter_delete_invoice', :agent => /(.*)/ do
+get '/settings/filter_delete_invoice', :auth => true, :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_delete_invoice'
 end
 
-get '/settings/filter_add_invoice_item', :agent => /(.*)/ do
+get '/settings/filter_add_invoice_item', :auth => true, :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_add_invoice_item'
 end
   
-get '/settings/filter_remove_invoice_item', :agent => /(.*)/ do
+get '/settings/filter_remove_invoice_item', :auth => true, :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_remove_invoice_item'
 end
   
@@ -37,13 +37,18 @@ get '/settings/filter_goto_invoice_paypal', :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_goto_invoice_paypal'
 end
 
-get '/settings/filter_set_invoice_paid', :agent => /(.*)/ do
+get '/settings/filter_set_invoice_paid', :auth => true, :agent => /(.*)/ do
     erb :'/extensions/i2p/views/filter_set_invoice_paid'
 end
 
-get '/settings/filter_update_subscription', :agent => /(.*)/ do
-    erb :'/extensions/i2p/views/filter_update_subscription'
+get '/settings/filter_request_cancelation', :auth => true, :agent => /(.*)/ do
+    erb :'/extensions/i2p/views/filter_request_cancelation'
 end
+
+get '/settings/filter_unrequest_cancelation', :auth => true, :agent => /(.*)/ do
+    erb :'/extensions/i2p/views/filter_unrequest_cancelation'
+end
+
 
 # AJAX
 post '/ajax/i2p/get_credits.json', :auth => true, :agent => /(.*)/ do

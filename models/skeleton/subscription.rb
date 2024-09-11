@@ -5,6 +5,18 @@ module BlackStack
       many_to_one :account, :class=>:'BlackStack::I2P::Client', :key=>:id_account
       one_to_many :invoices, :class=>:'BlackStack::I2P::Invoice', :key=>:id_subscription
       
+      # Returns an array of available payment types.
+      # Currently supported types are :paypal and :manual.
+      def self.types
+        [:paypal, :manual]
+      end
+
+      # Returns an array of available colors associated with types.
+      # Currently supported colors are :blue and :black.
+      def self.colors
+        [:blue, :black]
+      end
+
       # ----------------------------------------------------------------------------------------- 
       # Factory
       # ----------------------------------------------------------------------------------------- 
