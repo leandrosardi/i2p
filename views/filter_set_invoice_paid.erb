@@ -3,6 +3,23 @@ iid = params[:iid]
 dt = now()
 # load invoice
 i = BlackStack::I2P::Invoice.where(:id=>iid).first
+
+# if the invoice has not a subscr_id, then I create one.
+# reference: https://github.com/MassProspecting/docs/issues/259
+if i.subscr_id.nil?
+    subscr_name = "subscr-#{i.id}"
+
+    DB.execute("
+        insert into \"subscription\" 
+        (id, create_time, id_account, active, subscr_id, \"type\")
+        values
+        ('#{guid}', CAST('#{now}' AS TIMESTAMP), '#{i.id_account}', true, '#{subscr_name}', -1);
+    ")
+
+    i.subscr_id = subscr_name
+    i.save
+end
+
 # pay invoice
 i.getPaid(dt)
 # create next invoice

@@ -25,8 +25,8 @@ BlackStack::Extensions::add ({
     # add some screens of this extension to the account settings of your SaaS.
     :setting_screens => [
         # add a link in section `Billing & Finances` of the `/settings` screen, with a caption `Invoices`, and linking to the screen `/settings/invoices`. The source code of the screen `/settings/invoices` is copied from the file `/vews/invoices.erb` in the extension's folder. 
-        { :section => 'Billing & Finances', :label => 'Invoices', :screen => :invoices },
-        { :section => 'Billing & Finances', :label => 'PayPal Subscriptions', :screen => :subscriptions },
-        { :section => 'Billing & Finances', :label => 'Transactions', :screen => :transactions },
+        { :section => 'Billing & Finances', :label => 'Invoices', :screen => :invoices, :description => 'View and manage all invoices with status visibility.' },
+        { :section => 'Billing & Finances', :label => 'Subscriptions', :screen => :subscriptions, :description => 'The Subscriptions Screen shows all subscriptions with cancellation options.' },
+        { :section => 'Billing & Finances', :label => 'Transactions', :screen => :transactions, :description => 'The Transactions Screen lists all transactions with corresponding details.' },
     ],
 })
