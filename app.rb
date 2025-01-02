@@ -1,18 +1,18 @@
 # screens
 get '/settings/subscriptions', :auth => true, :agent => /(.*)/ do
-    erb :'/extensions/i2p/views/subscriptions', :layout => :'/views/layouts/core'
+    erb :'/extensions/i2p/views/subscriptions', :layout => :'/views/layouts/classic'
 end
   
 get '/settings/invoices', :auth => true, :agent => /(.*)/ do
-    erb :'/extensions/i2p/views/invoices', :layout => :'/views/layouts/core'
+    erb :'/extensions/i2p/views/invoices', :layout => :'/views/layouts/classic'
 end
   
 get '/settings/invoice', :auth => true, :agent => /(.*)/ do
-    erb :'/extensions/i2p/views/invoice', :layout => :'/views/layouts/core'
+    erb :'/extensions/i2p/views/invoice', :layout => :'/views/layouts/classic'
 end
     
 get '/settings/transactions', :auth => true, :agent => /(.*)/ do
-    erb :'/extensions/i2p/views/transactions', :layout => :'/views/layouts/core'
+    erb :'/extensions/i2p/views/transactions', :layout => :'/views/layouts/classic'
 end
   
 
