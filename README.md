@@ -60,7 +60,7 @@ BlackStack::I2P::set({
 ```ruby
 require 'i2p'
 
-BlackStack::I2P::set_services([
+BlackStack::I2P::add_services([
 { 
 	:code=>'dedicated-support', 
 	:name=>'Dedicated Support', 
