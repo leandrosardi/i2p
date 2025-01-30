@@ -16,44 +16,43 @@ The BlackStack.io will also receive the IPN notifications and process your payme
 gem install i2p
 ```
 
-## Signing Up to BlackStack.io
-
-Signup to [BlackStack.io](https://blackstack.io/signup)
-
-Upload your company information [here](https://blackstack.ip/member/clientinformation).
-The contact information of your company will be shown in your invoice.
-Remember to upload your company logo. It will be published in your invoice too.
-
-Your clients may want to edit their contact information, because their company details should be shown in their invoices for taxes pourposes.
-You can setup domain aliasing in order disguise the *blackstack.io* domain as *invoicing.yourdmain.com*, so your clients can signup to BlackStack, and edit their contact information, and make all of this as showning inside your website.
-
-## IPN Processing Hooks
-
-Even if you publish your invoices in your own website, PayPal's IPNs will be hooked and processed by the BlackStack.io service.
-
-You can know the exact URL where PayPal will send the IPNs by running this code:
+## Setting Up
 
 ```ruby
 require 'i2p'
 
-puts BlackStack::I2P::PAYPAL_HOOKS_URL
-# => http://blackstack.io:80/
+# I2P configuration
+# 
+BlackStack::I2P::set({
+  # In PROD environment: use your public domain.
+  # IN DEV environment: user your ngrok domain.
+  #
+  # ## For you DEV environment, set Up both Facilitator and Buyer accounts:
+  # 1. Login to developer.paypal.com.
+  # 2. Go to https://developer.paypal.com/developer/accounts
+  #
+  # ## Activate IPN:
+  # 1. Login to your PayPal account (if you are working on dev, login to sandbox.paypal.com using your facilitator email address).
+  # 2. Go Here: https://www.paypal.com/cgi-bin/customerprofileweb?cmd=_profile-ipn-notify
+  # (or https://sandbox.paypal.com/cgi-bin/customerprofileweb?cmd=_profile-ipn-notify if you are in dev)
+  # Reference: https://developer.paypal.com/api/nvp-soap/ipn/IPNTesting/
+  #
+  # ## How to Find the IPNs
+  # 1. Login to your PayPal account (if you are working on dev, login to sandbox.paypal.com using your facilitator email address).
+  # 2. Go Here: https://www.paypal.com/us/cgi-bin/webscr?cmd=_display-ipns-history
+  # (or https://sandbox.paypal.com/us/cgi-bin/webscr?cmd=_display-ipns-history if you are in dev)
+  #
+  'paypal_ipn_listener' => ( BlackStack.sandbox? ? 'https://b5f4-181-164-172-11.ngrok-free.app' : CS_HOME_WEBSITE) + '/api1.0/i2p/ipn.json',
 
-puts BlackStack::I2P::paypal_ipn_listener
-# => http://blackstack.io:80/api1.3/accounting/paypal/notify_new_invoice.json
-```
+  # In PROD environment: use your paypal.com email account.
+  # IN DEV environment: use your sandbox.paypal.con email address.
+  'paypal_business_email' => BlackStack.sandbox? ? 'sardi.leandro.daniel-facilitator@gmail.com' : 'sardi.leandro.daniel@gmail.com',
 
-## Setting You PayPal Account
-
-```ruby
-require 'i2p'
-
-BlackStack::I2P::set_paypal_business_email(
-	"sardi.leandro.daniel@gmail.com"	
-)
-
-puts BlackStack::I2P::paypal_business_email
-# => "sardi.leandro.daniel@gmail.com"	
+  # In PROD environment: use https://www.paypal.com.
+  # In DEV environment: use https://www.sandbox.paypal.com.
+  # More information here: https://developer.paypal.com/doapp/business/test-and-go-live/sandbox/
+  'paypal_orders_url' => BlackStack.sandbox? ? 'https://sandbox.paypal.com' : 'https://www.paypal.com',
+})
 ```
 
 ## Setting Up Products
