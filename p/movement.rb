@@ -25,6 +25,7 @@ while true
 
         a.update_movements(l)
         a.update_balance
+        a.update_affiliate_stats
         l.done
 
         a.update_balance_success = true

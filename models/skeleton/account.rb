@@ -150,6 +150,65 @@ module BlackStack
 				DB.execute(q)
 			end
 
+			def update_affiliate_stats
+#binding.pry if self.id == '94c644da-319d-4d6e-9ead-aa729917be00'
+				DB.transaction do
+					# Total and unique visits
+					q1 = %Q{
+						SELECT 
+						COUNT(DISTINCT v.id) AS total_visits, 
+						COUNT(DISTINCT v.id_visitor) AS unique_visits
+						FROM visit v
+						WHERE v.id_account_affiliate = '#{self.id}'
+					}
+					r1 = DB[q1].first
+				
+					# Signups
+					q2 = %Q{
+						SELECT COUNT(a.id) AS signups
+						FROM account a
+						WHERE a.id_account_affiliate = '#{self.id}'
+					}
+					r2 = DB[q2].first
+				
+					# Total revenue and commissions
+					q3 = %Q{
+						SELECT 
+						COALESCE(SUM(COALESCE(t.amount, 0)), 0) AS total_revenue,
+						COALESCE(SUM(COALESCE(t.amount, 0)), 0) * COALESCE(SUM(COALESCE(i.affiliate_commission, a.affiliate_commission)), 0) AS total_commissions
+						FROM account a
+						JOIN invoice i ON a.id = i.id_account
+						JOIN invoice_item t ON i.id = t.id_invoice
+						WHERE a.id_account_affiliate = '#{self.id}'
+						AND i.status = 1
+					}
+					r3 = DB[q3].first
+				
+					# Total paid off
+					q4 = %Q{
+						SELECT 
+						COALESCE(SUM(COALESCE(t.amount, 0)), 0) * COALESCE(SUM(COALESCE(i.affiliate_commission, a.affiliate_commission)), 0) AS paid_off
+						FROM account a
+						JOIN invoice i ON a.id = i.id_account
+						JOIN invoice_item t ON i.id = t.id_invoice
+						WHERE a.id_account_affiliate = '#{self.id}'
+						AND i.status = 1
+						AND i.affiliate_paid_off = true
+					}
+					r4 = DB[q4].first
+				
+					# Update current account
+					self.update(
+						stat_affiliate_visits: r1[:total_visits].to_i,
+						stat_affiliate_unique_visits: r1[:unique_visits].to_i,
+						stat_affiliate_signups: r2[:signups].to_i,
+						stat_affiliate_total_revenue: r3[:total_revenue].to_f,
+						stat_affiliate_total_commissions: r3[:total_commissions].to_f,
+						stat_affiliate_total_paid_off: r4[:paid_off].to_f
+					)
+				end
+			end
+			  
 			# update the table `movement`, with the credits consumed today
 			def update_consumption_of_the_day(service_code, rightnow=nil, l=nil)
                 rightnow = now if rightnow.nil?
@@ -200,7 +259,7 @@ module BlackStack
 				m.profits_amount = -amount
 				m.credits = n
 				m.save				
-			end
+			end # update_affiliate_stats
 
 			# update the table `movement`
 			# reference: https://github.com/leandrosardi/i2p/issues/24
