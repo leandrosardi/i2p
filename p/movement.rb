@@ -23,7 +23,7 @@ while true
         a.update_balance_start_time = now
         a.save
 
-        a.update_movements(l)
+        #a.update_movements(l)
         a.update_balance
         a.update_affiliate_stats
         l.done
