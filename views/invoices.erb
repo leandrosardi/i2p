@@ -1,4 +1,52 @@
 <!-- NavBar -->
+<%
+all = "
+select 
+	i.id,
+	i.id AS number,
+	i.subscr_id,
+	i.billing_period_from,
+	i.billing_period_to,
+	i.status,
+    (SELECT SUM(ii.amount) FROM invoice_item ii WHERE ii.id_invoice = i.id) AS total
+from invoice i
+where i.delete_time is null
+and i.id_account = '#{@login.user.id_account}'
+"
+
+all += "
+    order by i.create_time desc
+"
+
+# TODO: use re-utilizable function here.
+page_size = 25
+total_rows = DB[all].count
+if total_rows>0
+  total_pages = (total_rows.to_f/page_size.to_f).ceil
+  # if there is a GET parameters `number` on the URL, update the user preference regarding the page number on this screen
+  # then, get user preferences regarding the page number on this screen
+  page_number = @login.user.preference("i2p.invoices.pagination.page", 1, params[:number].nil? ? nil : params[:number].to_i)
+  # pagination correction to prevent glitches
+  page_number = 1 if page_number < 1
+  page_number = total_pages if page_number > total_pages
+  # calculate info for showing at the bottom of the table
+  from_row = (page_number.to_i-1) * page_size.to_i + 1
+  to_row = [page_number*page_size, total_rows].min
+else
+  total_pages = 1
+  page_number = 1
+  from_row = 0
+  to_row = 0
+end
+
+q = "
+"+all+"
+  LIMIT #{page_size.to_s}
+  OFFSET #{((page_number.to_i - 1) * page_size.to_i).to_s}
+"
+%>
+
+<!-- NavBar -->
 <div class="mynavbar mysticky">
 	<section class="row-fluid">	
 		<div class="span6">
@@ -10,6 +58,7 @@
 <!-- Content -->
 <section class="row-fluid">
 	<div class='span12 box'>
+        <p><b>Records:</b> <%=from_row.to_label%> to <%=to_row.to_label%> <b>of</b> <%=total_rows.to_label%></p>
 		<table class="table table-condensed">
 			<thead>
 				<tr>
@@ -42,46 +91,46 @@
 			<tbody>
 				<%
 				n = 0
-				BlackStack::I2P::Invoice.where(:id_account=>@login.user.account.id, :delete_time=>nil).order(:create_time, :billing_period_from).reverse.all { |invoice|
+				DB[q].all { |invoice|
 					n += 1
 				%>
 				<tr>
 					<td>
-						<a href='./invoice?iid=<%=invoice.id%>' target='_window'>#<%=invoice.number.to_s%></a>
+						<a href='./invoice?iid=<%=invoice[:id]%>' target='_window'>#<%=invoice[:id].to_s.to_guid%></a>
 						<%
-						if invoice.canBeDeleted?
+						if invoice[:canBeDeleted?]
 						%>
-						<a class='btn-link btn-mini' href='/settings/filter_delete_invoice?iid=<%=invoice.id.to_guid%>'>delete</a>
+						<a class='btn-link btn-mini' href='/settings/filter_delete_invoice?iid=<%=invoice[:id].to_guid%>'>delete</a>
 						<%
 						end
 						%>
 					</td>
 					<td align='right'>
-						<a href='/settings/subscriptions'><%=invoice.subscr_id%></a>
+						<a href='/settings/subscriptions'><%=invoice[:subscr_id]%></a>
 					</td>
 					<td align='right'>
-						<%=invoice.billing_period_from.strftime('%b %d, %Y')%>
+						<%=invoice[:billing_period_from].strftime('%b %d, %Y')%>
 					</td>
 					<td align='right'>
-						<%=invoice.billing_period_to.strftime('%b %d, %Y')%>
+						<%=invoice[:billing_period_to].strftime('%b %d, %Y')%>
 					</td>
 					<td>
-						$<%=invoice.totalDesc.encode_html%>
+						$<%=invoice[:total].to_s.encode_html%>
 					</td>
 					<td>
-						<span class='badge badge-<%=BlackStack::I2P::Invoice.statusColor(invoice.status)%>'><%=BlackStack::I2P::Invoice.statusDescription(invoice.status).to_s.downcase%></span>
+						<span class='badge badge-<%=BlackStack::I2P::Invoice.statusColor(invoice[:status])%>'><%=BlackStack::I2P::Invoice.statusDescription(invoice[:status]).to_s.downcase%></span>
 					</td>
 					<td>
 						<%
-						if invoice.automatic_billing != true && invoice.paypal_url.to_s.size > 0 && (invoice.status == BlackStack::I2P::Invoice::STATUS_UNPAID || invoice.status == nil)
+						if invoice[:automatic_billing] != true && invoice[:paypal_url].to_s.size > 0 && (invoice[:status] == BlackStack::I2P::Invoice::STATUS_UNPAID || invoice[:status] == nil)
 						%>
-						<a style='border:none;' href="./filter_goto_invoice_paypal?iid=<%=invoice.id.to_s.to_guid%>"><img src='/images/paypal-button.png' width='75px' /></a>
+						<a style='border:none;' href="./filter_goto_invoice_paypal?iid=<%=invoice[:id].to_s.to_guid%>"><img src='/images/paypal-button.png' width='75px' /></a>
 						<%
-						elsif invoice.automatic_billing == true
+						elsif invoice[:automatic_billing] == true
 						%>
 						<small>automatic billing</small>
 						<%
-						elsif invoice.paypal_url.to_s.size == 0
+						elsif invoice[:paypal_url].to_s.size == 0
 						%>
 						<small>paypal link not found!</small>
 						<%
@@ -94,9 +143,9 @@
 						if @login.whois.account.sysowner?
 						%>
 						<%
-						if invoice.subscr_id.nil? && invoice.status.to_i == BlackStack::I2P::Invoice::STATUS_UNPAID
+						if invoice[:subscr_id].nil? && invoice[:status].to_i == BlackStack::I2P::Invoice::STATUS_UNPAID
 						%>
-						<a class='btn btn-pink' href='./filter_set_invoice_paid?iid=<%=invoice.id.to_guid%>'>paid</a>
+						<a class='btn btn-pink' href='./filter_set_invoice_paid?iid=<%=invoice[:id].to_guid%>'>paid</a>
 						<%
 						end
 						%>
@@ -124,5 +173,12 @@
 		<%
 		end
 		%>
+        <div class="pagination"></div>
 	</div>
 </section>
+
+<script>
+    $(document).ready(function() {
+        drawPagination($(".pagination"), <%=page_number%>, <%=total_pages%>);
+    });
+</script>
