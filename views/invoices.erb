@@ -114,8 +114,8 @@ q = "
 					<td align='right'>
 						<%=invoice[:billing_period_to].strftime('%b %d, %Y')%>
 					</td>
-					<td>
-						$<%=invoice[:total].to_s.encode_html%>
+					<td align='right'>
+						$ <%= sprintf('%.2f', invoice[:total].to_f) %>
 					</td>
 					<td>
 						<span class='badge badge-<%=BlackStack::I2P::Invoice.statusColor(invoice[:status])%>'><%=BlackStack::I2P::Invoice.statusDescription(invoice[:status]).to_s.downcase%></span>

@@ -156,7 +156,12 @@ end
 						<tr>
 							<td align='left' colspan=3  valign='top'> 
 								<div class="description">
-									<%=item.description.encode_html%>
+									<%=plan[:name].encode_html%>
+									<br/>
+									<span style='color:gray;'><%=item.detail.encode_html%></span>
+									<br/>
+									<br/>
+									<span style='color:gray;'><%=prod[:description].to_s%></span>
 									<%
 									if invoice.items.size>1 && invoice.allowedToAddRemoveItems?
 									%> 
@@ -165,12 +170,10 @@ end
 									end
 									%>
 									<br/>
-									<span style='color:gray;'><%=item.detail.encode_html%></span>
-									<br/>
 								</div>
 							</td>
 							<td align='right' valign='top'> $<%=("%.4f" % item.unit_price.to_s.gsub(",",".").to_f)%></td>
-							<td align='right' valign='top'> <%=(item.units.to_i.to_s)%><br/><span style='color:gray;'><%=prod[:unit_name]%></span></td>
+							<td align='right' valign='top'> <%=(item.units.to_i.to_label)%><br/><span style='color:gray;'><%=prod[:unit_name]%></span></td>
 							<td align='right' valign='top'> $<%=("%.2f" % item.amount.to_s.gsub(",",".").to_f)%></td>
 						</tr>
 						<%
@@ -182,10 +185,11 @@ end
 							<tr>
 								<td align='left' colspan=3> 
 									<div class='bonus'>
-										<b><i class='icon-gift'></i> Bonus Products</b>
+										<b><i class='icon-gift'></i> Features</b>
 									</div>
 								</td>
 							</tr>
+
 							<%
 							bonuses.each { |bonus|
 								#h = BlackStack::I2P::plans_descriptor.select { |j| j[:item_number].to_s == bonus[:item_number] }.first
@@ -195,19 +199,29 @@ end
 								#raise "Bonus product '#{h[:service_code]}' not found in #{BlackStack::I2P::services_descriptor.to_s}" if i.nil?
 
 								item_bonus = invoice.create_item(bonus[:item_number], 1, false)
+								plan_bonus = BlackStack::I2P.plan_descriptor(item_bonus.item_number)
+								prod_bonus = BlackStack::I2P.service_descriptor(plan_bonus[:service_code])
+#binding.pry if prod_bonus.nil?
 								%>
-								<tr><td colspan='10' style='height:2px;'> </td></tr>
+								<tr><td colspan='10' style='height:2px;'><br/></td></tr>
 								<tr>
 									<td align='left' colspan=3> 
 										<div class="description">
-											<%=item_bonus.description.encode_html%>
+											<%=plan_bonus[:name].encode_html%>
 											<br/>
+											<span style='color:gray;'><%=prod_bonus[:description].to_s%></span>
+											<!--
 											<span style='color:gray;'><b><%=item_bonus.detail.encode_html%></b></span>
 											<br/>
+											-->
 										</div>
 									</td>
 									<td align='right' style='color:gray;'> </td>
-									<td align='right' style='color:gray;'> </td>
+									<td align='right'> 
+										<%=(item_bonus.units.to_i.to_label)%>
+										<br/>
+										<span style='color:gray;'><%=prod_bonus[:unit_name]%>
+									</td>
 									<td align='right'> 
 										<span style='color:red;'>free</span> <span style='color:gray;text-decoration:line-through;'>$<%=("%.2f" % item_bonus.amount.to_s.gsub(",",".").to_f)%></span>
 									</td>
