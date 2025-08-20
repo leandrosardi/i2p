@@ -17,7 +17,7 @@ while true
   i = 0
 
   begin
-    BlackStack::I2P::Account.all { |a|
+    BlackStack::I2P::Account.where(:delete_time => nil).all { |a|
       l.logs "#{a.name}... "
       begin
         a.update_balance_start_time = now
