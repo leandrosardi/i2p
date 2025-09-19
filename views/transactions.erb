@@ -184,7 +184,7 @@ show_credits = prods.select { |o| o[:mode] == BlackStack::I2P::MODE_CREDITS }.si
 							</td>
 							<td style='text-align:right;'>
 								<%
-								if m.id_invoice_item.nil?
+								if m.expiration_time.nil? # m.id_invoice_item.nil?
 								%>
 								<span>-</span>
 								<%
