@@ -146,7 +146,7 @@ q = "
 							#if invoice[:subscr_id].nil? && invoice[:status].to_i == BlackStack::I2P::Invoice::STATUS_UNPAID
 							if invoice[:status].to_i == BlackStack::I2P::Invoice::STATUS_UNPAID
 							%>
-								<a class='btn btn-pink' href='./filter_set_invoice_paid?iid=<%=invoice[:id].to_guid%>'>set paid</a>
+								<a class='btn btn-pink btm-mini' href='./filter_set_invoice_paid?iid=<%=invoice[:id].to_guid%>'>set paid</a>
 							<%
 							end
 							%>
