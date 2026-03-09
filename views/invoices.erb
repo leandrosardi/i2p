@@ -142,13 +142,14 @@ q = "
 						# if an agent is accessing a client's account, or if the user is the sysowner
 						if @login.whois.account.sysowner?
 						%>
-						<%
-						if invoice[:subscr_id].nil? && invoice[:status].to_i == BlackStack::I2P::Invoice::STATUS_UNPAID
-						%>
-						<a class='btn btn-pink' href='./filter_set_invoice_paid?iid=<%=invoice[:id].to_guid%>'>paid</a>
-						<%
-						end
-						%>
+							<%
+							#if invoice[:subscr_id].nil? && invoice[:status].to_i == BlackStack::I2P::Invoice::STATUS_UNPAID
+							if invoice[:status].to_i == BlackStack::I2P::Invoice::STATUS_UNPAID
+							%>
+								<a class='btn btn-pink' href='./filter_set_invoice_paid?iid=<%=invoice[:id].to_guid%>'>set paid</a>
+							<%
+							end
+							%>
 						<%
 						end
 						%>
